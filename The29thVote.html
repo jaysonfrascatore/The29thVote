@@ -1,0 +1,463 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The 29th Vote</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --ink: #16191d;
+    --muted: #5b636d;
+    --faint: #8c949e;
+    --rule: #e3e6ea;
+    --support: #2F6FD0;
+    --unclear: #8E5BC8;
+    --none: #B8BDC4;
+    --none-text: #7d848d;
+    --oppose: #12A6CC;
+    --marker: #3d434a;
+    --marker-fill: #6b7078;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; background: #fff; }
+  body {
+    font-family: "Inter", system-ui, -apple-system, "Segoe UI", sans-serif;
+    color: var(--ink);
+    -webkit-font-smoothing: antialiased;
+  }
+  .page { max-width: 1040px; margin: 0 auto; padding: 36px 28px 28px; }
+
+  /* Header */
+  header { text-align: center; }
+  .site-name {
+    font-size: 12px; font-weight: 700; letter-spacing: .14em; text-transform: uppercase;
+    color: var(--muted); margin: 0 0 10px;
+  }
+  h1 { font-size: clamp(26px, 4.4vw, 42px); font-weight: 800; letter-spacing: -.02em; margin: 0 0 8px; line-height: 1.1; }
+  .subtitle { font-size: clamp(13px, 1.7vw, 16px); color: var(--muted); margin: 0; }
+  hr { border: 0; border-top: 1.5px solid var(--rule); margin: 26px 0; }
+
+  /* Bar */
+  .bar-wrap { position: relative; padding-top: 78px; }
+  .majority-label {
+    position: absolute; top: 0; left: 50%; transform: translateX(-50%);
+    font-size: clamp(13px, 1.8vw, 17px); font-weight: 700; color: var(--marker); white-space: nowrap;
+  }
+  .majority-arrow {
+    position: absolute; top: 36px; left: 50%; transform: translateX(-50%);
+    width: 0; height: 0; border-left: 14px solid transparent; border-right: 14px solid transparent;
+    border-top: 26px solid var(--marker-fill);
+  }
+  .bar { display: flex; height: 92px; position: relative; }
+  .seg {
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    color: #fff; border-right: 4px solid #fff; min-width: 0;
+  }
+  .seg:last-child { border-right: 0; }
+  .seg .pct { font-size: clamp(17px, 3vw, 30px); font-weight: 700; line-height: 1.1; }
+  .seg .cnt { font-size: clamp(11px, 1.6vw, 17px); font-weight: 700; margin-top: 2px; white-space: nowrap; }
+  .seg.none { color: var(--ink); }
+  .majority-line {
+    position: absolute; top: -8px; bottom: -8px; left: 50%; width: 0;
+    border-left: 2.5px dashed var(--marker); transform: translateX(-1px); pointer-events: none;
+  }
+  .legend { display: flex; justify-content: center; flex-wrap: wrap; gap: 10px 40px; margin-top: 34px; font-size: 15px; }
+  .legend span { display: inline-flex; align-items: center; gap: 10px; }
+  .chip { width: 18px; height: 18px; border-radius: 3px; display: inline-block; flex: none; }
+
+  /* Chamber */
+  .chamber { position: relative; }
+  .chamber svg { display: block; width: 100%; max-width: 820px; margin: 0 auto; overflow: visible; }
+  .seat { stroke: #fff; stroke-width: 2.5; transition: transform .12s ease, opacity .12s ease; transform-box: fill-box; transform-origin: center; }
+  .seat.onrecord { cursor: pointer; }
+  .seat.onrecord:hover, .seat.active { transform: scale(1.22); }
+  .chamber.dim .seat:not(.active) { opacity: .28; }
+
+  .record {
+    position: absolute; top: 0; right: 0; width: 230px; font-size: 14px;
+  }
+  .record h3 { font-size: 14px; font-weight: 700; letter-spacing: .02em; margin: 0 0 6px; }
+  .record .total { color: var(--muted); margin-bottom: 12px; }
+  .record .row { display: flex; align-items: center; justify-content: space-between; margin: 6px 0; }
+  .record .row .lab { display: inline-flex; align-items: center; gap: 8px; }
+  .record .row .chip { width: 11px; height: 11px; border-radius: 2px; }
+  .record .row b { font-weight: 700; }
+  .record .latest-h { color: var(--muted); margin: 14px 0 6px; }
+  .record .mover { display: flex; justify-content: space-between; margin: 4px 0; font-weight: 700; }
+  .record .mover small { font-weight: 400; font-size: 12.5px; }
+  .record .since { color: var(--faint); font-size: 11.5px; margin-top: 8px; }
+
+  /* Tooltip */
+  .tip {
+    position: fixed; z-index: 10; pointer-events: none; opacity: 0; transition: opacity .1s ease;
+    background: #fff; border: 1px solid var(--rule); border-radius: 10px;
+    box-shadow: 0 8px 28px rgba(16,24,40,.14); padding: 12px 14px; width: 260px; font-size: 13.5px; line-height: 1.4;
+  }
+  .tip.show { opacity: 1; }
+  .tip .t-name { font-weight: 700; font-size: 15px; }
+  .tip .t-cat { font-weight: 700; font-size: 12px; letter-spacing: .04em; text-transform: uppercase; margin: 3px 0 6px; }
+  .tip .t-note { color: var(--muted); }
+
+  /* Name lists */
+  .lists { display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; column-gap: 28px; }
+  .col h2 { margin: 0; line-height: 1; }
+  .col .big { font-size: 56px; font-weight: 800; letter-spacing: -.02em; display: block; }
+  .col .lbl { font-size: 15px; font-weight: 700; letter-spacing: .02em; text-transform: uppercase; display: block; margin: 6px 0 14px; }
+  .support-h { grid-column: 1; grid-row: 1; }
+  .unclear-head { grid-column: 2 / span 2; grid-row: 1; text-align: center; }
+  .oppose-h { grid-column: 4; grid-row: 1; }
+  .support { grid-column: 1; grid-row: 2; }
+  .unclear-a { grid-column: 2; grid-row: 2; }
+  .unclear-b { grid-column: 3; grid-row: 2; }
+  .oppose { grid-column: 4; grid-row: 2; }
+  .col ul { list-style: none; margin: 0; padding: 0; font-size: 15px; line-height: 1.5; color: #2b3036; }
+  .col li { cursor: pointer; border-radius: 4px; padding: 0 4px; margin-left: -4px; width: fit-content; }
+  .col li:hover, .col li.active { background: #f1f3f5; }
+  .support-h .big { color: var(--support); }
+  .unclear-head .big { color: var(--unclear); }
+  .oppose-h .big { color: var(--oppose); }
+
+  footer { text-align: center; }
+  footer .note { font-size: 13.5px; color: var(--muted); margin: 0 0 8px; }
+  footer .src { font-size: 12px; color: var(--faint); margin: 0; }
+
+  @media (max-width: 860px) {
+    .record { position: static; width: 100%; max-width: 360px; margin: 20px auto 0; }
+    .lists { grid-template-columns: 1fr 1fr; row-gap: 0; }
+    .support-h { grid-column: 1; grid-row: 1; }
+    .oppose-h { grid-column: 2; grid-row: 1; }
+    .support { grid-column: 1; grid-row: 2; }
+    .oppose { grid-column: 2; grid-row: 2; }
+    .unclear-head { grid-column: 1 / span 2; grid-row: 3; margin-top: 28px; }
+    .unclear-a { grid-column: 1; grid-row: 4; }
+    .unclear-b { grid-column: 2; grid-row: 4; }
+  }
+  @media (max-width: 520px) {
+    .page { padding: 24px 16px; }
+    .bar { height: 76px; }
+    .seg { border-right-width: 2px; }
+    .seg .w { display: none; }
+    .seg .cnt { font-size: 14px; }
+    .legend { gap: 8px 20px; font-size: 13px; }
+    .lists { grid-template-columns: 1fr; }
+    .lists > .col { grid-column: 1; grid-row: auto; text-align: left; }
+    .unclear-head, .oppose-h { margin-top: 28px; }
+    .support-h { order: 1; } .support { order: 2; } .unclear-head { order: 3; } .unclear-a { order: 4; }
+    .unclear-b { order: 5; } .oppose-h { order: 6; } .oppose { order: 7; }
+    .col .big { font-size: 46px; }
+  }
+</style>
+</head>
+<body>
+<div class="page">
+  <header>
+    <p class="site-name">The 29th Vote</p>
+    <h1>Who's backing Schumer for Majority Leader?</h1>
+    <p class="subtitle">Public positions of the 56-member Senate Democratic caucus &nbsp;·&nbsp; Assumes Peltola (AK) and Colom (MS) win</p>
+  </header>
+
+  <hr>
+
+  <section class="bar-wrap" aria-label="Share of caucus by position">
+    <div class="majority-label">29 votes to become Majority Leader</div>
+    <div class="majority-arrow"></div>
+    <div class="bar" id="bar"><div class="majority-line"></div></div>
+    <div class="legend" id="legend"></div>
+  </section>
+
+  <hr>
+
+  <section class="chamber" id="chamber" aria-label="Senate Democratic seats">
+    <svg id="seats" viewBox="0 0 820 440" role="img" aria-label="Half-circle seating chart of 56 Senate Democrats"></svg>
+    <aside class="record" id="record"></aside>
+  </section>
+
+  <hr>
+
+  <section class="lists" id="lists"></section>
+
+  <hr>
+
+  <footer>
+    <p class="note">Senate Democrats elect their leader by secret ballot, expected in December. Senators with no public position are not committed either way. <span style="white-space:nowrap">* Senator-elect</span></p>
+    <p class="src">Sources: CBS News, Roll Call, CNN, The Hill, PolitiFact, Washington Times, Epoch Times, Punchbowl News, New Republic, NBC News &nbsp;·&nbsp; As of Nov. 11, 2026 &nbsp;·&nbsp; <span style="white-space:nowrap">Created by Jayson Frascatore</span></p>
+  </footer>
+</div>
+
+<div class="tip" id="tip" role="tooltip"></div>
+
+<script>
+/* ================= DATA (edit this block on each update) ================= */
+const TOTAL = 56;
+const NEEDED = 29;
+
+const SENATORS = {
+  "Support": [
+    ["Chuck Schumer", "NY", "Running for majority leader and says he's confident he has the votes."],
+    ["Kirsten Gillibrand", "NY", "DSCC chair. Stood beside Schumer on Nov. 10 and credited him with winning the majority."],
+    ["Ruben Gallego", "AZ", "Stood with Schumer on Nov. 10. Acknowledged past differences but said it's time to unify."],
+    ["Sheldon Whitehouse", "RI", "Stood with Schumer on Nov. 10 and said he was an early yes."],
+    ["Mark Kelly", "AZ", "Said he plans to support Schumer, while urging Democrats to do things differently."],
+    ["Richard Blumenthal", "CT", "Said he plans to vote for Schumer but wants the Senate to change how it operates."],
+    ["John Fetterman", "PA", "Said he “absolutely” stands with Schumer and will vote for him."],
+    ["Tammy Baldwin", "WI", "Listed by the Washington Times among senators backing Schumer."],
+    ["Brian Schatz", "HI", "Listed by the Washington Times among senators backing Schumer. In line for the No. 2 job."],
+    ["Jack Reed", "RI", "Listed by the Washington Times among senators backing Schumer."],
+    ["Angus King", "ME", "Independent who caucuses with Democrats. Backs Schumer."],
+    ["Sherrod Brown", "OH", "Senator-elect recruited by Schumer. Publicly supports him.", true],
+  ],
+  "Unclear": [
+    ["Chris Van Hollen", "MD", "Possible challenger. Says he's in “active listening mode” about a run."],
+    ["Cory Booker", "NJ", "Praised Schumer's handling of the midterms but hasn't committed."],
+    ["Raphael Warnock", "GA", "Won't commit. Says he wants to hear from anyone who thinks they should lead."],
+    ["Elizabeth Warren", "MA", "Reported member of the anti-Schumer “Fight Club.” No recent public answer."],
+    ["Chris Murphy", "CT", "Reported member of the anti-Schumer “Fight Club.” No recent public answer."],
+    ["Jon Ossoff", "GA", "His campaign wouldn't say whether he'd back Schumer."],
+    ["Ben Ray Luján", "NM", "Deflected when asked, pointing out no one is running against Schumer yet."],
+    ["Alex Padilla", "CA", "Declined to commit without further conversation."],
+    ["Mark Warner", "VA", "Won't commit, though he praised Schumer's fundraising."],
+    ["Martin Heinrich", "NM", "Won't publicly commit to backing Schumer yet."],
+    ["James Talarico", "TX", "Declined to affirm support when asked.", true],
+    ["Chris Pappas", "NH", "Declined to affirm support when asked.", true],
+    ["Josh Turek", "IA", "Declined to affirm support when asked.", true],
+    ["Roy Cooper", "NC", "Recruited by Schumer, but hasn't publicly committed.", true],
+    ["Scott Colom", "MS", "Noncommittal. Wants more geographic diversity in party leadership.", true],
+    ["Mary Peltola", "AK", "Race still being counted. No stated position since the election.", true],
+  ],
+  "Will not support": [
+    ["Bernie Sanders", "VT", "Says “the time is now for change” and won't support Schumer."],
+    ["Elissa Slotkin", "MI", "A no unless someone shows a concrete, different plan. Floated withholding quorum."],
+    ["Peggy Flanagan", "MN", "Says it's time for new leadership.", true],
+    ["Troy Jackson", "ME", "Told Schumer he'll support somebody else.", true],
+    ["Abdul El-Sayed", "MI", "Backs Chris Van Hollen for leader.", true],
+    ["Juliana Stratton", "IL", "Said through a spokesperson she won't support Schumer.", true],
+    ["Adam Hamilton", "KS", "Has said repeatedly he won't vote for Schumer.", true],
+    ["Annie Andrews", "SC", "Has said she won't support Schumer and wants generational change.", true],
+  ],
+};
+
+/* Previous snapshot for the "On the Record" box, plus who moved since then */
+const PREV = { "Support": 12, "Unclear": 14, "No public position": 22, "Will not support": 8 };
+const PREV_LABEL = "Change since Nov. 11 AM";
+const MOVERS = [["Mark Warner (VA)", "Unclear"], ["Martin Heinrich (NM)", "Unclear"]];
+/* ======================================================================== */
+
+const COLORS = { "Support": "#2F6FD0", "Unclear": "#8E5BC8", "No public position": "#B8BDC4", "Will not support": "#12A6CC" };
+const TEXT_COLORS = { ...COLORS, "No public position": "#7d848d" };
+const CATS = ["Support", "Unclear", "No public position", "Will not support"];
+
+const counts = {
+  "Support": SENATORS["Support"].length,
+  "Unclear": SENATORS["Unclear"].length,
+  "Will not support": SENATORS["Will not support"].length,
+};
+counts["No public position"] = TOTAL - counts["Support"] - counts["Unclear"] - counts["Will not support"];
+
+/* ---------- Bar + legend ---------- */
+const bar = document.getElementById("bar");
+CATS.forEach(cat => {
+  const n = counts[cat];
+  const d = document.createElement("div");
+  d.className = "seg" + (cat === "No public position" ? " none" : "");
+  d.style.flex = n;
+  d.style.background = COLORS[cat];
+  d.innerHTML = `<span class="pct">${(n / TOTAL * 100).toFixed(1)}%</span><span class="cnt">${n}<span class="w"> senators</span></span>`;
+  bar.insertBefore(d, bar.querySelector(".majority-line"));
+});
+document.getElementById("legend").innerHTML = CATS.map(cat =>
+  `<span><i class="chip" style="background:${COLORS[cat]}"></i>${cat} (${counts[cat]})</span>`).join("");
+
+/* ---------- Chamber ---------- */
+const svg = document.getElementById("seats");
+const NS = "http://www.w3.org/2000/svg";
+const CX = 410, CY = 400, SCALE = 330;
+const radii = [0.55, 0.70, 0.85, 1.0], rowCounts = [10, 12, 16, 18];
+let seats = [];
+radii.forEach((r, i) => {
+  const c = rowCounts[i];
+  for (let j = 0; j < c; j++) seats.push({ theta: Math.PI - (j / (c - 1)) * Math.PI, r });
+});
+seats.sort((a, b) => (b.theta - a.theta) || (a.r - b.r));
+
+// Seat order: Support | gray | Unclear (centered on 29th line) | gray | Will not support
+const uncStart = Math.floor((TOTAL - counts["Unclear"]) / 2);
+const grayLeft = uncStart - counts["Support"];
+const grayRight = counts["No public position"] - grayLeft;
+const order = [["Support", counts["Support"]], ["No public position", grayLeft], ["Unclear", counts["Unclear"]],
+               ["No public position", grayRight], ["Will not support", counts["Will not support"]]];
+
+const seatEls = {}; // key "Cat|index" -> circle
+let s = 0;
+const nameIdx = { "Support": 0, "Unclear": 0, "Will not support": 0 };
+order.forEach(([cat, n]) => {
+  for (let k = 0; k < n; k++, s++) {
+    const st = seats[s];
+    const c = document.createElementNS(NS, "circle");
+    c.setAttribute("cx", (CX + st.r * SCALE * Math.cos(st.theta)).toFixed(2));
+    c.setAttribute("cy", (CY - st.r * SCALE * Math.sin(st.theta)).toFixed(2));
+    c.setAttribute("r", (0.066 * SCALE).toFixed(2));
+    c.setAttribute("fill", COLORS[cat]);
+    c.classList.add("seat");
+    if (cat !== "No public position") {
+      const idx = nameIdx[cat]++;
+      const p = SENATORS[cat][idx];
+      c.classList.add("onrecord");
+      c.dataset.cat = cat; c.dataset.idx = idx;
+      c.setAttribute("tabindex", "0");
+      c.setAttribute("aria-label", `${p[0]} (${p[1]}): ${cat}`);
+      seatEls[cat + "|" + idx] = c;
+    }
+    svg.appendChild(c);
+  }
+});
+
+// 29th vote marker
+const majTheta = (seats[NEEDED - 2].theta + seats[NEEDED - 1].theta) / 2;
+const r0 = 0.44 * SCALE, r1 = 1.12 * SCALE;
+const line = document.createElementNS(NS, "line");
+line.setAttribute("x1", CX + r0 * Math.cos(majTheta)); line.setAttribute("y1", CY - r0 * Math.sin(majTheta));
+line.setAttribute("x2", CX + r1 * Math.cos(majTheta)); line.setAttribute("y2", CY - r1 * Math.sin(majTheta));
+line.setAttribute("stroke", "#3d434a"); line.setAttribute("stroke-width", "3"); line.setAttribute("stroke-dasharray", "8 6");
+svg.insertBefore(line, svg.firstChild);
+const tx = CX + r1 * Math.cos(majTheta), ty = CY - r1 * Math.sin(majTheta);
+const tri = document.createElementNS(NS, "polygon");
+tri.setAttribute("points", `${tx - 12},${ty - 24} ${tx + 12},${ty - 24} ${tx},${ty}`);
+tri.setAttribute("fill", "#6b7078");
+svg.appendChild(tri);
+const lab = document.createElementNS(NS, "text");
+lab.setAttribute("x", tx); lab.setAttribute("y", ty - 36); lab.setAttribute("text-anchor", "middle");
+lab.setAttribute("font-size", "22"); lab.setAttribute("font-weight", "700"); lab.setAttribute("fill", "#3d434a");
+lab.textContent = "29th vote";
+svg.appendChild(lab);
+
+// Center label
+const big = document.createElementNS(NS, "text");
+big.setAttribute("x", CX); big.setAttribute("y", CY - 52); big.setAttribute("text-anchor", "middle");
+big.setAttribute("font-size", "74"); big.setAttribute("font-weight", "800"); big.setAttribute("fill", "#16191d");
+big.textContent = TOTAL;
+svg.appendChild(big);
+const sub = document.createElementNS(NS, "text");
+sub.setAttribute("x", CX); sub.setAttribute("y", CY - 12); sub.setAttribute("text-anchor", "middle");
+sub.setAttribute("font-size", "22"); sub.setAttribute("fill", "#5b636d");
+sub.textContent = "Senate Democrats";
+svg.appendChild(sub);
+
+/* ---------- On the Record box (only shows what changed) ---------- */
+const rec = document.getElementById("record");
+const onNow = counts["Support"] + counts["Unclear"] + counts["Will not support"];
+const onPrev = PREV["Support"] + PREV["Unclear"] + PREV["Will not support"];
+const changed = CATS.filter(c => PREV[c] !== counts[c]);
+if (changed.length || onPrev !== onNow) {
+  let h = `<h3>ON THE RECORD</h3>`;
+  if (onPrev !== onNow) h += `<div class="total">${onPrev} → ${onNow} of ${TOTAL} senators</div>`;
+  changed.forEach(c => {
+    h += `<div class="row"><span class="lab"><i class="chip" style="background:${COLORS[c]}"></i>${c}</span>
+          <b style="color:${TEXT_COLORS[c]}">${PREV[c]} → ${counts[c]}</b></div>`;
+  });
+  if (MOVERS.length) {
+    h += `<div class="latest-h">Latest:</div>`;
+    MOVERS.forEach(([nm, c]) => {
+      h += `<div class="mover" style="color:${TEXT_COLORS[c]}"><span>${nm}</span><small>→ ${c}</small></div>`;
+    });
+  }
+  h += `<div class="since">${PREV_LABEL}</div>`;
+  rec.innerHTML = h;
+} else {
+  rec.remove();
+}
+
+/* ---------- Name lists ---------- */
+const lists = document.getElementById("lists");
+const li = (cat, idx) => {
+  const p = SENATORS[cat][idx];
+  return `<li data-cat="${cat}" data-idx="${idx}">${p[0]} (${p[1]})${p[3] ? "*" : ""}</li>`;
+};
+const half = Math.ceil(counts["Unclear"] / 2);
+lists.innerHTML = `
+  <div class="col support-h"><h2><span class="big">${counts["Support"]}</span><span class="lbl">Support</span></h2></div>
+  <div class="col unclear-head"><h2><span class="big">${counts["Unclear"]}</span><span class="lbl">Unclear</span></h2></div>
+  <div class="col oppose-h"><h2><span class="big">${counts["Will not support"]}</span><span class="lbl">Will not support</span></h2></div>
+  <div class="col support"><ul>${SENATORS["Support"].map((_, i) => li("Support", i)).join("")}</ul></div>
+  <div class="col unclear-a"><ul>${SENATORS["Unclear"].slice(0, half).map((_, i) => li("Unclear", i)).join("")}</ul></div>
+  <div class="col unclear-b"><ul>${SENATORS["Unclear"].slice(half).map((_, i) => li("Unclear", i + half)).join("")}</ul></div>
+  <div class="col oppose"><ul>${SENATORS["Will not support"].map((_, i) => li("Will not support", i)).join("")}</ul></div>`;
+
+/* ---------- Tooltip + linked highlighting ---------- */
+const tip = document.getElementById("tip");
+const chamber = document.getElementById("chamber");
+function showTip(cat, idx, x, y) {
+  const p = SENATORS[cat][idx];
+  tip.innerHTML = `<div class="t-name">${p[0]} (${p[1]})${p[3] ? " <span style='font-weight:400;color:#8c949e;font-size:12px'>Senator-elect</span>" : ""}</div>
+    <div class="t-cat" style="color:${TEXT_COLORS[cat]}">${cat}</div>
+    <div class="t-note">${p[2]}</div>`;
+  tip.classList.add("show");
+  placeTip(x, y);
+}
+function placeTip(x, y) {
+  const w = tip.offsetWidth, h = tip.offsetHeight, pad = 14;
+  let left = x + pad, top = y + pad;
+  if (left + w > window.innerWidth - 8) left = x - w - pad;
+  if (top + h > window.innerHeight - 8) top = y - h - pad;
+  tip.style.left = Math.max(8, left) + "px";
+  tip.style.top = Math.max(8, top) + "px";
+}
+function hideTip() { tip.classList.remove("show"); }
+function setActive(cat, idx, on) {
+  const seat = seatEls[cat + "|" + idx];
+  const item = lists.querySelector(`li[data-cat="${cat}"][data-idx="${idx}"]`);
+  if (seat) seat.classList.toggle("active", on);
+  if (item) item.classList.toggle("active", on);
+  chamber.classList.toggle("dim", on);
+}
+
+svg.addEventListener("mouseover", e => {
+  const c = e.target.closest(".onrecord"); if (!c) return;
+  setActive(c.dataset.cat, c.dataset.idx, true);
+  showTip(c.dataset.cat, +c.dataset.idx, e.clientX, e.clientY);
+});
+svg.addEventListener("mousemove", e => { if (tip.classList.contains("show")) placeTip(e.clientX, e.clientY); });
+svg.addEventListener("mouseout", e => {
+  const c = e.target.closest(".onrecord"); if (!c) return;
+  setActive(c.dataset.cat, c.dataset.idx, false); hideTip();
+});
+// Tap / keyboard support
+svg.addEventListener("click", e => {
+  const c = e.target.closest(".onrecord"); if (!c) return;
+  const r = c.getBoundingClientRect();
+  document.querySelectorAll(".seat.active, li.active").forEach(el => el.classList.remove("active"));
+  setActive(c.dataset.cat, c.dataset.idx, true);
+  showTip(c.dataset.cat, +c.dataset.idx, r.right, r.bottom);
+  e.stopPropagation();
+});
+svg.addEventListener("focusin", e => {
+  const c = e.target.closest(".onrecord"); if (!c) return;
+  const r = c.getBoundingClientRect();
+  setActive(c.dataset.cat, c.dataset.idx, true);
+  showTip(c.dataset.cat, +c.dataset.idx, r.right, r.bottom);
+});
+svg.addEventListener("focusout", e => {
+  const c = e.target.closest(".onrecord"); if (!c) return;
+  setActive(c.dataset.cat, c.dataset.idx, false); hideTip();
+});
+document.addEventListener("click", () => {
+  document.querySelectorAll(".seat.active, li.active").forEach(el => el.classList.remove("active"));
+  chamber.classList.remove("dim"); hideTip();
+});
+
+lists.addEventListener("mouseover", e => {
+  const l = e.target.closest("li"); if (!l) return;
+  setActive(l.dataset.cat, l.dataset.idx, true);
+  const r = l.getBoundingClientRect();
+  showTip(l.dataset.cat, +l.dataset.idx, r.right, r.top - 10);
+});
+lists.addEventListener("mouseout", e => {
+  const l = e.target.closest("li"); if (!l) return;
+  setActive(l.dataset.cat, l.dataset.idx, false); hideTip();
+});
+window.addEventListener("scroll", hideTip, { passive: true });
+</script>
+</body>
+</html>
