@@ -269,7 +269,7 @@
   html.dark { --ink: #e8eaed; --muted: #a6adb6; --faint: #7d858f; --rule: #2c3238;
     --marker: #cfd4da; --marker-fill: #9aa1a9; --none: #4b525b; --none-text: #9aa1a9; color-scheme: dark; }
   html.dark, html.dark body { background: #111418; }
-  html.dark .shot-btn, html.dark .rec-actions button, html.dark .modal-actions a { background: #1b1f24; }
+  html.dark .shot-btn, html.dark .rec-actions button, html.dark .modal-actions a, html.dark .modal-actions button { background: #1b1f24; }
   html.dark .shot-btn:hover, html.dark .rec-actions button:hover { background: #252a30; }
   html.dark .modal-card { background: #1b1f24; }
   html.dark .modal-actions a.primary { background: var(--ink); color: #111418; }
@@ -295,16 +295,112 @@
   html.dark .nopos li:hover, html.dark .nopos li.active { background: #23282e; }
   html.dark .nopos .big { color: #7d858f; }
   html.dark .support-h .big { color: #4d88e0; }
+
+  /* ---------- Tabs ---------- */
+  .toolbar { justify-content: space-between; align-items: center; gap: 12px; }
+  .tabs { display: inline-flex; gap: 8px; flex-wrap: wrap; }
+  .tab { font: 700 13.5px/1 "Inter", system-ui, sans-serif; padding: 10px 14px; border-radius: 999px; cursor: pointer;
+    border: 2px solid var(--tc); background: transparent; color: var(--ink); display: inline-flex; align-items: center; gap: 7px; }
+  .tab::before { content: ""; width: 9px; height: 9px; border-radius: 50%; background: var(--tc); }
+  .tab-tracker { --tc: #00b4d8; }
+  .tab-predict { --tc: #76c893; }
+  .tab[aria-selected="true"] { background: var(--tc); color: #0b2530; }
+  .tab[aria-selected="true"]::before { background: #0b2530; opacity: .75; }
+  .tab:hover:not([aria-selected="true"]) { background: color-mix(in srgb, var(--tc) 14%, transparent); }
+
+  /* ---------- Predictions ---------- */
+  .disclaimer { max-width: 640px; margin: 14px auto 0; padding: 10px 14px; border-radius: 10px; font-size: 13.5px; line-height: 1.45;
+    background: #eef8f0; border: 1px solid #cfe9d6; color: #24452f; }
+  .pseg { transition: flex-grow .5s cubic-bezier(.3,.7,.3,1), border-right-width .3s; flex-basis: 0; overflow: hidden; }
+  .pseg.empty { border-right-width: 0; }
+  .pseg .pct, .pseg .cnt { white-space: nowrap; }
+  .pseg.no-pct .pct, .pseg.no-cnt .cnt, .pseg.no-w .w { display: none; }
+  .wincheck { display: inline-grid; place-items: center; width: 0; height: 22px; margin-right: 0; border-radius: 50%;
+    background: #2e9e5b; color: #fff; font-size: 13px; font-weight: 800; overflow: hidden; vertical-align: -4px;
+    transition: width .3s, margin .3s; }
+  #viewPredict.won .wincheck { width: 22px; margin-right: 8px; }
+  #viewPredict.won .majority-label { color: #1f7a45; }
+  .check { display: inline-grid; place-items: center; width: 1.25em; height: 1.25em; border-radius: 50%; background: #2e9e5b; color: #fff;
+    font-size: .85em; font-weight: 800; vertical-align: .05em; margin-right: .2em; }
+  #viewPredict.won #pOv29 { color: #1f7a45; }
+  .pwin { position: absolute; left: 50%; top: 44%; width: 96px; height: 96px; margin: -48px 0 0 -48px; border-radius: 50%;
+    background: #2e9e5b; color: #fff; font-size: 56px; font-weight: 800; display: grid; place-items: center;
+    box-shadow: 0 10px 30px rgba(46,158,91,.35); opacity: 0; transform: scale(.3); pointer-events: none; }
+  .pwin.show { animation: winpop 1.6s ease forwards; }
+  @keyframes winpop { 0% { opacity: 0; transform: scale(.3); } 18% { opacity: 1; transform: scale(1.12); } 30% { transform: scale(1); }
+    75% { opacity: 1; transform: scale(1); } 100% { opacity: 0; transform: scale(.9); } }
+  .precord .row b { min-width: 2ch; text-align: right; }
+  .pstatus { display: flex; gap: 10px; align-items: flex-start; margin-top: 14px; padding-top: 12px; border-top: 1px solid var(--rule); }
+  .pstatus b { display: block; font-size: 14px; }
+  .pstatus span:not(.check) { display: block; color: var(--muted); font-size: 12.5px; margin-top: 2px; }
+  .pstatus.ok b { color: #1f7a45; }
+  .pstatus .check.big { font-size: 18px; flex: none; }
+
+  .pquestion { text-align: center; padding: 6px 0; }
+  .qprog { font-size: 12.5px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: var(--faint); }
+  .qprog span { font-weight: 500; letter-spacing: 0; text-transform: none; }
+  .pquestion h2 { font-size: clamp(20px, 3.2vw, 28px); line-height: 1.25; font-weight: 600; margin: 10px auto 8px; max-width: 720px; }
+  .pquestion h2 b { font-weight: 800; }
+  .qelect { display: inline-block; font-size: 12px; font-weight: 600; color: var(--faint); margin-left: 6px; vertical-align: middle; }
+  .qtracker { font-size: 13.5px; color: var(--muted); margin-bottom: 18px; }
+  .qbtns { display: flex; justify-content: center; gap: 12px; flex-wrap: wrap; }
+  .qb { font: 800 16px/1 "Inter", system-ui, sans-serif; min-width: 128px; padding: 15px 22px; border-radius: 12px; cursor: pointer;
+    border: 0; color: #fff; transition: transform .08s ease, box-shadow .15s; box-shadow: 0 2px 0 rgba(0,0,0,.12); }
+  .qb:active { transform: translateY(1px) scale(.98); }
+  .qb.yes { background: #2F6FD0; }
+  .qb.toss { background: #00f5d4; color: #0b3b35; }
+  .qb.no { background: #12A6CC; }
+  .qb.qshot { background: #76c893; color: #0f2e1c; }
+  .qb.picked { box-shadow: 0 0 0 3px var(--bg, #fff), 0 0 0 5px var(--ink); }
+  .qfoot { display: flex; justify-content: center; gap: 18px; margin-top: 16px; }
+  .qlink { background: none; border: 0; font: 600 13.5px "Inter", system-ui, sans-serif; color: var(--muted); cursor: pointer; padding: 6px 4px; }
+  .qlink:hover:not([disabled]) { color: var(--ink); text-decoration: underline; }
+  .qlink[disabled] { opacity: .4; cursor: default; }
+  .qdone h2 { margin-top: 8px; }
+  .qdone p { color: var(--muted); margin: 0 0 16px; }
+
+  .plists { display: grid; grid-template-columns: repeat(4, 1fr); column-gap: 28px; }
+  .pcol { grid-column: span var(--span); }
+  .pcol h2 { margin: 0; line-height: 1; }
+  .pcol .big { font-size: 56px; font-weight: 800; letter-spacing: -.02em; display: block; }
+  .pcol .lbl { font-size: 15px; font-weight: 700; letter-spacing: .02em; text-transform: uppercase; display: block; margin: 6px 0 14px; }
+  .pcol ul { list-style: none; margin: 0; padding: 0; font-size: 15px; line-height: 1.5; color: #2b3036; column-gap: 28px; }
+  .pcol li { cursor: pointer; border-radius: 4px; padding: 0 4px; margin-left: -4px; width: fit-content; break-inside: avoid; }
+  .pcol li:hover { background: #f1f3f5; }
+  .pcol li.empty { color: var(--faint); cursor: default; }
+  .pcol li.empty:hover { background: none; }
+  @media (max-width: 860px) {
+    .toolbar { flex-direction: column; }
+    .plists { grid-template-columns: 1fr; row-gap: 26px; text-align: center; }
+    .pcol { grid-column: auto; }
+    .pcol ul { columns: 2 !important; width: fit-content; margin: 0 auto; text-align: left; }
+  }
+  @media (max-width: 520px) {
+    .qb { min-width: 0; flex: 1; padding: 15px 10px; }
+    .qbtns { gap: 8px; }
+    .pcol ul { font-size: 14px; }
+  }
+  html.dark .disclaimer { background: #15251a; border-color: #24452f; color: #bfe3c9; }
+  html.dark .pcol ul { color: #d3d7dc; }
+  html.dark .pcol li:hover { background: #23282e; }
+  html.dark .tab[aria-selected="true"] { color: #0b2530; }
+  html.dark .qb.picked { box-shadow: 0 0 0 3px #111418, 0 0 0 5px var(--ink); }
+  html.dark #viewPredict.won .majority-label, html.dark #viewPredict.won #pOv29, html.dark .pstatus.ok b { color: #5fd08f; }
 </style>
 </head>
 <body>
 <div class="page">
   <div class="toolbar" data-noshot>
+    <nav class="tabs" role="tablist" aria-label="Views">
+      <button class="tab tab-tracker" role="tab" data-view="tracker" aria-selected="true" type="button">Latest Tracker</button>
+      <button class="tab tab-predict" role="tab" data-view="predict" aria-selected="false" type="button">Create Predictions</button>
+    </nav>
     <button class="shot-btn" id="shotBtn" type="button" data-noshot>
       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
       Screenshot
     </button>
   </div>
+  <div id="viewTracker">
   <header>
     <p class="site-name">The 29th Vote</p>
     <h1>Who's backing Schumer for Majority Leader?</h1>
@@ -341,6 +437,46 @@
   <hr>
 
   <section class="nopos" id="nopos" aria-label="Senators with no public position"></section>
+  </div>
+
+  <div id="viewPredict" hidden>
+    <header>
+      <p class="site-name">The 29th Vote</p>
+      <h1>Create your Senate majority prediction</h1>
+      <p class="subtitle">Go senator by senator and decide who you think will back Chuck Schumer for majority leader.</p>
+      <p class="disclaimer"><b>Prediction mode.</b> Everything on this tab is a predicted outcome that you create. It is not where senators actually stand. For reported positions, see the Latest Tracker.</p>
+    </header>
+
+    <hr>
+
+    <section class="bar-wrap" aria-label="Your predicted share of the caucus">
+      <div class="majority-label"><span class="wincheck" aria-hidden="true">✓</span>29 votes to become Majority Leader</div>
+      <div class="majority-arrow"></div>
+      <div class="bar" id="pBar"><div class="majority-line"></div></div>
+      <div class="legend" id="pLegend"></div>
+    </section>
+
+    <hr>
+
+    <section class="chamber" id="pChamber" aria-label="Your predicted seat chart">
+      <div class="seat-wrap" id="pSeatWrap">
+        <svg id="pSeats" viewBox="0 0 820 440" role="img" aria-label="Half-circle seating chart of your prediction"></svg>
+        <div class="ov ov-29" id="pOv29">29th vote</div>
+        <div class="ov ov-56" id="pOv56"></div>
+        <div class="ov ov-sub">Senate Democrats</div>
+        <div class="pwin" id="pWin" aria-hidden="true">✓</div>
+      </div>
+      <aside class="record precord" id="pRecord" aria-live="polite"></aside>
+    </section>
+
+    <hr>
+
+    <section class="pquestion" id="pQuestion" aria-live="polite"></section>
+
+    <hr>
+
+    <section class="plists" id="pLists" aria-label="Your picks"></section>
+  </div>
 
   <hr>
 
@@ -370,7 +506,6 @@
   </div>
 </div>
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 
 <script>
 /* ================= DATA (edit this block on each update) ================= */
@@ -1161,45 +1296,221 @@ if (KOFI_URL) { const k = document.getElementById("kofi"); k.href = KOFI_URL; k.
 /* ---------- Screenshot ---------- */
 const shotBtn = document.getElementById("shotBtn");
 const modal = document.getElementById("shotModal");
+/* ---------- Share image (drawn on a canvas so it looks the same on every device) ---------- */
+// Works for both tabs. spec = { title, subtitle, bar:[{label,n,color,text}], legend:[{label,color}],
+//   seatColors:[56], box(drawCtx), groups:[{label,n,color,names}], note, sources, ribbon }
+function trackerShareSpec() {
+  const name = p => `${p[0]} (${p[1]})${p[3] ? "*" : ""}`;
+  const stamp = LAST_UPDATED.replace(/^Last updated on\s*/i, "")
+    .replace(/^(\w{3})\w*\s+(\d+)\w*,\s*(\d{4})\s+at\s+/, (m, mo, d, y) => `${mo}. ${d}, ${y}, `)
+    .replace(/^May\. /, "May ");
+  const src = document.querySelector("footer .src").textContent.replace(/\s*·\s*Created by.*$/, "").replace(/ /g, " ").trim();
+  return {
+    title: document.querySelector("#viewTracker h1").textContent,
+    subtitle: SUBTITLE.replace(/ /g, " "),
+    bar: CATS.map(c => ({ label: c, n: counts[c], color: COLORS[c], text: c === "No public position" ? "#16191d" : "#fff" })),
+    legend: CATS.map(c => ({ label: `${c} (${counts[c]})`, color: COLORS[c] })),
+    seatColors: layoutFor(counts).map(c => COLORS[c]),
+    box: ({ text, g, RX, RR, y }) => {
+      if (!(changed.length || onPrev !== onNow)) return;
+      text("ON THE RECORD", RX, y, { w: 700, px: 12.5 }); y += 19;
+      if (onPrev !== onNow) { text(`${onPrev} → ${onNow} of ${TOTAL} senators`, RX, y, { px: 12, color: "#5b636d" }); y += 24; }
+      changed.forEach(c => {
+        g.fillStyle = COLORS[c]; g.fillRect(RX, y - 9, 9, 9);
+        text(c, RX + 15, y, { px: 12, maxW: RR - RX - 70 });
+        text(`${PREV[c]} → ${counts[c]}`, RR, y, { w: 700, px: 12, color: TEXT_COLORS[c], align: "right" });
+        y += 19;
+      });
+      if (MOVERS.length) {
+        y += 5; text("Latest:", RX, y, { px: 12, color: "#5b636d" }); y += 18;
+        MOVERS.slice(-5).forEach(([nm, , to]) => {
+          text(nm, RX, y, { w: 700, px: 12, color: TEXT_COLORS[to], maxW: RR - RX - 62 });
+          text(`→ ${to}`, RR, y, { px: 11, color: TEXT_COLORS[to], align: "right" });
+          y += 17;
+        });
+      }
+      text(PREV_LABEL, RX, y + 2, { px: 10.5, color: "#8c949e" });
+    },
+    groups: [
+      { label: "Support", n: counts["Support"], color: COLORS["Support"], names: SENATORS["Support"].map(name) },
+      { label: "Unclear", n: counts["Unclear"], color: COLORS["Unclear"], names: SENATORS["Unclear"].map(name) },
+      { label: "Will not support", n: counts["Will not support"], color: COLORS["Will not support"], names: SENATORS["Will not support"].map(name) },
+    ],
+    note: "Senate Democrats elect their leader by secret ballot, expected in December. Senators with no public position are not committed either way.   * Senator-elect",
+    sources: `${src}  ·  As of ${stamp}  ·  Created by Jayson Frascatore`,
+  };
+}
+
+// Split 4 list columns between the groups: every group gets one, extras go to the longest lists
+function splitColumns(groups, total = 4) {
+  const cols = groups.map(() => 1);
+  while (cols.reduce((a, b) => a + b, 0) < total) {
+    let best = 0, bestRows = -1;
+    groups.forEach((gr, i) => { const r = Math.ceil(gr.names.length / cols[i]); if (r > bestRows) { bestRows = r; best = i; } });
+    cols[best]++;
+  }
+  return cols;
+}
+
+async function drawShareImage(spec) {
+  const F = "Inter, system-ui, -apple-system, Segoe UI, sans-serif";
+  if (document.fonts && document.fonts.load) {
+    try { await Promise.all(["400", "500", "600", "700", "800"].map(w => document.fonts.load(`${w} 20px Inter`))); } catch (e) {}
+  }
+  const INK = "#16191d", MUTED = "#5b636d", FAINT = "#8c949e", RULE = "#e3e6ea", MARK = "#3d434a", MARKF = "#6b7078";
+  const W = 960, PAD = 60, TOP = spec.ribbon ? 26 : 0;
+  const cols = splitColumns(spec.groups);
+  const rows = Math.max(1, ...spec.groups.map((gr, i) => Math.ceil(gr.names.length / cols[i])));
+  const LH = 13.4, LIST_Y = 738;
+  const H = Math.max(960 + TOP, Math.ceil(TOP + LIST_Y + rows * LH + 72));
+  const S = 2;
+  const cv = document.createElement("canvas");
+  cv.width = W * S; cv.height = H * S;
+  const g = cv.getContext("2d");
+  g.scale(S, S);
+  g.fillStyle = "#fff"; g.fillRect(0, 0, W, H);
+  g.textBaseline = "alphabetic";
+  const font = (w, px) => { g.font = `${w} ${px}px ${F}`; };
+  const text = (s, x, y, { w = 400, px = 14, color = INK, align = "left", maxW } = {}) => {
+    font(w, px);
+    if (maxW) { let p = px; while (p > 7 && g.measureText(s).width > maxW) { p -= 0.5; font(w, p); } }
+    g.fillStyle = color; g.textAlign = align; g.fillText(s, x, y);
+  };
+  const rule = y => { g.fillStyle = RULE; g.fillRect(PAD - 2, y, W - 2 * (PAD - 2), 1.5); };
+  const tri = (x, yTop, w, h, color) => {
+    g.fillStyle = color; g.beginPath(); g.moveTo(x - w / 2, yTop); g.lineTo(x + w / 2, yTop); g.lineTo(x, yTop + h); g.closePath(); g.fill();
+  };
+  const dashed = (x1, y1, x2, y2) => {
+    g.save(); g.strokeStyle = MARK; g.lineWidth = 2.2; g.setLineDash([6, 4.5]);
+    g.beginPath(); g.moveTo(x1, y1); g.lineTo(x2, y2); g.stroke(); g.restore();
+  };
+
+  // Optional ribbon (prediction label)
+  if (spec.ribbon) {
+    font(800, 12.5);
+    const rw = g.measureText(spec.ribbon).width + 30;
+    g.fillStyle = spec.ribbonColor || "#76c893";
+    g.beginPath(); g.roundRect ? g.roundRect((W - rw) / 2, 16, rw, 24, 12) : g.rect((W - rw) / 2, 16, rw, 24); g.fill();
+    text(spec.ribbon, W / 2, 32.5, { w: 800, px: 12.5, color: "#0f2e1c", align: "center" });
+  }
+  g.save(); g.translate(0, TOP);
+
+  // Header
+  text(spec.title, W / 2, 56, { w: 800, px: 32, align: "center", maxW: W - 2 * PAD });
+  text(spec.subtitle, W / 2, 86, { px: 14.5, color: MUTED, align: "center", maxW: W - 2 * PAD });
+  rule(108);
+
+  // Bar
+  const BX = PAD, BW = W - 2 * PAD, BY = 170, BH = 58, GAP = 3;
+  const GREEN = "#2e9e5b", GREEN_T = "#1f7a45";
+  const checkMark = (cx, cy, r) => {
+    g.fillStyle = GREEN; g.beginPath(); g.arc(cx, cy, r, 0, Math.PI * 2); g.fill();
+    g.save(); g.strokeStyle = "#fff"; g.lineWidth = r * 0.26; g.lineCap = "round"; g.lineJoin = "round";
+    g.beginPath(); g.moveTo(cx - r * 0.45, cy); g.lineTo(cx - r * 0.1, cy + r * 0.38); g.lineTo(cx + r * 0.5, cy - r * 0.38); g.stroke(); g.restore();
+  };
+  const barLabel = `${NEEDED} votes to become Majority Leader`;
+  if (spec.won) {
+    font(700, 15); const tw = g.measureText(barLabel).width;
+    checkMark(W / 2 - tw / 2 - 4, 126, 10);
+    text(barLabel, W / 2 + 13, 131, { w: 700, px: 15, color: GREEN_T, align: "center" });
+  } else text(barLabel, W / 2, 131, { w: 700, px: 15, color: MARK, align: "center" });
+  const segs = spec.bar.filter(s => s.n > 0);
+  let x = BX;
+  segs.forEach((s, i) => {
+    const w = BW * s.n / TOTAL, last = i === segs.length - 1, ww = w - (last ? 0 : GAP);
+    g.fillStyle = s.color; g.fillRect(x, BY, ww, BH);
+    const cx = x + ww / 2;
+    if (ww > 14) {
+      if (ww > 50) text((100 * s.n / TOTAL).toFixed(1) + "%", cx, BY + 30, { w: 700, px: 22, color: s.text, align: "center", maxW: ww - 8 });
+      text(ww > 90 ? `${s.n} senator${s.n === 1 ? "" : "s"}` : String(s.n), cx, BY + 50, { w: 700, px: ww > 50 ? 14 : 15, color: s.text, align: "center", maxW: ww - 4 });
+    }
+    x += w;
+  });
+  const MX = BX + BW * (NEEDED - 0.5) / TOTAL;
+  tri(MX, 140, 22, 22, MARKF);
+  dashed(MX, 162, MX, BY + BH + 4);
+
+  // Legend
+  font(400, 13.5);
+  const widths = spec.legend.map(l => 14 + 9 + g.measureText(l.label).width);
+  const LG = 38, total = widths.reduce((a, b) => a + b, 0) + LG * (spec.legend.length - 1);
+  let lx = (W - total) / 2;
+  spec.legend.forEach((l, i) => {
+    g.fillStyle = l.color; g.fillRect(lx, 260, 14, 14);
+    text(l.label, lx + 23, 272, { px: 13.5, color: INK });
+    lx += widths[i] + LG;
+  });
+  rule(298);
+
+  // Chamber (same seat geometry as the page, scaled down)
+  const k = 0.74, CX2 = W / 2, CY2 = 622;
+  const P = (r, th) => [CX2 + r * 330 * k * Math.cos(th), CY2 - r * 330 * k * Math.sin(th)];
+  seats.forEach((st, i) => {
+    const [sx, sy] = P(st.r, st.theta);
+    g.fillStyle = spec.seatColors[i]; g.beginPath(); g.arc(sx, sy, 0.066 * 330 * k, 0, Math.PI * 2); g.fill();
+  });
+  const mt = (seats[NEEDED - 2].theta + seats[NEEDED - 1].theta) / 2;
+  const [l1x, l1y] = P(0.44, mt), [l2x, l2y] = P(1.12, mt);
+  dashed(l1x, l1y, l2x, l2y);
+  tri(l2x, l2y - 18, 18, 18, MARKF);
+  if (spec.won) {
+    font(700, 14); const tw = g.measureText(`${NEEDED}th vote`).width;
+    checkMark(l2x - tw / 2 - 4, l2y - 31, 9);
+    text(`${NEEDED}th vote`, l2x + 11, l2y - 26, { w: 700, px: 14, color: GREEN_T, align: "center" });
+  } else text(`${NEEDED}th vote`, l2x, l2y - 26, { w: 700, px: 14, color: MARK, align: "center" });
+  text(String(TOTAL), CX2, CY2 - 38, { w: 800, px: 48, align: "center" });
+  text("Senate Democrats", CX2, CY2 - 10, { px: 14.5, color: MUTED, align: "center" });
+
+  // Right-hand box
+  if (spec.box) spec.box({ text, g, RX: 738, RR: W - PAD, y: 336 });
+  rule(656);
+
+  // Name lists
+  const colW = (W - 2 * PAD - 24) / 4, X0 = 84;
+  let ci = 0;
+  spec.groups.forEach((gr, gi) => {
+    const n = cols[gi], x0 = X0 + ci * colW, span = n * colW;
+    const center = n > 1 ? x0 + (span - colW) / 2 + 75 : x0;
+    const al = n > 1 ? "center" : "left";
+    text(String(gr.n), center, 702, { w: 800, px: 36, color: gr.color, align: al });
+    text(gr.label.toUpperCase(), center, 720, { w: 700, px: 13, color: INK, align: al, maxW: span - 10 });
+    const per = Math.ceil(gr.names.length / n) || 1;
+    gr.names.forEach((nm, j) => {
+      const c = Math.floor(j / per), r = j % per;
+      text(nm, x0 + c * colW, LIST_Y + r * LH, { px: 12.8, color: "#2b3036", maxW: colW - 12 });
+    });
+    ci += n;
+  });
+
+  // Footer
+  const FY = H - TOP - 62;
+  rule(FY);
+  text(spec.note, W / 2, FY + 26, { px: 12, color: MUTED, align: "center", maxW: W - 2 * PAD });
+  text(spec.sources, W / 2, FY + 46, { px: 10.5, color: FAINT, align: "center", maxW: W - 2 * PAD + 10 });
+  g.restore();
+
+  return new Promise(r => cv.toBlob(r, "image/png"));
+}
+
 const shotImg = document.getElementById("shotImg");
 const shotDl = document.getElementById("shotDownload");
 let shotUrl = null;
 shotBtn.addEventListener("click", async e => {
   e.stopPropagation();
-  if (typeof html2canvas !== "function") return;
   pinned = null; hideTip();
   document.querySelectorAll(".seat.active, li.active").forEach(el => el.classList.remove("active"));
   chamber.classList.remove("dim");
   shotBtn.disabled = true;
   const label = shotBtn.lastChild.textContent;
-  shotBtn.lastChild.textContent = " Working\u2026";
+  shotBtn.lastChild.textContent = " Working…";
   try {
-    if (document.fonts && document.fonts.ready) await document.fonts.ready;
-    const canvas = await html2canvas(document.querySelector(".page"), {
-      scale: 2, backgroundColor: "#ffffff", windowWidth: 1200, windowHeight: 1800, useCORS: true,
-      ignoreElements: el => el.hasAttribute && el.hasAttribute("data-noshot"),
-      onclone: doc => {
-        const pg = doc.querySelector(".page"); pg.style.width = "1040px"; pg.style.maxWidth = "1040px";
-        doc.documentElement.classList.remove("dark");   // screenshots always use the light look
-        // html2canvas mis-draws inline SVG, so swap in an image of the live seat chart
-        const live = document.getElementById("seats").cloneNode(true);
-        live.querySelectorAll(".active").forEach(el => el.classList.remove("active"));
-        live.querySelectorAll("circle").forEach(c => { c.setAttribute("stroke", "#fff"); c.setAttribute("stroke-width", "2.5"); });
-        live.setAttribute("xmlns", "http://www.w3.org/2000/svg");
-        live.setAttribute("width", "820"); live.setAttribute("height", "440");
-        const img = doc.createElement("img");
-        img.src = "data:image/svg+xml;charset=utf-8," + encodeURIComponent(new XMLSerializer().serializeToString(live));
-        img.width = 820; img.height = 440;
-        doc.getElementById("seats").replaceWith(img);
-      }
-    });
-    const blob = await new Promise(r => canvas.toBlob(r, "image/png"));
+    const blob = await drawShareImage(view === "predict" ? predShareSpec() : trackerShareSpec());
     if (shotUrl) URL.revokeObjectURL(shotUrl);
     shotUrl = URL.createObjectURL(blob);
     shotImg.src = shotUrl;
     shotDl.href = shotUrl;
     const d = new Date();
-    shotDl.download = `the29thvote-${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")}.png`;
+    shotDl.download = `the29thvote-${view === "predict" ? "my-prediction-" : ""}${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")}.png`;
     modal.classList.add("open");
   } catch (err) {
     console.error(err);
@@ -1211,6 +1522,322 @@ shotBtn.addEventListener("click", async e => {
 document.getElementById("shotClose").addEventListener("click", e => { e.stopPropagation(); modal.classList.remove("open"); });
 modal.addEventListener("click", e => { if (e.target === modal) modal.classList.remove("open"); e.stopPropagation(); });
 document.addEventListener("keydown", e => { if (e.key === "Escape") modal.classList.remove("open"); });
+
+/* ====================== Create Predictions tab ====================== */
+const PRED = {
+  yes:  { label: "Will support",   color: "#2F6FD0", text: "#fff" },
+  toss: { label: "Toss up",        color: "#00f5d4", text: "#0b3b35" },
+  none: { label: "Not picked yet", color: "#B8BDC4", text: "#16191d" },
+  no:   { label: "Won't support",  color: "#12A6CC", text: "#fff" },
+};
+const PRED_ORDER = ["yes", "toss", "none", "no"];
+const PRED_KEY = "the29thvote-prediction-v1";
+
+// Everyone in the caucus, with where the Latest Tracker has them
+const ROSTER = [];
+["Support", "Unclear", "Will not support"].forEach(cat =>
+  SENATORS[cat].forEach(p => ROSTER.push({ id: `${p[0]}|${p[1]}`, name: p[0], st: p[1], elect: !!p[3], tracker: cat })));
+NO_POSITION.forEach(p => ROSTER.push({ id: `${p[0]}|${p[1]}`, name: p[0], st: p[1], elect: false, tracker: "No public position" }));
+const BY_ID = Object.fromEntries(ROSTER.map(r => [r.id, r]));
+const SELF = ROSTER.find(r => r.name === "Chuck Schumer");   // Schumer is counted as a yes for himself
+
+function shuffle(a) { for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; }
+
+let pState = null;
+function freshState() {
+  const answers = {}; if (SELF) answers[SELF.id] = "yes";
+  return { order: shuffle(ROSTER.filter(r => r !== SELF).map(r => r.id)), answers, history: [], editing: null };
+}
+function loadPred() {
+  try {
+    const s = JSON.parse(localStorage.getItem(PRED_KEY) || "null");
+    if (s && Array.isArray(s.order)) {
+      s.order = s.order.filter(id => BY_ID[id]);
+      shuffle(ROSTER.filter(r => r !== SELF && !s.order.includes(r.id)).map(r => r.id)).forEach(id => s.order.push(id));
+      s.answers = Object.fromEntries(Object.entries(s.answers || {}).filter(([id, v]) => BY_ID[id] && PRED[v]));
+      if (SELF) s.answers[SELF.id] = "yes";
+      s.history = (s.history || []).filter(id => BY_ID[id]);
+      s.editing = null;
+      return s;
+    }
+  } catch (e) {}
+  return freshState();
+}
+function savePred() { try { localStorage.setItem(PRED_KEY, JSON.stringify(pState)); } catch (e) {} }
+
+function pCounts() {
+  const c = { yes: 0, toss: 0, no: 0 };
+  Object.values(pState.answers).forEach(v => c[v]++);
+  c.none = TOTAL - c.yes - c.toss - c.no;
+  return c;
+}
+// Yes fills from the left, No from the right, Toss up sits centered on the 29th-vote line
+function pLayout(c) {
+  const out = new Array(TOTAL).fill("none");
+  for (let i = 0; i < c.yes; i++) out[i] = "yes";
+  for (let i = 0; i < c.no; i++) out[TOTAL - 1 - i] = "no";
+  const lo = c.yes, hi = TOTAL - c.no - c.toss;
+  const start = Math.min(Math.max(Math.floor((TOTAL - c.toss) / 2), lo), hi);
+  for (let i = 0; i < c.toss; i++) out[start + i] = "toss";
+  return out;
+}
+function landingSeat(kind, c, layout) {
+  if (kind === "yes") return c.yes - 1;
+  if (kind === "no") return TOTAL - c.no;
+  const idx = layout.lastIndexOf("toss"); return idx;
+}
+
+/* ----- Build the prediction chamber (same geometry as the tracker) ----- */
+const pSvg = document.getElementById("pSeats");
+const pCircles = seats.map(st => {
+  const c = document.createElementNS(NS, "circle");
+  c.setAttribute("cx", (CX + st.r * SCALE * Math.cos(st.theta)).toFixed(2));
+  c.setAttribute("cy", (CY - st.r * SCALE * Math.sin(st.theta)).toFixed(2));
+  c.setAttribute("r", (0.066 * SCALE).toFixed(2));
+  c.classList.add("seat");
+  pSvg.appendChild(c);
+  return c;
+});
+(() => {
+  const l = line.cloneNode(true), t = tri.cloneNode(true);
+  pSvg.insertBefore(l, pSvg.firstChild); pSvg.appendChild(t);
+})();
+document.getElementById("pOv56").textContent = TOTAL;
+
+const pBar = document.getElementById("pBar");
+const pSegs = {};
+PRED_ORDER.forEach(k => {
+  const d = document.createElement("div");
+  d.className = "seg pseg" + (k === "none" ? " none" : "");
+  d.style.background = PRED[k].color; if (k !== "none") d.style.color = PRED[k].text;
+  d.innerHTML = `<span class="pct"></span><span class="cnt"></span>`;
+  pBar.insertBefore(d, pBar.querySelector(".majority-line"));
+  pSegs[k] = d;
+});
+
+const inflight = new Map(); // seat index -> kind, while a marble is falling
+function paintPred() {
+  const c = pCounts(), lay = pLayout(c);
+  lay.forEach((k, i) => {
+    const el = pCircles[i];
+    if (inflight.get(i) === k) { el.classList.add("gap"); return; }
+    el.classList.remove("gap");
+    el.setAttribute("fill", PRED[k].color);
+    el.dataset.color = k === "none" ? "No public position" : k;
+  });
+  // bar
+  const visible = PRED_ORDER.filter(k => c[k] > 0);
+  const bw = pBar.clientWidth || 800;
+  PRED_ORDER.forEach(k => {
+    const d = pSegs[k], n = c[k], px = bw * n / TOTAL;
+    d.classList.toggle("no-pct", px < 64);
+    d.classList.toggle("no-cnt", px < 20);
+    d.classList.toggle("no-w", px < 112);
+    d.style.flexGrow = n;
+    d.classList.toggle("empty", n === 0);
+    d.classList.toggle("lastvis", k === visible[visible.length - 1]);
+    d.querySelector(".pct").textContent = n ? (n / TOTAL * 100).toFixed(1) + "%" : "";
+    d.querySelector(".cnt").innerHTML = n ? `${n}<span class="w"> senator${n === 1 ? "" : "s"}</span>` : "";
+  });
+  document.getElementById("pLegend").innerHTML = PRED_ORDER.map(k =>
+    `<span><i class="chip${k === "none" ? " c-none" : ""}" style="background:${PRED[k].color}"></i>${PRED[k].label} (${c[k]})</span>`).join("");
+  // 29 reached?
+  const won = c.yes >= NEEDED, lost = c.no > TOTAL - NEEDED;
+  document.getElementById("viewPredict").classList.toggle("won", won);
+  document.getElementById("pOv29").innerHTML = won ? `<span class="check">✓</span> 29th vote` : "29th vote";
+  // status box
+  const need = NEEDED - c.yes;
+  document.getElementById("pRecord").innerHTML = `
+    <h3>YOUR PREDICTION</h3>
+    ${PRED_ORDER.map(k => `<div class="row"><span class="lab"><i class="chip${k === "none" ? " c-none" : ""}" style="background:${PRED[k].color}"></i>${PRED[k].label}</span><b>${c[k]}</b></div>`).join("")}
+    <div class="pstatus ${won ? "ok" : lost ? "short" : ""}">
+      ${won ? `<span class="check big">✓</span><div><b>Schumer gets to 29</b><span>${c.yes} senators back him in your prediction.</span></div>`
+            : lost ? `<div><b>Schumer can't reach 29</b><span>${c.no} senators won't back him in your prediction.</span></div>`
+            : `<div><b>${need} more to reach 29</b><span>${c.yes} of 29 so far</span></div>`}
+    </div>`;
+  renderPredLists(c);
+  renderQuestion();
+}
+
+/* ----- Question card ----- */
+function currentId() {
+  if (pState.editing) return pState.editing;
+  return pState.order.find(id => !pState.answers[id]) || null;
+}
+function renderQuestion() {
+  const q = document.getElementById("pQuestion");
+  const id = currentId(), c = pCounts();
+  const asked = pState.order.filter(x => pState.answers[x]).length, total = pState.order.length;
+  if (!id) {
+    q.innerHTML = `
+      <div class="qdone">
+        <div class="qprog">All ${TOTAL} senators picked</div>
+        <h2>${c.yes >= NEEDED ? "In your prediction, Schumer is majority leader." : "In your prediction, Schumer comes up short."}</h2>
+        <p>Tap any name below to change your pick, or save your prediction as an image.</p>
+        <div class="qbtns">
+          <button type="button" class="qb qshot" id="pShot">Save my prediction</button>
+          <button type="button" class="qlink" id="pReset">Start over</button>
+        </div>
+      </div>`;
+    document.getElementById("pShot").onclick = e => { e.stopPropagation(); shotBtn.click(); };
+  } else {
+    const r = BY_ID[id], cur = pState.answers[id];
+    q.innerHTML = `
+      <div class="qprog">${pState.editing ? "Changing your pick" : `Senator ${Math.min(asked + 1, total)} of ${total}`} <span>· random order</span></div>
+      <h2>Do you think <b>${r.name} (${r.st})</b> will support Chuck Schumer?</h2>
+      <div class="qtracker">${r.elect ? "Senator-elect &nbsp;·&nbsp; " : ""}On the Latest Tracker: <b style="color:${TEXT_COLORS[r.tracker]}">${r.tracker}</b></div>
+      <div class="qbtns">
+        <button type="button" class="qb yes${cur === "yes" ? " picked" : ""}" data-pick="yes">Yes</button>
+        <button type="button" class="qb toss${cur === "toss" ? " picked" : ""}" data-pick="toss">Toss Up</button>
+        <button type="button" class="qb no${cur === "no" ? " picked" : ""}" data-pick="no">No</button>
+      </div>
+      <div class="qfoot">
+        <button type="button" class="qlink" id="pBack" ${pState.history.length || pState.editing ? "" : "disabled"}>${pState.editing ? "Cancel" : "← Back"}</button>
+        <button type="button" class="qlink" id="pReset">Start over</button>
+      </div>`;
+    q.querySelectorAll("[data-pick]").forEach(b => b.onclick = e => { e.stopPropagation(); answer(id, b.dataset.pick); });
+    document.getElementById("pBack").onclick = e => { e.stopPropagation(); goBack(); };
+  }
+  document.getElementById("pReset").onclick = e => {
+    e.stopPropagation();
+    if (Object.keys(pState.answers).length > 1 && !confirmReset()) return;
+    pState = freshState(); savePred(); paintPred();
+  };
+}
+function confirmReset() {
+  const b = document.getElementById("pReset");
+  if (b.dataset.arm === "1") return true;
+  b.dataset.arm = "1"; b.textContent = "Tap again to clear all picks";
+  setTimeout(() => { if (b.isConnected) { b.dataset.arm = ""; b.textContent = "Start over"; } }, 3000);
+  return false;
+}
+
+async function answer(id, kind) {
+  unlockAudio();
+  const prev = pState.answers[id];
+  pState.answers[id] = kind;
+  if (!pState.editing) pState.history.push(id);
+  pState.editing = null;
+  savePred();
+  if (prev === kind) { paintPred(); return; }
+  const c = pCounts(), lay = pLayout(c), i = landingSeat(kind, c, lay);
+  const wasWon = (c.yes - (kind === "yes") + (prev === "yes")) >= NEEDED;
+  if (reduceMotion || i < 0) { paintPred(); celebrate(wasWon); return; }
+  inflight.set(i, kind);
+  paintPred();
+  await pDrop(i, kind);
+  inflight.delete(i);
+  paintPred();
+  celebrate(wasWon);
+}
+function celebrate(wasWon) {
+  const c = pCounts();
+  if (!wasWon && c.yes >= NEEDED) {
+    const el = document.getElementById("pWin");
+    el.classList.remove("show"); void el.offsetWidth; el.classList.add("show");
+    if (canPlay()) { clinkBounce(window.innerWidth / 2); setTimeout(() => clinkBounce(window.innerWidth / 2), 140); }
+  }
+}
+function goBack() {
+  if (pState.editing) { pState.editing = null; paintPred(); return; }
+  const id = pState.history.pop();
+  if (!id) return;
+  delete pState.answers[id];
+  // put it back as the next question
+  pState.order = [id, ...pState.order.filter(x => x !== id)];
+  savePred(); paintPred();
+}
+
+async function pDrop(i, kind) {
+  const r = pCircles[i].getBoundingClientRect();
+  const x = r.left + r.width / 2, y = r.top + r.height / 2, d = r.width;
+  const startY = Math.max(-d, pSvg.getBoundingClientRect().top - 140);
+  const m = makeMarble("Support", d); m.style.setProperty("--c", PRED[kind].color); place(m, x, startY, d);
+  await m.animate([{ transform: "translateY(0)" }, { transform: `translateY(${y - startY}px)` }],
+                  { duration: 560, easing: "cubic-bezier(.5,0,1,.6)", fill: "forwards" }).finished;
+  clinkBounce(x);
+  pCircles[i].animate([{ transform: "scale(1)" }, { transform: "scale(1.3)" }, { transform: "scale(.92)" }, { transform: "scale(1)" }],
+                      { duration: 420, easing: "ease-out" });
+  m.remove();
+}
+
+/* ----- Pick lists (same spot as the tracker's name lists) ----- */
+function pickGroups() {
+  const by = { yes: [], toss: [], no: [] };
+  ROSTER.forEach(r => { const v = pState.answers[r.id]; if (v) by[v].push(r); });
+  return ["yes", "toss", "no"].map(k => ({ k, label: PRED[k].label, color: k === "toss" ? "#00b89f" : PRED[k].color, list: by[k] }));
+}
+function renderPredLists(c) {
+  const gs = pickGroups();
+  const cols = splitColumns(gs.map(g => ({ names: g.list })));
+  document.getElementById("pLists").innerHTML = gs.map((g, i) => `
+    <div class="pcol" style="--span:${cols[i]}">
+      <h2><span class="big" style="color:${g.color}">${g.list.length}</span><span class="lbl">${g.label}</span></h2>
+      <ul style="columns:${cols[i]}">${g.list.map(r => `<li data-id="${r.id}" title="Change your pick">${r.name} (${r.st})${r.elect ? "*" : ""}</li>`).join("") || `<li class="empty">No one yet</li>`}</ul>
+    </div>`).join("");
+}
+document.getElementById("pLists").addEventListener("click", e => {
+  const li = e.target.closest("li[data-id]"); if (!li) return;
+  e.stopPropagation();
+  if (SELF && li.dataset.id === SELF.id) return;
+  pState.editing = li.dataset.id; paintPred();
+  document.getElementById("pQuestion").scrollIntoView({ behavior: reduceMotion ? "auto" : "smooth", block: "center" });
+});
+
+function predShareSpec() {
+  const c = pCounts(), gs = pickGroups();
+  const won = c.yes >= NEEDED, lost = c.no > TOTAL - NEEDED;
+  return {
+    ribbon: "MY PREDICTION",
+    won,
+    title: "Senate Majority Prediction",
+    subtitle: "Will the Senate Democratic caucus re-elect Chuck Schumer as leader?",
+    bar: PRED_ORDER.map(k => ({ label: PRED[k].label, n: c[k], color: PRED[k].color, text: PRED[k].text })),
+    legend: PRED_ORDER.map(k => ({ label: `${PRED[k].label} (${c[k]})`, color: PRED[k].color })),
+    seatColors: pLayout(c).map(k => PRED[k].color),
+    box: ({ text, g, RX, RR, y }) => {
+      text("MY PREDICTION", RX, y, { w: 700, px: 12.5 }); y += 22;
+      PRED_ORDER.forEach(k => {
+        g.fillStyle = PRED[k].color; g.fillRect(RX, y - 9, 9, 9);
+        text(PRED[k].label, RX + 15, y, { px: 12 });
+        text(String(c[k]), RR, y, { w: 700, px: 12, align: "right" });
+        y += 19;
+      });
+      y += 14;
+      if (won) {
+        g.fillStyle = "#2e9e5b"; g.beginPath(); g.arc(RX + 13, y + 4, 13, 0, Math.PI * 2); g.fill();
+        g.strokeStyle = "#fff"; g.lineWidth = 3; g.lineCap = "round"; g.lineJoin = "round";
+        g.beginPath(); g.moveTo(RX + 7, y + 4); g.lineTo(RX + 11.5, y + 9); g.lineTo(RX + 19.5, y - 1); g.stroke();
+        text("Schumer gets to 29", RX + 34, y + 1, { w: 700, px: 13, color: "#1f7a45", maxW: RR - RX - 34 });
+        text(`${c.yes} votes`, RX + 34, y + 17, { px: 11.5, color: "#5b636d" });
+      } else {
+        text(lost ? "Schumer can't reach 29" : `${NEEDED - c.yes} more to reach 29`, RX, y + 1, { w: 700, px: 13, maxW: RR - RX });
+        text(`${c.yes} of 29 so far`, RX, y + 17, { px: 11.5, color: "#5b636d" });
+      }
+    },
+    groups: gs.map(g => ({ label: g.label, n: g.list.length, color: g.color, names: g.list.map(r => `${r.name} (${r.st})${r.elect ? "*" : ""}`) })),
+    note: "This is a predicted outcome made by a reader, not where senators actually stand.   * Senator-elect",
+    sources: "Make your own at jaysonfrascatore.github.io/The29thVote  ·  Created by Jayson Frascatore",
+  };
+}
+
+/* ----- Tabs ----- */
+let view = "tracker";
+function setView(v) {
+  view = v;
+  document.getElementById("viewTracker").hidden = v !== "tracker";
+  document.getElementById("viewPredict").hidden = v !== "predict";
+  document.querySelectorAll(".tab").forEach(t => t.setAttribute("aria-selected", String(t.dataset.view === v)));
+  pinned = null; hideTip();
+  try { history.replaceState(null, "", v === "predict" ? "#predict" : location.pathname + location.search); } catch (e) {}
+  if (v === "predict") paintPred();
+}
+document.querySelectorAll(".tab").forEach(t => t.addEventListener("click", e => { e.stopPropagation(); setView(t.dataset.view); }));
+
+pState = loadPred();
+paintPred();
+let pResizeT; window.addEventListener("resize", () => { clearTimeout(pResizeT); pResizeT = setTimeout(() => { if (view === "predict") paintPred(); }, 150); });
+if (location.hash === "#predict") setView("predict");
 </script>
 <!-- Cloudflare Web Analytics --><script type='module' src='https://static.cloudflareinsights.com/beacon.min.js' data-cf-beacon='{"token": "fd5bb1f3f1224382a6c68221e97e0c9b"}'></script><!-- End Cloudflare Web Analytics -->
 </body>
