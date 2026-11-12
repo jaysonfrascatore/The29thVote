@@ -4,6 +4,7 @@
 //   node Updates/make_csv.js --date 2026-11-12 --time "6:00 PM" \
 //     --moves '[["Ed Markey (MA)","No public position","Unclear"]]' > Updates/2026-11-12_1800.csv
 // --moves lists only the changes found in THIS run (leave it out, or pass [], when nothing changed).
+// Add --pending yes when those changes are in a pull request that hasn't been merged yet.
 const fs = require("fs");
 const path = require("path");
 
@@ -32,7 +33,7 @@ const byName = Object.fromEntries(moves.map(m => [m[0], m]));
 const out = ["Time,Date,State,Senator,Movement,Vote Total"];
 for (const r of rows) {
   const m = byName[`${r.name} (${r.st})`];
-  const movement = m ? `Moved from ${m[1]} to ${m[2]}` : `No change (${r.cat})`;
+  const movement = m ? `Moved from ${m[1]} to ${m[2]}${args.pending === "yes" ? " (waiting for your approval)" : ""}` : `No change (${r.cat})`;
   out.push([args.time, args.date, r.st, r.name, movement, total].map(q).join(","));
 }
 process.stdout.write(out.join("\n") + "\n");
