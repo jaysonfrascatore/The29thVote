@@ -19,6 +19,22 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<meta name="theme-color" content="#ffffff">
+<script>
+/* Dark mode: on from 9pm to 7am in the visitor's local time. Add ?theme=dark or ?theme=light to the URL to preview. */
+(function () {
+  const force = new URLSearchParams(location.search).get("theme");
+  function apply() {
+    const h = new Date().getHours();
+    const dark = force === "dark" ? true : force === "light" ? false : (h >= 21 || h < 7);
+    document.documentElement.classList.toggle("dark", dark);
+    const m = document.querySelector('meta[name="theme-color"]');
+    if (m) m.setAttribute("content", dark ? "#111418" : "#ffffff");
+  }
+  apply();
+  setInterval(apply, 60000);
+})();
+</script>
 <style>
   :root {
     --ink: #16191d;
@@ -155,6 +171,17 @@
     box-shadow: 0 8px 28px rgba(16,24,40,.14); padding: 12px 14px; width: 260px; font-size: 13.5px; line-height: 1.4;
   }
   .tip.show { opacity: 1; }
+  .tip.pinned { pointer-events: auto; }
+  .tip .t-call { display: flex; align-items: center; gap: 9px; margin-top: 10px; padding: 8px 12px; border-radius: 8px;
+    background: #f1f3f5; color: #1f2933; text-decoration: none; font-size: 13px; }
+  .tip .t-call svg { color: #2b6cb0; flex: none; }
+  .tip .t-calltext { display: flex; flex-direction: column; line-height: 1.25; min-width: 0; }
+  .tip .t-calltext span { font-size: 12px; color: #5b6470; }
+  .tip .t-calltext b { font-size: 14px; white-space: nowrap; }
+  .tip.pinned .t-call:hover { background: #e4e8ec; }
+  .tip .t-callsub { color: #8c949e; font-size: 12px; margin-top: 5px; }
+  .tip .t-hint { color: #8c949e; font-size: 11.5px; margin-top: 6px; }
+  .tip.pinned .t-hint { display: none; }
   .tip .t-name { font-weight: 700; font-size: 15px; }
   .tip .t-cat { font-weight: 700; font-size: 12px; letter-spacing: .04em; text-transform: uppercase; margin: 3px 0 6px; }
   .tip .t-note { color: var(--muted); }
@@ -237,6 +264,37 @@
     .record h3, .record .total, .record .latest-h, .record .since { text-align: center; }
     .col .big { font-size: 46px; }
   }
+
+  /* ---------- Dark mode (on automatically 9pm–7am local time) ---------- */
+  html.dark { --ink: #e8eaed; --muted: #a6adb6; --faint: #7d858f; --rule: #2c3238;
+    --marker: #cfd4da; --marker-fill: #9aa1a9; --none: #4b525b; --none-text: #9aa1a9; color-scheme: dark; }
+  html.dark, html.dark body { background: #111418; }
+  html.dark .shot-btn, html.dark .rec-actions button, html.dark .modal-actions a { background: #1b1f24; }
+  html.dark .shot-btn:hover, html.dark .rec-actions button:hover { background: #252a30; }
+  html.dark .modal-card { background: #1b1f24; }
+  html.dark .modal-actions a.primary { background: var(--ink); color: #111418; }
+  html.dark .modal-body { background: #0c0e11; }
+  html.dark .seg { border-right-color: #111418; }
+  html.dark .seg.none { background: var(--none) !important; }
+  html.dark .chip.c-none { background: var(--none) !important; }
+  html.dark .seat { stroke: #111418; }
+  html.dark .seat[data-color="No public position"] { fill: var(--none); }
+  html.dark .seat.gap { fill: #111418 !important; stroke: #5b626b; }
+  html.dark .maj-line { stroke: var(--marker); }
+  html.dark .maj-tri { fill: var(--marker-fill); }
+  html.dark .marble { box-shadow: 0 0 0 2px #111418; }
+  html.dark .move-caption { background: #1b1f24; box-shadow: 0 6px 20px rgba(0,0,0,.45); }
+  html.dark .tip { background: #1b1f24; box-shadow: 0 8px 28px rgba(0,0,0,.5); }
+  html.dark .tip .t-call { background: #262b31; color: var(--ink); }
+  html.dark .tip.pinned .t-call:hover { background: #30363d; }
+  html.dark .tip .t-call svg { color: #6a9fe8; }
+  html.dark .tip .t-calltext span { color: var(--muted); }
+  html.dark .tip .t-callsub, html.dark .tip .t-hint { color: var(--faint); }
+  html.dark .col ul, html.dark .nopos ul { color: #d3d7dc; }
+  html.dark .col li:hover, html.dark .col li.active,
+  html.dark .nopos li:hover, html.dark .nopos li.active { background: #23282e; }
+  html.dark .nopos .big { color: #7d858f; }
+  html.dark .support-h .big { color: #4d88e0; }
 </style>
 </head>
 <body>
@@ -390,6 +448,57 @@ const MOVERS = [
 ];
 /* ======================================================================== */
 
+/* ===== DC office phone numbers (last 4 digits after 202-224-) =====
+   From the Senate Sergeant at Arms suite & telephone list (Aug. 3, 2026).
+   Anyone not listed here (senators-elect, appointees) gets the Capitol Switchboard. */
+const SWITCHBOARD = "3121";
+const DC_PHONES = {
+  "Chuck Schumer": "6542",
+  "Kirsten Gillibrand": "4451",
+  "Ruben Gallego": "4521",
+  "Sheldon Whitehouse": "2921",
+  "Mark Kelly": "2235",
+  "Richard Blumenthal": "2823",
+  "John Fetterman": "4254",
+  "Tammy Baldwin": "5653",
+  "Brian Schatz": "3934",
+  "Jack Reed": "4642",
+  "Angus King": "5344",
+  "Chris Van Hollen": "4654",
+  "Cory Booker": "3224",
+  "Raphael Warnock": "3643",
+  "Elizabeth Warren": "4543",
+  "Chris Murphy": "4041",
+  "Jon Ossoff": "3521",
+  "Ben Ray Luján": "6621",
+  "Alex Padilla": "3553",
+  "Mark Warner": "2023",
+  "Martin Heinrich": "5521",
+  "Bernie Sanders": "5141",
+  "Elissa Slotkin": "4822",
+  "Adam Schiff": "3841",
+  "Michael Bennet": "5852",
+  "John Hickenlooper": "5941",
+  "Chris Coons": "5042",
+  "Lisa Blunt Rochester": "2441",
+  "Mazie Hirono": "6361",
+  "Tammy Duckworth": "2854",
+  "Ed Markey": "2742",
+  "Angela Alsobrooks": "4524",
+  "Amy Klobuchar": "3244",
+  "Andy Kim": "4744",
+  "Maggie Hassan": "3324",
+  "Catherine Cortez Masto": "3542",
+  "Jacky Rosen": "6244",
+  "Jeff Merkley": "3753",
+  "Ron Wyden": "5244",
+  "Tim Kaine": "4024",
+  "Peter Welch": "4242",
+  "Maria Cantwell": "3441",
+  "Patty Murray": "2621"
+};
+
+
 const COLORS = { "Support": "#2F6FD0", "Unclear": "#8E5BC8", "No public position": "#B8BDC4", "Will not support": "#12A6CC" };
 const TEXT_COLORS = { ...COLORS, "No public position": "#7d848d" };
 const CATS = ["Support", "Unclear", "No public position", "Will not support"];
@@ -413,7 +522,7 @@ CATS.forEach(cat => {
   bar.insertBefore(d, bar.querySelector(".majority-line"));
 });
 document.getElementById("legend").innerHTML = CATS.map(cat =>
-  `<span><i class="chip" style="background:${COLORS[cat]}"></i>${cat} (${counts[cat]})</span>`).join("");
+  `<span><i class="chip${cat === "No public position" ? " c-none" : ""}" style="background:${COLORS[cat]}"></i>${cat} (${counts[cat]})</span>`).join("");
 
 /* ---------- Chamber ---------- */
 const svg = document.getElementById("seats");
@@ -489,12 +598,12 @@ const r0 = 0.44 * SCALE, r1 = 1.12 * SCALE;
 const line = document.createElementNS(NS, "line");
 line.setAttribute("x1", CX + r0 * Math.cos(majTheta)); line.setAttribute("y1", CY - r0 * Math.sin(majTheta));
 line.setAttribute("x2", CX + r1 * Math.cos(majTheta)); line.setAttribute("y2", CY - r1 * Math.sin(majTheta));
-line.setAttribute("stroke", "#3d434a"); line.setAttribute("stroke-width", "3"); line.setAttribute("stroke-dasharray", "8 6");
+line.setAttribute("stroke", "#3d434a"); line.setAttribute("class", "maj-line"); line.setAttribute("stroke-width", "3"); line.setAttribute("stroke-dasharray", "8 6");
 svg.insertBefore(line, svg.firstChild);
 const tx = CX + r1 * Math.cos(majTheta), ty = CY - r1 * Math.sin(majTheta);
 const tri = document.createElementNS(NS, "polygon");
 tri.setAttribute("points", `${tx - 12},${ty - 24} ${tx + 12},${ty - 24} ${tx},${ty}`);
-tri.setAttribute("fill", "#6b7078");
+tri.setAttribute("fill", "#6b7078"); tri.setAttribute("class", "maj-tri");
 svg.appendChild(tri);
 document.getElementById("ov56").textContent = TOTAL;
 
@@ -507,7 +616,7 @@ if (changed.length || onPrev !== onNow) {
   let h = `<h3>ON THE RECORD</h3>`;
   if (onPrev !== onNow) h += `<div class="total">${onPrev} → ${onNow} of ${TOTAL} senators</div>`;
   changed.forEach(c => {
-    h += `<div class="row"><span class="lab"><i class="chip" style="background:${COLORS[c]}"></i>${c}</span>
+    h += `<div class="row"><span class="lab"><i class="chip${c === "No public position" ? " c-none" : ""}" style="background:${COLORS[c]}"></i>${c}</span>
           <b style="color:${TEXT_COLORS[c]}">${PREV[c]} → ${counts[c]}</b></div>`;
   });
   if (MOVERS.length) {
@@ -914,13 +1023,25 @@ const nopos = document.getElementById("nopos");
 /* ---------- Tooltip + linked highlighting ---------- */
 const tip = document.getElementById("tip");
 const chamber = document.getElementById("chamber");
+function callRow(name, isElect) {
+  const ext = DC_PHONES[name];
+  const num = ext || SWITCHBOARD;
+  const pretty = "(202) 224-" + num;
+  const label = ext ? "Call DC office" : "Capitol Switchboard";
+  const sub = ext ? "" : `<div class="t-callsub">${isElect ? "Senate office opens in January. After that, the switchboard can connect you." : "Ask the operator for " + name.split(" ").slice(-1)[0] + "'s office."}</div>`;
+  return `<a class="t-call" href="tel:+1202224${num}" onclick="event.stopPropagation()">
+      <svg viewBox="0 0 24 24" width="14" height="14" aria-hidden="true"><path fill="currentColor" d="M6.6 10.8a15.1 15.1 0 0 0 6.6 6.6l2.2-2.2c.3-.3.7-.4 1-.2 1.1.4 2.3.6 3.6.6.6 0 1 .4 1 1V20c0 .6-.4 1-1 1A17 17 0 0 1 3 4c0-.6.4-1 1-1h3.5c.6 0 1 .4 1 1 0 1.3.2 2.5.6 3.6.1.3 0 .7-.2 1z"/></svg>
+      <span class="t-calltext"><span>${label}</span><b>${pretty}</b></span></a>${sub}
+    <div class="t-hint">Click to keep this open</div>`;
+}
 function showTip(cat, idx, x, y) {
   const p = cat === "No public position"
     ? [NOPOS_SORTED[idx][0], NOPOS_SORTED[idx][1], NOPOS_SORTED[idx][3] || NO_POSITION_DEFAULT]
     : SENATORS[cat][idx];
   tip.innerHTML = `<div class="t-name">${p[0]} (${p[1]})${p[3] ? " <span style='font-weight:400;color:#8c949e;font-size:12px'>Senator-elect</span>" : ""}</div>
     <div class="t-cat" style="color:${TEXT_COLORS[cat]}">${cat}</div>
-    <div class="t-note">${p[2]}</div>`;
+    <div class="t-note">${p[2]}</div>
+    ${callRow(p[0], !!p[3])}`;
   tip.classList.add("show");
   placeTip(x, y);
 }
@@ -945,7 +1066,7 @@ function setActive(cat, idx, on) {
 let pinned = null; // { cat, idx, el } when someone taps/clicks a senator
 function clearActive() {
   document.querySelectorAll(".seat.active, li.active").forEach(el => el.classList.remove("active"));
-  chamber.classList.remove("dim"); hideTip();
+  chamber.classList.remove("dim"); hideTip(); tip.classList.remove("pinned");
 }
 function placePinned() {
   if (!pinned) return;
@@ -969,6 +1090,7 @@ function pin(cat, idx, el) {
   pinned = { cat, idx, el };
   setActive(cat, idx, true);
   placePinned();
+  tip.classList.add("pinned");
 }
 function unpin() { pinned = null; clearActive(); }
 
@@ -1058,6 +1180,7 @@ shotBtn.addEventListener("click", async e => {
       ignoreElements: el => el.hasAttribute && el.hasAttribute("data-noshot"),
       onclone: doc => {
         const pg = doc.querySelector(".page"); pg.style.width = "1040px"; pg.style.maxWidth = "1040px";
+        doc.documentElement.classList.remove("dark");   // screenshots always use the light look
         // html2canvas mis-draws inline SVG, so swap in an image of the live seat chart
         const live = document.getElementById("seats").cloneNode(true);
         live.querySelectorAll(".active").forEach(el => el.classList.remove("active"));
