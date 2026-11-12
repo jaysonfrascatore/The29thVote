@@ -109,6 +109,11 @@
     color: #fff; border-right: 4px solid #fff; min-width: 0;
   }
   .seg:last-child { border-right: 0; }
+  .seg { transition: flex-grow .7s cubic-bezier(.3,.7,.3,1); }
+  .rv.rolling { display: inline-block; overflow: hidden; vertical-align: bottom; }
+  .rv.rolling .rv-in { display: block; }
+  .rv.rolling .rv-in > span { display: block; text-align: inherit; }
+  .big.rolling { overflow: hidden; }
   .seg .pct { font-size: clamp(17px, 3vw, 30px); font-weight: 700; line-height: 1.1; }
   .seg .cnt { font-size: clamp(11px, 1.6vw, 17px); font-weight: 700; margin-top: 2px; white-space: nowrap; }
   .seg.none { color: var(--ink); }
@@ -117,7 +122,7 @@
     border-left: 2.5px dashed var(--marker); transform: translateX(-1px); pointer-events: none;
   }
   .legend { display: flex; justify-content: center; flex-wrap: wrap; gap: 10px 40px; margin-top: 34px; font-size: 15px; }
-  .legend span { display: inline-flex; align-items: center; gap: 10px; }
+  .legend > span { display: inline-flex; align-items: center; gap: 10px; }
   .chip { width: 18px; height: 18px; border-radius: 3px; display: inline-block; flex: none; }
 
   /* Chamber */
@@ -672,13 +677,54 @@ CATS.forEach(cat => {
   const n = counts[cat];
   const d = document.createElement("div");
   d.className = "seg" + (cat === "No public position" ? " none" : "");
+  d.dataset.cat = cat;
   d.style.flex = n;
   d.style.background = COLORS[cat];
-  d.innerHTML = `<span class="pct">${(n / TOTAL * 100).toFixed(1)}%</span><span class="cnt">${n}<span class="w"> senators</span></span>`;
+  d.innerHTML = `<span class="pct"><span class="rv">${(n / TOTAL * 100).toFixed(1)}%</span></span><span class="cnt"><span class="rv">${n}</span><span class="w"> senators</span></span>`;
   bar.insertBefore(d, bar.querySelector(".majority-line"));
 });
 document.getElementById("legend").innerHTML = CATS.map(cat =>
-  `<span><i class="chip${cat === "No public position" ? " c-none" : ""}" style="background:${COLORS[cat]}"></i>${cat} (${counts[cat]})</span>`).join("");
+  `<span><i class="chip${cat === "No public position" ? " c-none" : ""}" style="background:${COLORS[cat]}"></i><span>${cat} (<span class="rv" data-lg="${cat}">${counts[cat]}</span>)</span></span>`).join("");
+
+/* ---------- Counts that roll up or down as the marbles land ---------- */
+function rollTo(el, text, dir, animate) {
+  if (!el) return;
+  if (el._rollAnim) { el._rollAnim.cancel(); el._rollAnim = null; }
+  const old = el.dataset.v ?? el.textContent;
+  el.dataset.v = text;
+  if (!animate || old === text || reduceMotion) { el.textContent = text; return; }
+  el.textContent = old;
+  el.classList.add("rolling");
+  const h = el.getBoundingClientRect().height || 20;
+  el.style.height = h + "px"; el.style.lineHeight = h + "px";
+  const first = dir > 0 ? old : text, second = dir > 0 ? text : old;
+  el.innerHTML = `<span class="rv-in"><span>${first}</span><span>${second}</span></span>`;
+  const inner = el.firstChild;
+  const a = inner.animate(dir > 0 ? [{ transform: "translateY(0)" }, { transform: `translateY(-${h}px)` }]
+                                    : [{ transform: `translateY(-${h}px)` }, { transform: "translateY(0)" }],
+                          { duration: 650, easing: "cubic-bezier(.3,.7,.3,1)", fill: "forwards" });
+  el._rollAnim = a;
+  const reset = () => { el.classList.remove("rolling"); el.style.height = ""; el.style.lineHeight = ""; };
+  a.onfinish = () => { if (el._rollAnim === a) { el._rollAnim = null; el.textContent = text; reset(); } };
+  a.oncancel = () => { el.textContent = el.dataset.v; reset(); };
+}
+let shownCounts = { ...counts };
+function showCounts(c, animate) {
+  CATS.forEach(cat => {
+    const dir = Math.sign(c[cat] - shownCounts[cat]);
+    const seg = bar.querySelector(`.seg[data-cat="${cat}"]`);
+    if (seg) {
+      seg.style.flexGrow = c[cat];
+      const r = seg.querySelectorAll(".rv");
+      rollTo(r[0], (c[cat] / TOTAL * 100).toFixed(1) + "%", dir, animate);
+      rollTo(r[1], String(c[cat]), dir, animate);
+      if (animate && dir) seg.animate([{ filter: "brightness(1.18)" }, { filter: "brightness(1)" }], { duration: 900, easing: "ease-out" });
+    }
+    rollTo(document.querySelector(`.legend .rv[data-lg="${cat}"]`), String(c[cat]), dir, animate);
+    rollTo(document.querySelector(`.big[data-big="${cat}"]`), String(c[cat]), dir, animate);
+  });
+  shownCounts = { ...c };
+}
 
 /* ---------- Chamber ---------- */
 const svg = document.getElementById("seats");
@@ -1086,14 +1132,15 @@ function showCaption(name, from, to) {
 }
 function hideCaption() { caption.classList.remove("show"); }
 
-let running = false;
+let running = false, movesStarted = false;
 async function playMoves() {
   if (!canAnimate || running) return;
-  running = true;
+  running = true; movesStarted = true;
   pinned = null; hideTip(); chamber.classList.remove("dim");
   clearNames();
   let cur = { ...PREV };
   paint(layoutFor(cur));
+  showCounts(cur, false);
   await sleep(450);
   for (const [name, from, to] of MOVERS) {
     const next = { ...cur }; next[from]--; next[to]++;
@@ -1123,10 +1170,12 @@ async function playMoves() {
       }
     }
     cur = next;
-    await sleep(900);
+    showCounts(cur, true);          // bar, legend and big numbers catch up with the marble that just landed
+    await sleep(1100);
   }
   hideCaption();
   paint(layoutFor(counts));
+  showCounts(counts, false);
   assignNames();
   running = false;
 }
@@ -1166,9 +1215,9 @@ const li = (cat, idx) => {
 };
 const half = Math.ceil(counts["Unclear"] / 2);
 lists.innerHTML = `
-  <div class="col support-h"><h2><span class="big">${counts["Support"]}</span><span class="lbl">Support</span></h2></div>
-  <div class="col unclear-head"><h2><span class="big">${counts["Unclear"]}</span><span class="lbl">Unclear</span></h2></div>
-  <div class="col oppose-h"><h2><span class="big">${counts["Will not support"]}</span><span class="lbl">Will not support</span></h2></div>
+  <div class="col support-h"><h2><span class="big" data-big="Support">${counts["Support"]}</span><span class="lbl">Support</span></h2></div>
+  <div class="col unclear-head"><h2><span class="big" data-big="Unclear">${counts["Unclear"]}</span><span class="lbl">Unclear</span></h2></div>
+  <div class="col oppose-h"><h2><span class="big" data-big="Will not support">${counts["Will not support"]}</span><span class="lbl">Will not support</span></h2></div>
   <div class="col support"><ul>${SENATORS["Support"].map((_, i) => li("Support", i)).join("")}</ul></div>
   <div class="col unclear-a"><ul>${SENATORS["Unclear"].slice(0, half).map((_, i) => li("Unclear", i)).join("")}</ul></div>
   <div class="col unclear-b"><ul>${SENATORS["Unclear"].slice(half).map((_, i) => li("Unclear", i + half)).join("")}</ul></div>
@@ -1184,7 +1233,7 @@ const nopos = document.getElementById("nopos");
     console.warn(`NO_POSITION has ${NO_POSITION.length} names but the chart has ${counts["No public position"]} gray seats.`);
   const hasMark = NOPOS_SORTED.some(p => p[2]);
   nopos.innerHTML = `
-    <h2 style="margin:0"><span class="big">${counts["No public position"]}</span><span class="lbl">No public position</span></h2>
+    <h2 style="margin:0"><span class="big" data-big="No public position">${counts["No public position"]}</span><span class="lbl">No public position</span></h2>
     <p class="sub">Haven't said publicly where they stand. Listed by state.</p>
     <ul>${NOPOS_SORTED.map((p, i) => `<li data-cat="No public position" data-idx="${i}"><i class="ndot"></i>${p[0]} (${p[1]})${p[2] || ""}</li>`).join("")}</ul>
     ${hasMark ? `<p class="note">${NO_POSITION_NOTE}</p>` : ""}`;
@@ -1319,6 +1368,12 @@ function wireList(el) {
 }
 wireList(lists);
 wireList(document.getElementById("nopos"));
+
+// Before the marbles play, the bar and counts show the previous update; if the chart never scrolls into view, show today's
+if (canAnimate) {
+  showCounts(PREV, false);
+  setTimeout(() => { if (!movesStarted) showCounts(counts, false); }, 6000);
+}
 // A pinned card follows its senator while you scroll; an unpinned hover card just closes
 window.addEventListener("scroll", () => { if (pinned) placePinned(); else hideTip(); }, { passive: true });
 window.addEventListener("resize", () => { if (pinned) placePinned(); });
