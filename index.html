@@ -208,6 +208,11 @@
   .support-h .big { color: var(--support); }
   .unclear-head .big { color: var(--unclear); }
   .oppose-h .big { color: var(--oppose); }
+  .ndot { display: inline-block; width: 8px; height: 8px; border-radius: 50%; margin-right: 8px; vertical-align: 1px; flex: none; }
+  .nopos .ndot { background: #9aa1a9; }
+  .ldiv { grid-row: 1 / 3; width: 1px; background: var(--rule); justify-self: start; margin-left: -14px; }
+  .ldiv-1 { grid-column: 2; }
+  .ldiv-2 { grid-column: 4; }
 
   .nopos { text-align: center; }
   .nopos .big { font-size: 56px; font-weight: 800; letter-spacing: -.02em; display: block; line-height: 1; color: #9aa0a8; }
@@ -241,6 +246,8 @@
     .col li { margin: 0 auto; }
     .unclear-a { grid-column: 1; grid-row: 4; }
     .unclear-b { grid-column: 2; grid-row: 4; }
+    .ldiv-1 { grid-column: 1 / -1; grid-row: 3; width: auto; height: 1px; justify-self: stretch; align-self: start; margin: 8px 0 0; }
+    .ldiv-2 { grid-column: 2; grid-row: 1 / 3; }
   }
   @media (max-width: 640px) {
     .toolbar { justify-content: center; margin: 0 0 14px; }
@@ -262,8 +269,10 @@
     .lists > .col { grid-column: 1; grid-row: auto; text-align: center; }
     .col li { margin: 0 auto; }
     .unclear-head, .oppose-h { margin-top: 28px; }
-    .support-h { order: 1; } .support { order: 2; } .unclear-head { order: 3; } .unclear-a { order: 4; }
-    .unclear-b { order: 5; } .oppose-h { order: 6; } .oppose { order: 7; }
+    .support-h { order: 1; } .support { order: 2; } .ldiv-1 { order: 3; } .unclear-head { order: 4; } .unclear-a { order: 5; }
+    .unclear-b { order: 6; } .ldiv-2 { order: 7; } .oppose-h { order: 8; } .oppose { order: 9; }
+    .ldiv-1, .ldiv-2 { grid-column: 1; grid-row: auto; width: auto; height: 1px; justify-self: stretch; margin: 24px 0 0; }
+    .unclear-head, .oppose-h { margin-top: 22px; }
     .record { text-align: left; }
     .record h3, .record .total, .record .latest-h, .record .since { text-align: center; }
     .record .nochange { justify-content: center; }
@@ -366,6 +375,7 @@
 
   .plists { display: grid; grid-template-columns: repeat(4, 1fr); column-gap: 28px; }
   .pcol { grid-column: span var(--span); }
+  .pcol + .pcol { border-left: 1px solid var(--rule); margin-left: -14px; padding-left: 14px; }
   .pcol h2 { margin: 0; line-height: 1; }
   .pcol .big { font-size: 56px; font-weight: 800; letter-spacing: -.02em; display: block; }
   .pcol .lbl { font-size: 15px; font-weight: 700; letter-spacing: .02em; text-transform: uppercase; display: block; margin: 6px 0 14px; }
@@ -378,6 +388,7 @@
     .toolbar { flex-direction: column; }
     .plists { grid-template-columns: 1fr; row-gap: 26px; text-align: center; }
     .pcol { grid-column: auto; }
+    .pcol + .pcol { border-left: 0; margin-left: 0; padding-left: 0; border-top: 1px solid var(--rule); padding-top: 24px; }
     .pcol ul { columns: 2 !important; width: fit-content; margin: 0 auto; text-align: left; }
   }
   @media (max-width: 520px) {
@@ -1149,7 +1160,7 @@ if (soundBtn) {
 const lists = document.getElementById("lists");
 const li = (cat, idx) => {
   const p = SENATORS[cat][idx];
-  return `<li data-cat="${cat}" data-idx="${idx}">${p[0]} (${p[1]})${p[3] ? "*" : ""}</li>`;
+  return `<li data-cat="${cat}" data-idx="${idx}"><i class="ndot" style="background:${COLORS[cat]}"></i>${p[0]} (${p[1]})${p[3] ? "*" : ""}</li>`;
 };
 const half = Math.ceil(counts["Unclear"] / 2);
 lists.innerHTML = `
@@ -1159,7 +1170,8 @@ lists.innerHTML = `
   <div class="col support"><ul>${SENATORS["Support"].map((_, i) => li("Support", i)).join("")}</ul></div>
   <div class="col unclear-a"><ul>${SENATORS["Unclear"].slice(0, half).map((_, i) => li("Unclear", i)).join("")}</ul></div>
   <div class="col unclear-b"><ul>${SENATORS["Unclear"].slice(half).map((_, i) => li("Unclear", i + half)).join("")}</ul></div>
-  <div class="col oppose"><ul>${SENATORS["Will not support"].map((_, i) => li("Will not support", i)).join("")}</ul></div>`;
+  <div class="col oppose"><ul>${SENATORS["Will not support"].map((_, i) => li("Will not support", i)).join("")}</ul></div>
+  <div class="ldiv ldiv-1" aria-hidden="true"></div><div class="ldiv ldiv-2" aria-hidden="true"></div>`;
 
 /* ---------- No public position list ---------- */
 const NOPOS_SORTED = [...NO_POSITION].sort((a, b) => a[1].localeCompare(b[1]) || a[0].localeCompare(b[0]));
@@ -1172,7 +1184,7 @@ const nopos = document.getElementById("nopos");
   nopos.innerHTML = `
     <h2 style="margin:0"><span class="big">${counts["No public position"]}</span><span class="lbl">No public position</span></h2>
     <p class="sub">Haven't said publicly where they stand. Listed by state.</p>
-    <ul>${NOPOS_SORTED.map((p, i) => `<li data-cat="No public position" data-idx="${i}">${p[0]} (${p[1]})${p[2] || ""}</li>`).join("")}</ul>
+    <ul>${NOPOS_SORTED.map((p, i) => `<li data-cat="No public position" data-idx="${i}"><i class="ndot"></i>${p[0]} (${p[1]})${p[2] || ""}</li>`).join("")}</ul>
     ${hasMark ? `<p class="note">${NO_POSITION_NOTE}</p>` : ""}`;
 })();
 
@@ -1500,9 +1512,11 @@ async function drawShareImage(spec) {
     text(String(gr.n), center, 702, { w: 800, px: 36, color: gr.color, align: al });
     text(gr.label.toUpperCase(), center, 720, { w: 700, px: 13, color: INK, align: al, maxW: span - 10 });
     const per = Math.ceil(gr.names.length / n) || 1;
+    if (gi > 0) { g.fillStyle = RULE; g.fillRect(x0 - 14, 672, 1.2, Math.max(60, LIST_Y + rows * LH - 672 - 4)); }
     gr.names.forEach((nm, j) => {
-      const c = Math.floor(j / per), r = j % per;
-      text(nm, x0 + c * colW, LIST_Y + r * LH, { px: 12.8, color: "#2b3036", maxW: colW - 12 });
+      const c = Math.floor(j / per), r = j % per, nx = x0 + c * colW, ny = LIST_Y + r * LH;
+      g.fillStyle = gr.dot || gr.color; g.beginPath(); g.arc(nx + 3.5, ny - 4.2, 3.4, 0, Math.PI * 2); g.fill();
+      text(nm, nx + 12, ny, { px: 12.8, color: "#2b3036", maxW: colW - 24 });
     });
     ci += n;
   });
@@ -1798,7 +1812,7 @@ function renderPredLists(c) {
   document.getElementById("pLists").innerHTML = gs.map((g, i) => `
     <div class="pcol" style="--span:${cols[i]}">
       <h2><span class="big" style="color:${g.color}">${g.list.length}</span><span class="lbl">${g.label}</span></h2>
-      <ul style="columns:${cols[i]}">${g.list.map(r => `<li data-id="${r.id}" title="Change your pick">${r.name} (${r.st})${r.elect ? "*" : ""}</li>`).join("") || `<li class="empty">No one yet</li>`}</ul>
+      <ul style="columns:${cols[i]}">${g.list.map(r => `<li data-id="${r.id}" title="Change your pick"><i class="ndot" style="background:${PRED[g.k].color}"></i>${r.name} (${r.st})${r.elect ? "*" : ""}</li>`).join("") || `<li class="empty">No one yet</li>`}</ul>
     </div>`).join("");
 }
 document.getElementById("pLists").addEventListener("click", e => {
@@ -1840,7 +1854,7 @@ function predShareSpec() {
         text(`${c.yes} of 29 so far`, RX, y + 17, { px: 11.5, color: "#5b636d" });
       }
     },
-    groups: gs.map(g => ({ label: g.label, n: g.list.length, color: g.color, names: g.list.map(r => `${r.name} (${r.st})${r.elect ? "*" : ""}`) })),
+    groups: gs.map(g => ({ label: g.label, n: g.list.length, color: g.color, dot: PRED[g.k].color, names: g.list.map(r => `${r.name} (${r.st})${r.elect ? "*" : ""}`) })),
     note: "This is a predicted outcome made by a reader, not where senators actually stand.   * Senator-elect",
     sources: "Make your own at jaysonfrascatore.github.io/The29thVote  ·  Created by Jayson Frascatore",
   };
