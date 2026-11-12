@@ -146,6 +146,10 @@
   .record .mover { display: flex; justify-content: space-between; margin: 4px 0; font-weight: 700; }
   .record .mover small { font-weight: 400; font-size: 12.5px; }
   .record .since { color: var(--faint); font-size: 11.5px; margin-top: 8px; }
+  .record .latest-h span { color: var(--faint); font-size: .9em; }
+  .record .nochange { display: flex; align-items: center; gap: 7px; margin-top: 8px; padding-top: 8px; border-top: 1px solid var(--rule);
+    color: var(--muted); font-size: 12px; }
+  .record .nochange i { width: 7px; height: 7px; border-radius: 50%; background: #9aa1a9; flex: none; }
 
   .seat.gap { fill: #fff !important; stroke: #b8bdc4; stroke-width: 2; stroke-dasharray: 4 3; }
   .marble-layer { position: fixed; inset: 0; pointer-events: none; overflow: hidden; z-index: 15; }
@@ -262,6 +266,7 @@
     .unclear-b { order: 5; } .oppose-h { order: 6; } .oppose { order: 7; }
     .record { text-align: left; }
     .record h3, .record .total, .record .latest-h, .record .since { text-align: center; }
+    .record .nochange { justify-content: center; }
     .col .big { font-size: 46px; }
   }
 
@@ -577,6 +582,9 @@ const NO_POSITION_NOTE = "\u2020 Elected Minnesota governor. Her seat will go to
 /* Previous snapshot for the "On the Record" box, plus who moved since then */
 const PREV = { "Support": 12, "Unclear": 16, "No public position": 20, "Will not support": 8 };
 const PREV_LABEL = "Change since Nov. 11, 3 PM";
+// When the senators in MOVERS moved (short form, e.g. "Nov. 12, 9 AM"). LAST_UPDATED at the top is the time of the
+// latest check, even when that check found no change; if the two differ, the page says there was no change.
+const LAST_MOVE = "Nov. 12, 9 AM";
 // Each move: [name, moved FROM, moved TO]. Listed in the order they happened; the page animates them one at a time.
 const MOVERS = [
   ["Ed Markey (MA)", "No public position", "Unclear"],
@@ -742,6 +750,18 @@ tri.setAttribute("fill", "#6b7078"); tri.setAttribute("class", "maj-tri");
 svg.appendChild(tri);
 document.getElementById("ov56").textContent = TOTAL;
 
+/* ---------- Timestamps ---------- */
+// "Last updated on November 12th, 2026 at 6:00pm" -> "Nov. 12, 6 PM"
+function shortStamp(full) {
+  const m = full.match(/(January|February|March|April|May|June|July|August|September|October|November|December)\s+(\d+)\w*,\s*\d{4}\s+at\s+(\d+):(\d+)\s*([ap]m)/i);
+  if (!m) return full;
+  const ap = { January: "Jan.", February: "Feb.", March: "March", April: "April", May: "May", June: "June", July: "July",
+               August: "Aug.", September: "Sept.", October: "Oct.", November: "Nov.", December: "Dec." }[m[1]];
+  return `${ap} ${m[2]}, ${m[3]}${m[4] === "00" ? "" : ":" + m[4]} ${m[5].toUpperCase()}`;
+}
+const CHECKED = shortStamp(LAST_UPDATED);
+const NO_CHANGE = typeof LAST_MOVE === "string" && LAST_MOVE !== CHECKED;
+
 /* ---------- On the Record box (only shows what changed) ---------- */
 const rec = document.getElementById("record");
 const onNow = counts["Support"] + counts["Unclear"] + counts["Will not support"];
@@ -755,12 +775,13 @@ if (changed.length || onPrev !== onNow) {
           <b style="color:${TEXT_COLORS[c]}">${PREV[c]} → ${counts[c]}</b></div>`;
   });
   if (MOVERS.length) {
-    h += `<div class="latest-h">Latest:</div>`;
+    h += `<div class="latest-h">Latest${typeof LAST_MOVE === "string" ? ` <span>(${LAST_MOVE})</span>` : ""}:</div>`;
     MOVERS.forEach(([nm, , to]) => {
       h += `<div class="mover" style="color:${TEXT_COLORS[to]}"><span>${nm}</span><small>→ ${to}</small></div>`;
     });
   }
   h += `<div class="since">${PREV_LABEL}</div>`;
+  if (NO_CHANGE) h += `<div class="nochange"><i></i>No change in the latest check (${CHECKED})</div>`;
   if (MOVERS.length) {
     h += `<div class="rec-actions" data-noshot>
             <button type="button" id="replayBtn">▶ Replay changes</button>
@@ -1290,7 +1311,7 @@ window.addEventListener("resize", () => { if (pinned) placePinned(); });
 
 /* ---------- Header text ---------- */
 document.getElementById("subtitle").textContent = SUBTITLE;
-document.getElementById("updated").textContent = LAST_UPDATED;
+document.getElementById("updated").textContent = LAST_UPDATED + (NO_CHANGE ? ` \u00a0·\u00a0 No change since ${LAST_MOVE}` : "");
 if (KOFI_URL) { const k = document.getElementById("kofi"); k.href = KOFI_URL; k.hidden = false; }
 
 /* ---------- Screenshot ---------- */
@@ -1322,7 +1343,7 @@ function trackerShareSpec() {
         y += 19;
       });
       if (MOVERS.length) {
-        y += 5; text("Latest:", RX, y, { px: 12, color: "#5b636d" }); y += 18;
+        y += 5; text(typeof LAST_MOVE === "string" ? `Latest (${LAST_MOVE}):` : "Latest:", RX, y, { px: 12, color: "#5b636d", maxW: RR - RX }); y += 18;
         MOVERS.slice(-5).forEach(([nm, , to]) => {
           text(nm, RX, y, { w: 700, px: 12, color: TEXT_COLORS[to], maxW: RR - RX - 62 });
           text(`→ ${to}`, RR, y, { px: 11, color: TEXT_COLORS[to], align: "right" });
@@ -1330,6 +1351,10 @@ function trackerShareSpec() {
         });
       }
       text(PREV_LABEL, RX, y + 2, { px: 10.5, color: "#8c949e" });
+      if (NO_CHANGE) {
+        g.fillStyle = "#9aa1a9"; g.beginPath(); g.arc(RX + 3.5, y + 18, 3.5, 0, Math.PI * 2); g.fill();
+        text(`No change in the latest check (${CHECKED})`, RX + 12, y + 22, { px: 10.5, color: "#5b636d", maxW: RR - RX - 12 });
+      }
     },
     groups: [
       { label: "Support", n: counts["Support"], color: COLORS["Support"], names: SENATORS["Support"].map(name) },
