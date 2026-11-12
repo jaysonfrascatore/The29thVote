@@ -178,6 +178,14 @@
   .unclear-head .big { color: var(--unclear); }
   .oppose-h .big { color: var(--oppose); }
 
+  .nopos { text-align: center; }
+  .nopos .big { font-size: 56px; font-weight: 800; letter-spacing: -.02em; display: block; line-height: 1; color: #9aa0a8; }
+  .nopos .lbl { font-size: 15px; font-weight: 700; letter-spacing: .02em; text-transform: uppercase; display: block; margin: 6px 0 4px; }
+  .nopos .sub { font-size: 13.5px; color: var(--muted); margin: 0 0 16px; }
+  .nopos ul { list-style: none; margin: 0 auto; padding: 0; columns: 4; column-gap: 44px; width: fit-content;
+    font-size: 15px; line-height: 1.5; color: #2b3036; text-align: left; }
+  .nopos li { break-inside: avoid; white-space: nowrap; }
+  .nopos .note { font-size: 12.5px; color: var(--faint); margin: 14px 0 0; }
   footer { text-align: center; }
   .kofi { display: inline-flex; align-items: center; gap: 8px; margin: 0 0 18px; padding: 11px 18px;
     font: 600 14px/1 "Inter", system-ui, sans-serif; color: #fff; background: #FF5E5B; border-radius: 999px; text-decoration: none; }
@@ -205,7 +213,13 @@
   @media (max-width: 640px) {
     .toolbar { justify-content: center; margin: 0 0 14px; }
   }
+  @media (max-width: 860px) {
+    .nopos ul { columns: 2; column-gap: 28px; }
+  }
   @media (max-width: 520px) {
+    .nopos ul { font-size: 14px; column-gap: 16px; width: auto; max-width: 100%; }
+    .nopos li { white-space: normal; padding-left: 1em; text-indent: -1em; }
+    .nopos .big { font-size: 46px; }
     .page { padding: 24px 16px; }
     .bar { height: 76px; }
     .seg { border-right-width: 2px; }
@@ -264,6 +278,10 @@
   <hr>
 
   <section class="lists" id="lists"></section>
+
+  <hr>
+
+  <section class="nopos" id="nopos" aria-label="Senators with no public position"></section>
 
   <hr>
 
@@ -347,6 +365,16 @@ const SENATORS = {
     ["Annie Andrews", "SC", "Has said she won't support Schumer and wants generational change.", true],
   ],
 };
+
+// Senators with no public position yet (shown as a plain list, sorted by state). Move a name out of here when they go on the record.
+const NO_POSITION = [
+  ["Adam Schiff", "CA"], ["Michael Bennet", "CO"], ["John Hickenlooper", "CO"], ["Chris Coons", "DE"],
+  ["Lisa Blunt Rochester", "DE"], ["Mazie Hirono", "HI"], ["Tammy Duckworth", "IL"], ["Ed Markey", "MA"],
+  ["Angela Alsobrooks", "MD"], ["Amy Klobuchar", "MN", "\u2020"], ["Andy Kim", "NJ"], ["Maggie Hassan", "NH"],
+  ["Catherine Cortez Masto", "NV"], ["Jacky Rosen", "NV"], ["Jeff Merkley", "OR"], ["Ron Wyden", "OR"],
+  ["Tim Kaine", "VA"], ["Peter Welch", "VT"], ["Maria Cantwell", "WA"], ["Patty Murray", "WA"],
+];
+const NO_POSITION_NOTE = "\u2020 Elected Minnesota governor. Her seat will go to an appointee.";
 
 /* Previous snapshot for the "On the Record" box, plus who moved since then */
 const PREV = { "Support": 12, "Unclear": 14, "No public position": 22, "Will not support": 8 };
@@ -780,7 +808,7 @@ let running = false;
 async function playMoves() {
   if (!canAnimate || running) return;
   running = true;
-  hideTip(); chamber.classList.remove("dim");
+  pinned = null; hideTip(); chamber.classList.remove("dim");
   clearNames();
   let cur = { ...PREV };
   paint(layoutFor(cur));
@@ -864,6 +892,21 @@ lists.innerHTML = `
   <div class="col unclear-b"><ul>${SENATORS["Unclear"].slice(half).map((_, i) => li("Unclear", i + half)).join("")}</ul></div>
   <div class="col oppose"><ul>${SENATORS["Will not support"].map((_, i) => li("Will not support", i)).join("")}</ul></div>`;
 
+/* ---------- No public position list ---------- */
+(function () {
+  const box = document.getElementById("nopos");
+  if (!NO_POSITION.length) { box.previousElementSibling.remove(); box.remove(); return; }
+  if (NO_POSITION.length !== counts["No public position"])
+    console.warn(`NO_POSITION has ${NO_POSITION.length} names but the chart has ${counts["No public position"]} gray seats.`);
+  const sorted = [...NO_POSITION].sort((a, b) => a[1].localeCompare(b[1]) || a[0].localeCompare(b[0]));
+  const hasMark = sorted.some(p => p[2]);
+  box.innerHTML = `
+    <h2 style="margin:0"><span class="big">${counts["No public position"]}</span><span class="lbl">No public position</span></h2>
+    <p class="sub">Haven't said publicly where they stand. Listed by state.</p>
+    <ul>${sorted.map(p => `<li>${p[0]} (${p[1]})${p[2] || ""}</li>`).join("")}</ul>
+    ${hasMark ? `<p class="note">${NO_POSITION_NOTE}</p>` : ""}`;
+})();
+
 /* ---------- Tooltip + linked highlighting ---------- */
 const tip = document.getElementById("tip");
 const chamber = document.getElementById("chamber");
@@ -892,51 +935,89 @@ function setActive(cat, idx, on) {
   chamber.classList.toggle("dim", on);
 }
 
+let pinned = null; // { cat, idx, el } when someone taps/clicks a senator
+function clearActive() {
+  document.querySelectorAll(".seat.active, li.active").forEach(el => el.classList.remove("active"));
+  chamber.classList.remove("dim"); hideTip();
+}
+function placePinned() {
+  if (!pinned) return;
+  const r = pinned.el.getBoundingClientRect();
+  if (pinned.el.tagName === "LI" && window.innerWidth <= 860) {
+    // On phones, drop the card just under the tapped name so it doesn't cover it
+    showTip(pinned.cat, +pinned.idx, 0, 0);
+    const w = tip.offsetWidth, h = tip.offsetHeight;
+    let top = r.bottom + 8;
+    if (top + h > window.innerHeight - 8) top = r.top - h - 8;
+    tip.style.left = Math.max(8, (window.innerWidth - w) / 2) + "px";
+    tip.style.top = Math.max(8, top) + "px";
+    return;
+  }
+  showTip(pinned.cat, +pinned.idx, r.right, pinned.el.tagName === "LI" ? r.top - 10 : r.bottom);
+}
+function pin(cat, idx, el) {
+  const same = pinned && pinned.cat === cat && String(pinned.idx) === String(idx);
+  clearActive(); pinned = null;
+  if (same) return;                 // tapping the same senator again closes it
+  pinned = { cat, idx, el };
+  setActive(cat, idx, true);
+  placePinned();
+}
+function unpin() { pinned = null; clearActive(); }
+
 svg.addEventListener("mouseover", e => {
+  if (pinned) return;
   const c = e.target.closest(".onrecord"); if (!c) return;
   setActive(c.dataset.cat, c.dataset.idx, true);
   showTip(c.dataset.cat, +c.dataset.idx, e.clientX, e.clientY);
 });
-svg.addEventListener("mousemove", e => { if (tip.classList.contains("show")) placeTip(e.clientX, e.clientY); });
+svg.addEventListener("mousemove", e => { if (!pinned && tip.classList.contains("show")) placeTip(e.clientX, e.clientY); });
 svg.addEventListener("mouseout", e => {
+  if (pinned) return;
   const c = e.target.closest(".onrecord"); if (!c) return;
   setActive(c.dataset.cat, c.dataset.idx, false); hideTip();
 });
-// Tap / keyboard support
 svg.addEventListener("click", e => {
   const c = e.target.closest(".onrecord"); if (!c) return;
-  const r = c.getBoundingClientRect();
-  document.querySelectorAll(".seat.active, li.active").forEach(el => el.classList.remove("active"));
-  setActive(c.dataset.cat, c.dataset.idx, true);
-  showTip(c.dataset.cat, +c.dataset.idx, r.right, r.bottom);
   e.stopPropagation();
+  pin(c.dataset.cat, c.dataset.idx, c);
 });
 svg.addEventListener("focusin", e => {
-  const c = e.target.closest(".onrecord"); if (!c) return;
+  const c = e.target.closest(".onrecord"); if (!c || pinned) return;
   const r = c.getBoundingClientRect();
   setActive(c.dataset.cat, c.dataset.idx, true);
   showTip(c.dataset.cat, +c.dataset.idx, r.right, r.bottom);
 });
 svg.addEventListener("focusout", e => {
-  const c = e.target.closest(".onrecord"); if (!c) return;
+  const c = e.target.closest(".onrecord"); if (!c || pinned) return;
   setActive(c.dataset.cat, c.dataset.idx, false); hideTip();
 });
-document.addEventListener("click", () => {
-  document.querySelectorAll(".seat.active, li.active").forEach(el => el.classList.remove("active"));
-  chamber.classList.remove("dim"); hideTip();
+document.addEventListener("click", e => {
+  if (e.target.closest && e.target.closest("#tip")) return;
+  unpin();
 });
+document.addEventListener("keydown", e => { if (e.key === "Escape") unpin(); });
 
 lists.addEventListener("mouseover", e => {
+  if (pinned) return;
   const l = e.target.closest("li"); if (!l) return;
   setActive(l.dataset.cat, l.dataset.idx, true);
   const r = l.getBoundingClientRect();
   showTip(l.dataset.cat, +l.dataset.idx, r.right, r.top - 10);
 });
 lists.addEventListener("mouseout", e => {
+  if (pinned) return;
   const l = e.target.closest("li"); if (!l) return;
   setActive(l.dataset.cat, l.dataset.idx, false); hideTip();
 });
-window.addEventListener("scroll", hideTip, { passive: true });
+lists.addEventListener("click", e => {
+  const l = e.target.closest("li"); if (!l) return;
+  e.stopPropagation();
+  pin(l.dataset.cat, l.dataset.idx, l);
+});
+// A pinned card follows its senator while you scroll; an unpinned hover card just closes
+window.addEventListener("scroll", () => { if (pinned) placePinned(); else hideTip(); }, { passive: true });
+window.addEventListener("resize", () => { if (pinned) placePinned(); });
 
 /* ---------- Header text ---------- */
 document.getElementById("subtitle").textContent = SUBTITLE;
@@ -952,7 +1033,7 @@ let shotUrl = null;
 shotBtn.addEventListener("click", async e => {
   e.stopPropagation();
   if (typeof html2canvas !== "function") return;
-  hideTip();
+  pinned = null; hideTip();
   document.querySelectorAll(".seat.active, li.active").forEach(el => el.classList.remove("active"));
   chamber.classList.remove("dim");
   shotBtn.disabled = true;
