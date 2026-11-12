@@ -4,6 +4,18 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>The 29th Vote</title>
+<meta name="description" content="Tracking which Senate Democrats publicly back Chuck Schumer for Majority Leader, and who's still holding out.">
+<meta property="og:type" content="website">
+<meta property="og:title" content="The 29th Vote">
+<meta property="og:description" content="Tracking which Senate Democrats publicly back Chuck Schumer for Majority Leader, and who's still holding out.">
+<meta property="og:url" content="https://jaysonfrascatore.github.io/The29thVote/">
+<meta property="og:image" content="https://jaysonfrascatore.github.io/The29thVote/thumbnail.png?v=2">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="The 29th Vote">
+<meta name="twitter:description" content="Tracking which Senate Democrats publicly back Chuck Schumer for Majority Leader, and who's still holding out.">
+<meta name="twitter:image" content="https://jaysonfrascatore.github.io/The29thVote/thumbnail.png?v=2">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -100,7 +112,7 @@
   .ov-29 { left: 50%; top: -1.5%; font-size: 2.7cqw; font-weight: 700; color: var(--marker); }
   .ov-56 { left: 50%; top: 79.5%; font-size: 9cqw; font-weight: 800; color: var(--ink); letter-spacing: -.01em; }
   .ov-sub { left: 50%; top: 89%; font-size: 2.7cqw; color: var(--muted); }
-  .seat { stroke: #fff; stroke-width: 2.5; transition: transform .12s ease, opacity .12s ease; transform-box: fill-box; transform-origin: center; }
+  .seat { stroke: #fff; stroke-width: 2.5; transition: transform .12s ease, opacity .12s ease, fill .45s ease; transform-box: fill-box; transform-origin: center; }
   .seat.onrecord { cursor: pointer; }
   .seat.onrecord:hover, .seat.active { transform: scale(1.22); }
   .chamber.dim .seat:not(.active) { opacity: .28; }
@@ -118,6 +130,23 @@
   .record .mover { display: flex; justify-content: space-between; margin: 4px 0; font-weight: 700; }
   .record .mover small { font-weight: 400; font-size: 12.5px; }
   .record .since { color: var(--faint); font-size: 11.5px; margin-top: 8px; }
+
+  .seat.gap { fill: #fff !important; stroke: #b8bdc4; stroke-width: 2; stroke-dasharray: 4 3; }
+  .marble-layer { position: fixed; inset: 0; pointer-events: none; overflow: hidden; z-index: 15; }
+  .marble { position: absolute; border-radius: 50%; background: var(--c); box-shadow: 0 0 0 2px #fff; }
+  .marble .swirl { display: none; }
+  .move-caption {
+    position: absolute; top: 0; left: 0; max-width: 260px; font-size: 14px; line-height: 1.35;
+    background: #fff; border: 1px solid var(--rule); border-radius: 10px; padding: 10px 12px;
+    box-shadow: 0 6px 20px rgba(16,24,40,.10); opacity: 0; transform: translateY(-6px);
+    transition: opacity .25s ease, transform .25s ease; pointer-events: none;
+  }
+  .move-caption.show { opacity: 1; transform: none; }
+  .move-caption span { color: var(--muted); display: block; font-size: 12.5px; margin-top: 2px; }
+  .rec-actions { display: flex; gap: 8px; margin-top: 12px; }
+  .rec-actions button { font: 600 12px/1 "Inter", system-ui, sans-serif; padding: 7px 10px; border-radius: 7px;
+    border: 1.5px solid var(--rule); background: #fff; color: var(--ink); cursor: pointer; }
+  .rec-actions button:hover { background: #f6f7f9; }
 
   /* Tooltip */
   .tip {
@@ -158,6 +187,9 @@
   footer .src { font-size: 12px; color: var(--faint); margin: 0; }
 
   @media (max-width: 860px) {
+    .move-caption { left: 50%; transform: translate(-50%, -6px); text-align: center; }
+    .move-caption.show { transform: translate(-50%, 0); }
+    .rec-actions { justify-content: center; }
     .record { position: static; width: 100%; max-width: 360px; margin: 20px auto 0; }
     .lists { grid-template-columns: 1fr 1fr; row-gap: 0; }
     .support-h { grid-column: 1; grid-row: 1; }
@@ -226,6 +258,7 @@
       <div class="ov ov-sub">Senate Democrats</div>
     </div>
     <aside class="record" id="record"></aside>
+    <div class="move-caption" id="moveCaption" aria-live="polite" data-noshot></div>
   </section>
 
   <hr>
@@ -245,6 +278,7 @@
 </div>
 
 <div class="tip" id="tip" role="tooltip"></div>
+<div class="marble-layer" id="marbleLayer" aria-hidden="true"></div>
 
 <div class="modal" id="shotModal" role="dialog" aria-modal="true" aria-label="Screenshot preview">
   <div class="modal-card">
@@ -317,7 +351,11 @@ const SENATORS = {
 /* Previous snapshot for the "On the Record" box, plus who moved since then */
 const PREV = { "Support": 12, "Unclear": 14, "No public position": 22, "Will not support": 8 };
 const PREV_LABEL = "Change since Nov. 11 AM";
-const MOVERS = [["Mark Warner (VA)", "Unclear"], ["Martin Heinrich (NM)", "Unclear"]];
+// Each move: [name, moved FROM, moved TO]. Listed in the order they happened; the page animates them one at a time.
+const MOVERS = [
+  ["Mark Warner (VA)", "No public position", "Unclear"],
+  ["Martin Heinrich (NM)", "No public position", "Unclear"],
+];
 /* ======================================================================== */
 
 const COLORS = { "Support": "#2F6FD0", "Unclear": "#8E5BC8", "No public position": "#B8BDC4", "Will not support": "#12A6CC" };
@@ -358,36 +396,60 @@ radii.forEach((r, i) => {
 seats.sort((a, b) => (b.theta - a.theta) || (a.r - b.r));
 
 // Seat order: Support | gray | Unclear (centered on 29th line) | gray | Will not support
-const uncStart = Math.floor((TOTAL - counts["Unclear"]) / 2);
-const grayLeft = uncStart - counts["Support"];
-const grayRight = counts["No public position"] - grayLeft;
-const order = [["Support", counts["Support"]], ["No public position", grayLeft], ["Unclear", counts["Unclear"]],
-               ["No public position", grayRight], ["Will not support", counts["Will not support"]]];
+function layoutFor(cn) {
+  const uncStart = Math.floor((TOTAL - cn["Unclear"]) / 2);
+  const gl = uncStart - cn["Support"];
+  const gr = cn["No public position"] - gl;
+  const out = [];
+  [["Support", cn["Support"]], ["No public position", gl], ["Unclear", cn["Unclear"]],
+   ["No public position", gr], ["Will not support", cn["Will not support"]]]
+    .forEach(([cat, n]) => { for (let k = 0; k < n; k++) out.push(cat); });
+  return out;
+}
+
+const circles = seats.map(st => {
+  const c = document.createElementNS(NS, "circle");
+  c.setAttribute("cx", (CX + st.r * SCALE * Math.cos(st.theta)).toFixed(2));
+  c.setAttribute("cy", (CY - st.r * SCALE * Math.sin(st.theta)).toFixed(2));
+  c.setAttribute("r", (0.066 * SCALE).toFixed(2));
+  c.classList.add("seat");
+  svg.appendChild(c);
+  return c;
+});
+
+function setSeat(i, cat) {
+  const c = circles[i];
+  c.classList.remove("gap");
+  c.setAttribute("fill", COLORS[cat]);
+  c.dataset.color = cat;
+}
+function setGap(i) { circles[i].classList.add("gap"); }
+function paint(layout) { layout.forEach((cat, i) => setSeat(i, cat)); }
 
 const seatEls = {}; // key "Cat|index" -> circle
-let s = 0;
-const nameIdx = { "Support": 0, "Unclear": 0, "Will not support": 0 };
-order.forEach(([cat, n]) => {
-  for (let k = 0; k < n; k++, s++) {
-    const st = seats[s];
-    const c = document.createElementNS(NS, "circle");
-    c.setAttribute("cx", (CX + st.r * SCALE * Math.cos(st.theta)).toFixed(2));
-    c.setAttribute("cy", (CY - st.r * SCALE * Math.sin(st.theta)).toFixed(2));
-    c.setAttribute("r", (0.066 * SCALE).toFixed(2));
-    c.setAttribute("fill", COLORS[cat]);
-    c.classList.add("seat");
-    if (cat !== "No public position") {
-      const idx = nameIdx[cat]++;
-      const p = SENATORS[cat][idx];
-      c.classList.add("onrecord");
-      c.dataset.cat = cat; c.dataset.idx = idx;
-      c.setAttribute("tabindex", "0");
-      c.setAttribute("aria-label", `${p[0]} (${p[1]}): ${cat}`);
-      seatEls[cat + "|" + idx] = c;
-    }
-    svg.appendChild(c);
-  }
-});
+function clearNames() {
+  circles.forEach(c => {
+    c.classList.remove("onrecord", "active");
+    delete c.dataset.cat; delete c.dataset.idx;
+    c.removeAttribute("tabindex"); c.removeAttribute("aria-label");
+  });
+  for (const k in seatEls) delete seatEls[k];
+}
+function assignNames() {
+  clearNames();
+  const nameIdx = { "Support": 0, "Unclear": 0, "Will not support": 0 };
+  layoutFor(counts).forEach((cat, i) => {
+    if (cat === "No public position") return;
+    const idx = nameIdx[cat]++;
+    const p = SENATORS[cat][idx];
+    const c = circles[i];
+    c.classList.add("onrecord");
+    c.dataset.cat = cat; c.dataset.idx = idx;
+    c.setAttribute("tabindex", "0");
+    c.setAttribute("aria-label", `${p[0]} (${p[1]}): ${cat}`);
+    seatEls[cat + "|" + idx] = c;
+  });
+}
 
 // 29th vote marker
 const majTheta = (seats[NEEDED - 2].theta + seats[NEEDED - 1].theta) / 2;
@@ -418,14 +480,372 @@ if (changed.length || onPrev !== onNow) {
   });
   if (MOVERS.length) {
     h += `<div class="latest-h">Latest:</div>`;
-    MOVERS.forEach(([nm, c]) => {
-      h += `<div class="mover" style="color:${TEXT_COLORS[c]}"><span>${nm}</span><small>→ ${c}</small></div>`;
+    MOVERS.forEach(([nm, , to]) => {
+      h += `<div class="mover" style="color:${TEXT_COLORS[to]}"><span>${nm}</span><small>→ ${to}</small></div>`;
     });
   }
   h += `<div class="since">${PREV_LABEL}</div>`;
+  if (MOVERS.length) {
+    h += `<div class="rec-actions" data-noshot>
+            <button type="button" id="replayBtn">▶ Replay changes</button>
+            <button type="button" id="soundBtn" aria-pressed="true">Sound on</button>
+          </div>`;
+  }
   rec.innerHTML = h;
 } else {
   rec.remove();
+}
+
+/* ---------- Marble animation for the latest moves ---------- */
+const NONE = "No public position";
+const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+const layer = document.getElementById("marbleLayer");
+const caption = document.getElementById("moveCaption");
+const sleep = ms => new Promise(r => setTimeout(r, ms));
+
+// Check the moves add up: PREV + moves must equal today's counts
+function movesAreConsistent() {
+  const c = { ...PREV };
+  for (const [, from, to] of MOVERS) {
+    if (!(from in c) || !(to in c) || from === to) return false;
+    c[from]--; c[to]++;
+    if (c[from] < 0) return false;
+  }
+  return CATS.every(k => c[k] === counts[k]);
+}
+const canAnimate = MOVERS.length > 0 && movesAreConsistent() && !reduceMotion;
+
+/* ---------- Sound ----------
+   Built-in sounds are modeled in the browser (micro-impacts through wood-table resonances for rolling,
+   inharmonic glass modes for clinks). To use real recordings instead, add files at these paths in the repo;
+   any file that exists replaces the built-in sound for that event. */
+const SOUND_FILES = { roll: "sounds/roll.mp3", clink: "sounds/clink.mp3", drop: "sounds/drop.mp3" };
+
+let actx = null, soundOn = true, samples = {}, samplesTried = false;
+function audio() {
+  if (!actx) { try { actx = new (window.AudioContext || window.webkitAudioContext)(); } catch (e) { actx = null; } }
+  return actx;
+}
+function loadSamples() {
+  if (samplesTried || !actx || location.protocol === "file:") return;
+  samplesTried = true;
+  Object.entries(SOUND_FILES).forEach(([k, url]) => {
+    fetch(url).then(r => r.ok ? r.arrayBuffer() : Promise.reject())
+      .then(ab => actx.decodeAudioData(ab)).then(buf => { samples[k] = buf; }).catch(() => {});
+  });
+}
+function unlockAudio() {
+  const a = audio(); if (!a) return;
+  if (a.state === "suspended") a.resume().catch(() => {});
+  loadSamples();
+}
+["pointerdown", "keydown", "touchstart"].forEach(ev => window.addEventListener(ev, unlockAudio, { passive: true }));
+function canPlay() { return soundOn && actx && actx.state === "running"; }
+
+const SFX = (() => {
+  const noiseCache = new WeakMap();
+  function noise(ctx) {
+    if (!noiseCache.has(ctx)) {
+      const b = ctx.createBuffer(1, ctx.sampleRate * 2, ctx.sampleRate), d = b.getChannelData(0);
+      for (let i = 0; i < d.length; i++) d[i] = Math.random() * 2 - 1;
+      noiseCache.set(ctx, b);
+    }
+    return noiseCache.get(ctx);
+  }
+  function panner(ctx, dest, from, to, t0, dur) {
+    if (!ctx.createStereoPanner) return dest;
+    const p = ctx.createStereoPanner();
+    p.pan.setValueAtTime(from, t0); p.pan.linearRampToValueAtTime(to, t0 + dur);
+    p.connect(dest); return p;
+  }
+  // Glass marble hitting glass marble: short noise tick + inharmonic ringing modes
+  function clink(ctx, dest, t, vol = 1, pan = 0) {
+    const out = panner(ctx, dest, pan, pan, t, 0.01);
+    const f0 = 2500 + Math.random() * 500;
+    [[1, 1, .42], [2.76, .5, .24], [5.40, .28, .12], [8.93, .12, .07]].forEach(([r, a, dec]) => {
+      const o = ctx.createOscillator(), g = ctx.createGain();
+      o.type = "sine"; o.frequency.value = f0 * r * (1 + (Math.random() - .5) * .015);
+      g.gain.setValueAtTime(0.0001, t);
+      g.gain.exponentialRampToValueAtTime(0.11 * a * vol, t + 0.0015);
+      g.gain.exponentialRampToValueAtTime(0.0001, t + dec);
+      o.connect(g).connect(out); o.start(t); o.stop(t + dec + 0.02);
+    });
+    const n = ctx.createBufferSource(); n.buffer = noise(ctx);
+    const hp = ctx.createBiquadFilter(); hp.type = "highpass"; hp.frequency.value = 4500;
+    const ng = ctx.createGain();
+    ng.gain.setValueAtTime(0.1 * vol, t); ng.gain.exponentialRampToValueAtTime(0.0001, t + 0.006);
+    n.connect(hp).connect(ng).connect(out); n.start(t, Math.random()); n.stop(t + 0.01);
+  }
+  // A marble settling into place: one hit and a couple of quick rattles
+  function settle(ctx, dest, t, pan = 0) {
+    clink(ctx, dest, t, 1, pan);
+    clink(ctx, dest, t + 0.085, 0.42, pan);
+    clink(ctx, dest, t + 0.14, 0.2, pan);
+    clink(ctx, dest, t + 0.175, 0.09, pan);
+  }
+  // Glass marble landing on a wooden tabletop: dull knock + a little glass tick
+  function knock(ctx, dest, t, vol = 1, pan = 0) {
+    const out = panner(ctx, dest, pan, pan, t, 0.01);
+    const n = ctx.createBufferSource(); n.buffer = noise(ctx);
+    const env = ctx.createGain();
+    env.gain.setValueAtTime(0.0001, t); env.gain.exponentialRampToValueAtTime(2.6 * vol, t + 0.001);
+    env.gain.exponentialRampToValueAtTime(0.0001, t + 0.03);
+    [[210, 7, 1], [520, 6, .55], [1250, 4, .25]].forEach(([f, q, a]) => {
+      const bp = ctx.createBiquadFilter(); bp.type = "bandpass"; bp.frequency.value = f; bp.Q.value = q;
+      const g = ctx.createGain(); g.gain.value = a;
+      env.connect(bp).connect(g).connect(out);
+    });
+    n.connect(env); n.start(t, Math.random()); n.stop(t + 0.2);
+    clink(ctx, dest, t + 0.002, 0.12 * vol, pan);
+  }
+  // Rolling on a wooden table: a soft, hollow rumble from the tabletop's low body resonances,
+  // with a gentle wobble from the marble turning over, plus a few faint contacts. No hiss.
+  function roll(ctx, dest, t0, dur, profile = "accel", panFrom = 0, panTo = 0, vol = 1) {
+    const sr = ctx.sampleRate, N = Math.ceil(dur * sr);
+    const speed = u => profile === "accel" ? 0.35 + 0.65 * Math.pow(u, 1.3) : 1 - 0.7 * Math.pow(u, 0.8);
+    const env = u => Math.min(1, u / 0.08) * Math.min(1, (1 - u) / 0.18);
+    // Excitation: brown-ish noise (smooth, low) shaped by speed, plus sparse soft contacts
+    const buf = ctx.createBuffer(1, N, sr), d = buf.getChannelData(0);
+    let last = 0, phase = 0;
+    for (let i = 0; i < N; i++) {
+      const u = i / N, sp = speed(u);
+      last = 0.985 * last + 0.06 * (Math.random() * 2 - 1);            // brown noise
+      phase += (6 + 16 * sp) / sr;                                      // turning-over wobble
+      const wob = 0.75 + 0.25 * Math.sin(2 * Math.PI * phase) + 0.1 * Math.sin(4.3 * Math.PI * phase);
+      d[i] = last * sp * wob * env(u);
+    }
+    let t = 0;
+    while (t < dur) {
+      const u = t / dur, sp = speed(u);
+      t += -Math.log(1 - Math.random()) / (20 + 70 * sp);
+      const i0 = Math.floor(t * sr); if (i0 >= N) break;
+      const a = (0.2 + 0.5 * Math.random()) * 0.35 * sp * env(u);
+      for (let k = 0; k < 90 && i0 + k < N; k++) d[i0 + k] += a * (Math.random() * 2 - 1) * Math.exp(-k / 14);
+    }
+    const src = ctx.createBufferSource(); src.buffer = buf;
+    const out = panner(ctx, dest, panFrom, panTo, t0, dur);
+    const lp = ctx.createBiquadFilter(); lp.type = "lowpass"; lp.frequency.value = 900; lp.Q.value = 0.5;
+    const master = ctx.createGain(); master.gain.value = 1.1 * vol;
+    master.connect(out);
+    src.connect(lp);
+    // hollow wooden-table body: a few low resonances
+    [[95, 5, .7], [165, 7, 1], [260, 8, .8], [410, 6, .7], [620, 5, .4]].forEach(([f, q, a]) => {
+      const bp = ctx.createBiquadFilter(); bp.type = "bandpass"; bp.frequency.value = f; bp.Q.value = q;
+      const g = ctx.createGain(); g.gain.value = a;
+      lp.connect(bp).connect(g).connect(master);
+    });
+    const dry = ctx.createGain(); dry.gain.value = 0.25; lp.connect(dry).connect(master);
+    src.start(t0); src.stop(t0 + dur + 0.05);
+  }
+  return { clink, settle, knock, roll };
+})();
+
+function playSample(key, { pan = 0, dur = null, vol = 1 } = {}) {
+  const buf = samples[key]; if (!buf) return false;
+  const t = actx.currentTime, src = actx.createBufferSource(); src.buffer = buf;
+  const g = actx.createGain(); g.gain.value = vol;
+  let out = actx.destination;
+  if (actx.createStereoPanner) { const p = actx.createStereoPanner(); p.pan.value = pan; p.connect(out); out = p; }
+  src.connect(g).connect(out);
+  const len = dur ? Math.min(dur, buf.duration) : buf.duration;
+  if (dur) { g.gain.setValueAtTime(vol, t + Math.max(0, len - 0.25)); g.gain.linearRampToValueAtTime(0.0001, t + len); }
+  src.start(t, 0, len);
+  return true;
+}
+let outBus = null;
+function bus() {
+  if (!outBus) {
+    outBus = actx.createGain(); outBus.gain.value = 0.9;
+    const lim = actx.createDynamicsCompressor(); lim.threshold.value = -6; lim.ratio.value = 12;
+    outBus.connect(lim).connect(actx.destination);
+  }
+  return outBus;
+}
+const panAt = x => Math.max(-1, Math.min(1, (x / window.innerWidth) * 2 - 1)) * 0.8;
+function clinkBounce(x) {
+  if (!canPlay()) return;
+  if (!playSample("clink", { pan: panAt(x) })) SFX.settle(actx, bus(), actx.currentTime, panAt(x));
+}
+function tap(x, vol = 1) {
+  if (!canPlay()) return;
+  if (!playSample("drop", { pan: panAt(x), vol })) SFX.knock(actx, bus(), actx.currentTime, vol, panAt(x));
+}
+function roll(durationMs, profile, panFrom, panTo) {
+  if (!canPlay()) return;
+  if (!playSample("roll", { pan: (panFrom + panTo) / 2, dur: durationMs / 1000 }))
+    SFX.roll(actx, bus(), actx.currentTime, durationMs / 1000, profile, panFrom, panTo);
+}
+
+/* Geometry helpers (viewport coordinates; the marble layer is position: fixed) */
+function seatBox(i) {
+  const r = circles[i].getBoundingClientRect();
+  return { x: r.left + r.width / 2, y: r.top + r.height / 2, d: r.width };
+}
+function floorY() { const r = svg.getBoundingClientRect(); return r.bottom + 4; }
+function sideOf(cat) { return cat === "Support" ? "left" : cat === "Will not support" ? "right" : "center"; }
+
+function makeMarble(cat, d) {
+  const m = document.createElement("div");
+  m.className = "marble";
+  m.style.width = m.style.height = d + "px";
+  m.style.setProperty("--c", COLORS[cat]);
+  m.innerHTML = '<i class="swirl"></i>';
+  layer.appendChild(m);
+  return m;
+}
+function place(m, x, y, d) { m.style.left = (x - d / 2) + "px"; m.style.top = (y - d / 2) + "px"; }
+function pop(i) {
+  circles[i].animate([{ transform: "scale(1)" }, { transform: "scale(1.3)" }, { transform: "scale(.92)" }, { transform: "scale(1)" }],
+                     { duration: 420, easing: "ease-out" });
+}
+
+// A marble drops from above into a seat
+async function dropInto(i, cat) {
+  const { x, y, d } = seatBox(i);
+  const startY = Math.max(-d, svg.getBoundingClientRect().top - 140);
+  const m = makeMarble(cat, d); place(m, x, startY, d);
+  await m.animate([{ transform: "translateY(0)" }, { transform: `translateY(${y - startY}px)` }],
+                  { duration: 620, easing: "cubic-bezier(.5,0,1,.6)", fill: "forwards" }).finished;
+  clinkBounce(x);
+  setSeat(i, cat); pop(i);
+  m.remove();
+}
+
+// A marble lifts out of a seat, drops to the floor and rolls off one side of the screen
+async function liftAndRollAway(i, cat, dir) {
+  const { x, y, d } = seatBox(i);
+  const m = makeMarble(cat, d); place(m, x, y, d);
+  setGap(i);
+  const fy = floorY() - d / 2;
+  const drop = fy - y;
+  await m.animate([{ transform: "translate(0,0)" }, { transform: "translate(0,-14px)" }],
+                  { duration: 180, easing: "ease-out", fill: "forwards" }).finished;
+  await m.animate([{ transform: "translate(0,-14px)" }, { transform: `translate(0,${drop}px)` }],
+                  { duration: 380 + Math.min(260, drop), easing: "cubic-bezier(.5,0,1,.6)", fill: "forwards" }).finished;
+  tap(x, 1);
+  await m.animate([{ transform: `translate(0,${drop}px)` }, { transform: `translate(0,${drop - d * .45}px)` }, { transform: `translate(0,${drop}px)` }],
+                  { duration: 260, easing: "ease-in-out", fill: "forwards" }).finished;
+  tap(x, 0.45);
+  const endX = dir === "right" ? (window.innerWidth + d * 2) - x : -(x + d * 2);
+  const turns = Math.abs(endX) / (Math.PI * d) * 360 * (dir === "right" ? 1 : -1);
+  const dur = 900 + Math.abs(endX) * 0.7;
+  roll(dur, "accel", panAt(x), dir === "right" ? 0.9 : -0.9);
+  const swirl = m.querySelector(".swirl");
+  swirl.animate([{ transform: "rotate(0deg)" }, { transform: `rotate(${turns}deg)` }], { duration: dur, easing: "cubic-bezier(.35,0,.9,1)", fill: "forwards" });
+  await m.animate([{ transform: `translate(0,${drop}px)` }, { transform: `translate(${endX}px,${drop}px)` }],
+                  { duration: dur, easing: "cubic-bezier(.35,0,.9,1)", fill: "forwards" }).finished;
+  m.remove();
+}
+
+// A new marble rolls in from one side of the screen and gets shot up into a seat
+async function shootInto(i, cat, fromSide) {
+  const { x, y, d } = seatBox(i);
+  const fy = floorY() - d / 2;
+  const startX = fromSide === "left" ? -d * 2 : window.innerWidth + d * 2;
+  const sign = fromSide === "left" ? 1 : -1;
+  const launchX = x - sign * Math.min(160, window.innerWidth * 0.18);
+  const m = makeMarble(cat, d); place(m, startX, fy, d);
+  const rollDist = launchX - startX;
+  const dur = 700 + Math.abs(rollDist) * 0.55;
+  roll(dur, "decel", fromSide === "left" ? -0.9 : 0.9, panAt(launchX));
+  const swirl = m.querySelector(".swirl");
+  swirl.animate([{ transform: "rotate(0deg)" }, { transform: `rotate(${rollDist / (Math.PI * d) * 360}deg)` }], { duration: dur, easing: "cubic-bezier(.1,.6,.4,1)", fill: "forwards" });
+  await m.animate([{ transform: "translate(0,0)" }, { transform: `translate(${rollDist}px,0)` }],
+                  { duration: dur, easing: "cubic-bezier(.1,.6,.4,1)", fill: "forwards" }).finished;
+  // Arc up into the seat
+  const peak = Math.min(y, fy) - Math.max(70, d * 3);
+  const frames = [];
+  const N = 16;
+  for (let k = 0; k <= N; k++) {
+    const t = k / N;
+    const px = rollDist + (x - launchX) * t;
+    // quadratic Bezier from floor -> peak -> seat
+    const py = (1 - t) * (1 - t) * 0 + 2 * (1 - t) * t * (peak - fy) + t * t * (y - fy);
+    frames.push({ transform: `translate(${px}px,${py}px)` });
+  }
+  swirl.animate([{ transform: "rotate(0deg)" }, { transform: `rotate(${sign * 300}deg)` }], { duration: 560, fill: "forwards" });
+  await m.animate(frames, { duration: 560, easing: "cubic-bezier(.3,.1,.6,1)", fill: "forwards" }).finished;
+  clinkBounce(x);
+  setSeat(i, cat); pop(i);
+  m.remove();
+}
+
+function showCaption(name, from, to) {
+  caption.innerHTML = `<b style="color:${TEXT_COLORS[to]}">${name}</b> <span>${from} → <b style="color:${TEXT_COLORS[to]}">${to}</b></span>`;
+  caption.classList.add("show");
+}
+function hideCaption() { caption.classList.remove("show"); }
+
+let running = false;
+async function playMoves() {
+  if (!canAnimate || running) return;
+  running = true;
+  hideTip(); chamber.classList.remove("dim");
+  clearNames();
+  let cur = { ...PREV };
+  paint(layoutFor(cur));
+  await sleep(450);
+  for (const [name, from, to] of MOVERS) {
+    const next = { ...cur }; next[from]--; next[to]++;
+    const A = layoutFor(cur), B = layoutFor(next);
+    const diff = [];
+    A.forEach((c, i) => { if (c !== B[i]) diff.push(i); });
+    const fromSeat = from !== NONE ? diff.find(i => A[i] === from && B[i] !== from) : undefined;
+    const toSeat = to !== NONE ? diff.find(i => B[i] === to && A[i] !== to) : undefined;
+    showCaption(name, from, to);
+
+    let away = sideOf(from);
+    if (away === "center") away = sideOf(to) === "right" ? "left" : "right";
+    const enterFrom = away === "left" ? "right" : "left";
+
+    if (fromSeat !== undefined) await liftAndRollAway(fromSeat, from, away);
+    // everything else that shifts with this move just fades to its new color
+    diff.forEach(i => { if (i !== toSeat) setSeat(i, B[i]); });
+    if (toSeat !== undefined) {
+      if (from === NONE) {
+        setSeat(toSeat, NONE);       // the gray gap it's about to fill
+        await sleep(250);
+        await dropInto(toSeat, to);
+      } else {
+        setGap(toSeat);
+        await sleep(200);
+        await shootInto(toSeat, to, enterFrom);
+      }
+    }
+    cur = next;
+    await sleep(900);
+  }
+  hideCaption();
+  paint(layoutFor(counts));
+  assignNames();
+  running = false;
+}
+
+// Start: if there are moves to show, begin from the previous update and animate when the chart scrolls into view
+if (canAnimate) {
+  paint(layoutFor(PREV));
+  const io = new IntersectionObserver(entries => {
+    if (entries.some(e => e.isIntersecting)) { io.disconnect(); setTimeout(playMoves, 300); }
+  }, { threshold: 0.55 });
+  io.observe(document.getElementById("seatWrap"));
+} else {
+  paint(layoutFor(counts));
+  assignNames();
+}
+const replayBtn = document.getElementById("replayBtn");
+if (replayBtn) {
+  if (!canAnimate) replayBtn.remove();
+  else replayBtn.addEventListener("click", e => { e.stopPropagation(); unlockAudio(); playMoves(); });
+}
+const soundBtn = document.getElementById("soundBtn");
+if (soundBtn) {
+  try { if (localStorage.getItem("t29v-sound") === "off") soundOn = false; } catch (e) {}
+  const sync = () => { soundBtn.textContent = soundOn ? "Sound on" : "Sound off"; soundBtn.setAttribute("aria-pressed", soundOn); };
+  sync();
+  soundBtn.addEventListener("click", e => {
+    e.stopPropagation(); soundOn = !soundOn; unlockAudio(); sync();
+    try { localStorage.setItem("t29v-sound", soundOn ? "on" : "off"); } catch (e2) {}
+  });
 }
 
 /* ---------- Name lists ---------- */
