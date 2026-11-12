@@ -146,6 +146,10 @@
   .record .mover { display: flex; justify-content: space-between; margin: 4px 0; font-weight: 700; }
   .record .mover small { font-weight: 400; font-size: 12.5px; }
   .record .since { color: var(--faint); font-size: 11.5px; margin-top: 8px; }
+  .record .latest-h span { color: var(--faint); font-size: .9em; }
+  .record .nochange { display: flex; align-items: center; gap: 7px; margin-top: 8px; padding-top: 8px; border-top: 1px solid var(--rule);
+    color: var(--muted); font-size: 12px; }
+  .record .nochange i { width: 7px; height: 7px; border-radius: 50%; background: #9aa1a9; flex: none; }
 
   .seat.gap { fill: #fff !important; stroke: #b8bdc4; stroke-width: 2; stroke-dasharray: 4 3; }
   .marble-layer { position: fixed; inset: 0; pointer-events: none; overflow: hidden; z-index: 15; }
@@ -204,6 +208,11 @@
   .support-h .big { color: var(--support); }
   .unclear-head .big { color: var(--unclear); }
   .oppose-h .big { color: var(--oppose); }
+  .ndot { display: inline-block; width: 8px; height: 8px; border-radius: 50%; margin-right: 8px; vertical-align: 1px; flex: none; }
+  .nopos .ndot { background: #9aa1a9; }
+  .ldiv { grid-row: 1 / 3; width: 1px; background: var(--rule); justify-self: start; margin-left: -14px; }
+  .ldiv-1 { grid-column: 2; }
+  .ldiv-2 { grid-column: 4; }
 
   .nopos { text-align: center; }
   .nopos .big { font-size: 56px; font-weight: 800; letter-spacing: -.02em; display: block; line-height: 1; color: #9aa0a8; }
@@ -237,6 +246,8 @@
     .col li { margin: 0 auto; }
     .unclear-a { grid-column: 1; grid-row: 4; }
     .unclear-b { grid-column: 2; grid-row: 4; }
+    .ldiv-1 { grid-column: 1 / -1; grid-row: 3; width: auto; height: 1px; justify-self: stretch; align-self: start; margin: 8px 0 0; }
+    .ldiv-2 { grid-column: 2; grid-row: 1 / 3; }
   }
   @media (max-width: 640px) {
     .toolbar { justify-content: center; margin: 0 0 14px; }
@@ -258,10 +269,13 @@
     .lists > .col { grid-column: 1; grid-row: auto; text-align: center; }
     .col li { margin: 0 auto; }
     .unclear-head, .oppose-h { margin-top: 28px; }
-    .support-h { order: 1; } .support { order: 2; } .unclear-head { order: 3; } .unclear-a { order: 4; }
-    .unclear-b { order: 5; } .oppose-h { order: 6; } .oppose { order: 7; }
+    .support-h { order: 1; } .support { order: 2; } .ldiv-1 { order: 3; } .unclear-head { order: 4; } .unclear-a { order: 5; }
+    .unclear-b { order: 6; } .ldiv-2 { order: 7; } .oppose-h { order: 8; } .oppose { order: 9; }
+    .ldiv-1, .ldiv-2 { grid-column: 1; grid-row: auto; width: auto; height: 1px; justify-self: stretch; margin: 24px 0 0; }
+    .unclear-head, .oppose-h { margin-top: 22px; }
     .record { text-align: left; }
     .record h3, .record .total, .record .latest-h, .record .since { text-align: center; }
+    .record .nochange { justify-content: center; }
     .col .big { font-size: 46px; }
   }
 
@@ -361,6 +375,7 @@
 
   .plists { display: grid; grid-template-columns: repeat(4, 1fr); column-gap: 28px; }
   .pcol { grid-column: span var(--span); }
+  .pcol + .pcol { border-left: 1px solid var(--rule); margin-left: -14px; padding-left: 14px; }
   .pcol h2 { margin: 0; line-height: 1; }
   .pcol .big { font-size: 56px; font-weight: 800; letter-spacing: -.02em; display: block; }
   .pcol .lbl { font-size: 15px; font-weight: 700; letter-spacing: .02em; text-transform: uppercase; display: block; margin: 6px 0 14px; }
@@ -373,6 +388,7 @@
     .toolbar { flex-direction: column; }
     .plists { grid-template-columns: 1fr; row-gap: 26px; text-align: center; }
     .pcol { grid-column: auto; }
+    .pcol + .pcol { border-left: 0; margin-left: 0; padding-left: 0; border-top: 1px solid var(--rule); padding-top: 24px; }
     .pcol ul { columns: 2 !important; width: fit-content; margin: 0 auto; text-align: left; }
   }
   @media (max-width: 520px) {
@@ -578,6 +594,9 @@ const NO_POSITION_NOTE = "\u2020 Elected Minnesota governor. Her seat will go to
 /* Previous snapshot for the "On the Record" box, plus who moved since then */
 const PREV = { "Support": 12, "Unclear": 17, "No public position": 19, "Will not support": 8 };
 const PREV_LABEL = "Change since Nov. 12, 9 AM";
+// When the senators in MOVERS moved (short form, e.g. "Nov. 12, 9 AM"). LAST_UPDATED at the top is the time of the
+// latest check, even when that check found no change; if the two differ, the page says there was no change.
+const LAST_MOVE = "Nov. 12, 6 PM";
 // Each move: [name, moved FROM, moved TO]. Listed in the order they happened; the page animates them one at a time.
 const MOVERS = [
   ["Mazie Hirono (HI)", "No public position", "Unclear"],
@@ -744,6 +763,18 @@ tri.setAttribute("fill", "#6b7078"); tri.setAttribute("class", "maj-tri");
 svg.appendChild(tri);
 document.getElementById("ov56").textContent = TOTAL;
 
+/* ---------- Timestamps ---------- */
+// "Last updated on November 12th, 2026 at 6:00pm" -> "Nov. 12, 6 PM"
+function shortStamp(full) {
+  const m = full.match(/(January|February|March|April|May|June|July|August|September|October|November|December)\s+(\d+)\w*,\s*\d{4}\s+at\s+(\d+):(\d+)\s*([ap]m)/i);
+  if (!m) return full;
+  const ap = { January: "Jan.", February: "Feb.", March: "March", April: "April", May: "May", June: "June", July: "July",
+               August: "Aug.", September: "Sept.", October: "Oct.", November: "Nov.", December: "Dec." }[m[1]];
+  return `${ap} ${m[2]}, ${m[3]}${m[4] === "00" ? "" : ":" + m[4]} ${m[5].toUpperCase()}`;
+}
+const CHECKED = shortStamp(LAST_UPDATED);
+const NO_CHANGE = typeof LAST_MOVE === "string" && LAST_MOVE !== CHECKED;
+
 /* ---------- On the Record box (only shows what changed) ---------- */
 const rec = document.getElementById("record");
 const onNow = counts["Support"] + counts["Unclear"] + counts["Will not support"];
@@ -757,12 +788,13 @@ if (changed.length || onPrev !== onNow) {
           <b style="color:${TEXT_COLORS[c]}">${PREV[c]} → ${counts[c]}</b></div>`;
   });
   if (MOVERS.length) {
-    h += `<div class="latest-h">Latest:</div>`;
+    h += `<div class="latest-h">Latest${typeof LAST_MOVE === "string" ? ` <span>(${LAST_MOVE})</span>` : ""}:</div>`;
     MOVERS.forEach(([nm, , to]) => {
       h += `<div class="mover" style="color:${TEXT_COLORS[to]}"><span>${nm}</span><small>→ ${to}</small></div>`;
     });
   }
   h += `<div class="since">${PREV_LABEL}</div>`;
+  if (NO_CHANGE) h += `<div class="nochange"><i></i>No change in the latest check (${CHECKED})</div>`;
   if (MOVERS.length) {
     h += `<div class="rec-actions" data-noshot>
             <button type="button" id="replayBtn">▶ Replay changes</button>
@@ -1130,7 +1162,7 @@ if (soundBtn) {
 const lists = document.getElementById("lists");
 const li = (cat, idx) => {
   const p = SENATORS[cat][idx];
-  return `<li data-cat="${cat}" data-idx="${idx}">${p[0]} (${p[1]})${p[3] ? "*" : ""}</li>`;
+  return `<li data-cat="${cat}" data-idx="${idx}"><i class="ndot" style="background:${COLORS[cat]}"></i>${p[0]} (${p[1]})${p[3] ? "*" : ""}</li>`;
 };
 const half = Math.ceil(counts["Unclear"] / 2);
 lists.innerHTML = `
@@ -1140,7 +1172,8 @@ lists.innerHTML = `
   <div class="col support"><ul>${SENATORS["Support"].map((_, i) => li("Support", i)).join("")}</ul></div>
   <div class="col unclear-a"><ul>${SENATORS["Unclear"].slice(0, half).map((_, i) => li("Unclear", i)).join("")}</ul></div>
   <div class="col unclear-b"><ul>${SENATORS["Unclear"].slice(half).map((_, i) => li("Unclear", i + half)).join("")}</ul></div>
-  <div class="col oppose"><ul>${SENATORS["Will not support"].map((_, i) => li("Will not support", i)).join("")}</ul></div>`;
+  <div class="col oppose"><ul>${SENATORS["Will not support"].map((_, i) => li("Will not support", i)).join("")}</ul></div>
+  <div class="ldiv ldiv-1" aria-hidden="true"></div><div class="ldiv ldiv-2" aria-hidden="true"></div>`;
 
 /* ---------- No public position list ---------- */
 const NOPOS_SORTED = [...NO_POSITION].sort((a, b) => a[1].localeCompare(b[1]) || a[0].localeCompare(b[0]));
@@ -1153,7 +1186,7 @@ const nopos = document.getElementById("nopos");
   nopos.innerHTML = `
     <h2 style="margin:0"><span class="big">${counts["No public position"]}</span><span class="lbl">No public position</span></h2>
     <p class="sub">Haven't said publicly where they stand. Listed by state.</p>
-    <ul>${NOPOS_SORTED.map((p, i) => `<li data-cat="No public position" data-idx="${i}">${p[0]} (${p[1]})${p[2] || ""}</li>`).join("")}</ul>
+    <ul>${NOPOS_SORTED.map((p, i) => `<li data-cat="No public position" data-idx="${i}"><i class="ndot"></i>${p[0]} (${p[1]})${p[2] || ""}</li>`).join("")}</ul>
     ${hasMark ? `<p class="note">${NO_POSITION_NOTE}</p>` : ""}`;
 })();
 
@@ -1292,7 +1325,7 @@ window.addEventListener("resize", () => { if (pinned) placePinned(); });
 
 /* ---------- Header text ---------- */
 document.getElementById("subtitle").textContent = SUBTITLE;
-document.getElementById("updated").textContent = LAST_UPDATED;
+document.getElementById("updated").textContent = LAST_UPDATED + (NO_CHANGE ? ` \u00a0·\u00a0 No change since ${LAST_MOVE}` : "");
 if (KOFI_URL) { const k = document.getElementById("kofi"); k.href = KOFI_URL; k.hidden = false; }
 
 /* ---------- Screenshot ---------- */
@@ -1324,7 +1357,7 @@ function trackerShareSpec() {
         y += 19;
       });
       if (MOVERS.length) {
-        y += 5; text("Latest:", RX, y, { px: 12, color: "#5b636d" }); y += 18;
+        y += 5; text(typeof LAST_MOVE === "string" ? `Latest (${LAST_MOVE}):` : "Latest:", RX, y, { px: 12, color: "#5b636d", maxW: RR - RX }); y += 18;
         MOVERS.slice(-5).forEach(([nm, , to]) => {
           text(nm, RX, y, { w: 700, px: 12, color: TEXT_COLORS[to], maxW: RR - RX - 62 });
           text(`→ ${to}`, RR, y, { px: 11, color: TEXT_COLORS[to], align: "right" });
@@ -1332,6 +1365,10 @@ function trackerShareSpec() {
         });
       }
       text(PREV_LABEL, RX, y + 2, { px: 10.5, color: "#8c949e" });
+      if (NO_CHANGE) {
+        g.fillStyle = "#9aa1a9"; g.beginPath(); g.arc(RX + 3.5, y + 18, 3.5, 0, Math.PI * 2); g.fill();
+        text(`No change in the latest check (${CHECKED})`, RX + 12, y + 22, { px: 10.5, color: "#5b636d", maxW: RR - RX - 12 });
+      }
     },
     groups: [
       { label: "Support", n: counts["Support"], color: COLORS["Support"], names: SENATORS["Support"].map(name) },
@@ -1477,9 +1514,11 @@ async function drawShareImage(spec) {
     text(String(gr.n), center, 702, { w: 800, px: 36, color: gr.color, align: al });
     text(gr.label.toUpperCase(), center, 720, { w: 700, px: 13, color: INK, align: al, maxW: span - 10 });
     const per = Math.ceil(gr.names.length / n) || 1;
+    if (gi > 0) { g.fillStyle = RULE; g.fillRect(x0 - 14, 672, 1.2, Math.max(60, LIST_Y + rows * LH - 672 - 4)); }
     gr.names.forEach((nm, j) => {
-      const c = Math.floor(j / per), r = j % per;
-      text(nm, x0 + c * colW, LIST_Y + r * LH, { px: 12.8, color: "#2b3036", maxW: colW - 12 });
+      const c = Math.floor(j / per), r = j % per, nx = x0 + c * colW, ny = LIST_Y + r * LH;
+      g.fillStyle = gr.dot || gr.color; g.beginPath(); g.arc(nx + 3.5, ny - 4.2, 3.4, 0, Math.PI * 2); g.fill();
+      text(nm, nx + 12, ny, { px: 12.8, color: "#2b3036", maxW: colW - 24 });
     });
     ci += n;
   });
@@ -1775,7 +1814,7 @@ function renderPredLists(c) {
   document.getElementById("pLists").innerHTML = gs.map((g, i) => `
     <div class="pcol" style="--span:${cols[i]}">
       <h2><span class="big" style="color:${g.color}">${g.list.length}</span><span class="lbl">${g.label}</span></h2>
-      <ul style="columns:${cols[i]}">${g.list.map(r => `<li data-id="${r.id}" title="Change your pick">${r.name} (${r.st})${r.elect ? "*" : ""}</li>`).join("") || `<li class="empty">No one yet</li>`}</ul>
+      <ul style="columns:${cols[i]}">${g.list.map(r => `<li data-id="${r.id}" title="Change your pick"><i class="ndot" style="background:${PRED[g.k].color}"></i>${r.name} (${r.st})${r.elect ? "*" : ""}</li>`).join("") || `<li class="empty">No one yet</li>`}</ul>
     </div>`).join("");
 }
 document.getElementById("pLists").addEventListener("click", e => {
@@ -1817,7 +1856,7 @@ function predShareSpec() {
         text(`${c.yes} of 29 so far`, RX, y + 17, { px: 11.5, color: "#5b636d" });
       }
     },
-    groups: gs.map(g => ({ label: g.label, n: g.list.length, color: g.color, names: g.list.map(r => `${r.name} (${r.st})${r.elect ? "*" : ""}`) })),
+    groups: gs.map(g => ({ label: g.label, n: g.list.length, color: g.color, dot: PRED[g.k].color, names: g.list.map(r => `${r.name} (${r.st})${r.elect ? "*" : ""}`) })),
     note: "This is a predicted outcome made by a reader, not where senators actually stand.   * Senator-elect",
     sources: "Make your own at jaysonfrascatore.github.io/The29thVote  ·  Created by Jayson Frascatore",
   };
