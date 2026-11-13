@@ -111,9 +111,9 @@
   .seg:last-child { border-right: 0; }
   .seg { transition: flex-grow .7s cubic-bezier(.3,.7,.3,1); }
   .rv.rolling { display: inline-block; overflow: hidden; vertical-align: bottom; }
-  .rv.rolling .rv-in { display: block; }
-  .rv.rolling .rv-in > span { display: block; text-align: inherit; }
   .big.rolling { overflow: hidden; }
+  .rolling .rv-in { display: block; }
+  .rolling .rv-in > span { display: block; text-align: inherit; white-space: nowrap; }
   .seg .pct { font-size: clamp(17px, 3vw, 30px); font-weight: 700; line-height: 1.1; }
   .seg .cnt { font-size: clamp(11px, 1.6vw, 17px); font-weight: 700; margin-top: 2px; white-space: nowrap; }
   .seg.none { color: var(--ink); }
