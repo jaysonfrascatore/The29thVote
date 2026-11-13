@@ -778,19 +778,52 @@ function clearNames() {
   });
   for (const k in seatEls) delete seatEls[k];
 }
+function nameSeat(i, cat, idx) {
+  const p = SENATORS[cat][idx], c = circles[i];
+  c.classList.add("onrecord");
+  c.dataset.cat = cat; c.dataset.idx = idx;
+  c.setAttribute("tabindex", "0");
+  c.setAttribute("aria-label", `${p[0]} (${p[1]}): ${cat}`);
+  seatEls[cat + "|" + idx] = c;
+}
+// Where each mover's marble lands, replaying the moves from the previous update (same math as the animation)
+function moverSeat(cur, next, to) {
+  if (to === "No public position") return -1;
+  const A = layoutFor(cur), B = layoutFor(next);
+  return A.findIndex((c, i) => B[i] === to && c !== to);
+}
+function moverLandings() {
+  const out = [];
+  if (!MOVERS.length || !movesAreConsistent()) return out;
+  let cur = { ...PREV };
+  for (const [name, from, to] of MOVERS) {
+    const next = { ...cur }; next[from]--; next[to]++;
+    const seat = moverSeat(cur, next, to);
+    if (seat >= 0) out.push([name, to, seat]);
+    cur = next;
+  }
+  return out;
+}
+function senatorIdx(cat, label) {
+  return (SENATORS[cat] || []).findIndex(p => `${p[0]} (${p[1]})` === label);
+}
 function assignNames() {
   clearNames();
-  const nameIdx = { "Support": 0, "Unclear": 0, "Will not support": 0 };
-  layoutFor(counts).forEach((cat, i) => {
-    if (cat === "No public position") return;
-    const idx = nameIdx[cat]++;
-    const p = SENATORS[cat][idx];
-    const c = circles[i];
-    c.classList.add("onrecord");
-    c.dataset.cat = cat; c.dataset.idx = idx;
-    c.setAttribute("tabindex", "0");
-    c.setAttribute("aria-label", `${p[0]} (${p[1]}): ${cat}`);
-    seatEls[cat + "|" + idx] = c;
+  const lay = layoutFor(counts);
+  const taken = new Set(), used = { "Support": new Set(), "Unclear": new Set(), "Will not support": new Set() };
+  // Movers keep the seat their marble landed in (latest mover first, in case two landed in the same spot)
+  moverLandings().reverse().forEach(([label, cat, seat]) => {
+    const idx = senatorIdx(cat, label);
+    if (idx < 0 || lay[seat] !== cat || taken.has(seat) || used[cat].has(idx)) return;
+    nameSeat(seat, cat, idx); taken.add(seat); used[cat].add(idx);
+  });
+  const next = { "Support": 0, "Unclear": 0, "Will not support": 0 };
+  lay.forEach((cat, i) => {
+    if (cat === "No public position" || taken.has(i)) return;
+    while (used[cat].has(next[cat])) next[cat]++;
+    const idx = next[cat]++;
+    if (idx >= SENATORS[cat].length) return;
+    nameSeat(i, cat, idx); used[cat].add(idx);
   });
 }
 
@@ -1168,6 +1201,10 @@ async function playMoves() {
         await sleep(200);
         await shootInto(toSeat, to, enterFrom);
       }
+    }
+    if (toSeat !== undefined) {
+      const idx = senatorIdx(to, name);
+      if (idx >= 0) nameSeat(toSeat, to, idx);   // hover or tap the marble right after it lands
     }
     cur = next;
     showCounts(cur, true);          // bar, legend and big numbers catch up with the marble that just landed
