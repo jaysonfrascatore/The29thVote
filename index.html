@@ -636,10 +636,12 @@ const MOVERS = [
 ];
 
 // Senators running for leader. Their own marble gets a green dotted ring, its own color and a label.
-// This doesn't change the bar or the counts. [name, state, label, marble color]
+// This doesn't change the bar or the counts. [name, state, label, marble color, locked seat (optional)]
+// Locked seat N keeps the marble in the Nth seat of its color block, counted from that block's outside edge
+// (from the left for Support, from the right for Opposing Schumer). Van Hollen stays in the 9th Opposing seat.
 const CANDIDATES = [
   ["Chuck Schumer", "NY", "Sen. Chuck Schumer running for a 3rd term as Majority Leader", "#03045E"],
-  ["Chris Van Hollen", "MD", "Sen. Chris Van Hollen announces his run for Majority Leader", "#3bf4fb"],
+  ["Chris Van Hollen", "MD", "Sen. Chris Van Hollen announces his run for Majority Leader", "#3bf4fb", 9],
 ];
 /* ======================================================================== */
 
@@ -905,6 +907,18 @@ function assignNames() {
   clearNames();
   const lay = layoutFor(counts);
   const taken = new Set(), used = { "Support": new Set(), "Unclear": new Set(), "Will not support": new Set() };
+  // Candidates with a locked seat go there first, so nobody else's marble ever lands on it
+  (typeof CANDIDATES !== "undefined" ? CANDIDATES : []).forEach(cand => {
+    const n = cand[4];
+    if (!n) return;
+    const label = `${cand[0]} (${cand[1]})`;
+    for (const cat of ["Support", "Will not support"]) {
+      const idx = senatorIdx(cat, label);
+      if (idx < 0) continue;
+      const seat = cat === "Support" ? n - 1 : TOTAL - n;
+      if (lay[seat] === cat && !taken.has(seat)) { nameSeat(seat, cat, idx); taken.add(seat); used[cat].add(idx); }
+    }
+  });
   // Movers keep the seat their marble landed in (latest mover first, in case two landed in the same spot)
   moverLandings().reverse().forEach(([label, cat, seat]) => {
     const idx = senatorIdx(cat, label);
