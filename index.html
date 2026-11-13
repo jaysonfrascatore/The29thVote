@@ -685,7 +685,7 @@ const TOTAL = 56;
 const NEEDED = 29;
 const SUBTITLE = "Public positions of the 56-member Senate Democratic caucus \u00a0\u00b7\u00a0 Assumes Peltola (AK) wins";
 const KOFI_URL = "https://ko-fi.com/jaysonfras";
-const LAST_UPDATED = "Last updated on November 13th, 2026 at 3:00pm";
+const LAST_UPDATED = "Last updated on November 13th, 2026 at 3:30pm";
 
 const SENATORS = {
   "Support": [
@@ -730,6 +730,7 @@ const SENATORS = {
     ["Chris Van Hollen", "MD", "Announced Nov. 12 that he's running against Schumer for majority leader, saying \"we need new leadership\" (AP, The Washington Sun)."],
     ["Bernie Sanders", "VT", "Posted on Nov. 12 that he is \"supporting Senator Chris Van Hollen to lead Senate Democrats\" (CNN). Had already said he won't back Schumer."],
     ["Abdul El-Sayed", "MI", "Reiterated his support for Van Hollen after Van Hollen announced on Nov. 12 (CNN). First backed him for leader in April.", true],
+    ["Jeff Merkley", "OR", "Posted on Nov. 13 that Americans want government for the people, not the powerful, and \"@ChrisVanHollen is that leader\" (<a href='https://x.com/SenJeffMerkley/status/2121328108854751475' target='_blank' rel='noopener' onclick='event.stopPropagation()'>X</a>)."],
     ["Peggy Flanagan", "MN", "Announced on X on Nov. 13 that she's backing Van Hollen for leader. Had already called for new leadership.", true],
   ],
   // Against Schumer, but haven't said who they'd back instead
@@ -748,21 +749,21 @@ const NO_POSITION = [
   ["John Hickenlooper", "CO"], ["Lisa Blunt Rochester", "DE"],
   ["Angela Alsobrooks", "MD"], ["Amy Klobuchar", "MN", "\u2020", "Elected Minnesota governor, so her seat will go to an appointee. Hasn't said publicly where she stands on Schumer."],
   ["Andy Kim", "NJ"], ["Maggie Hassan", "NH"],
-  ["Jeff Merkley", "OR"], ["Ron Wyden", "OR"], ["Tim Kaine", "VA"], ["Peter Welch", "VT"],
+  ["Ron Wyden", "OR"], ["Tim Kaine", "VA"], ["Peter Welch", "VT"],
   ["Maria Cantwell", "WA"], ["Patty Murray", "WA"],
 ];
 const NO_POSITION_DEFAULT = "Hasn't said publicly whether they'll back Schumer for majority leader.";
 const NO_POSITION_NOTE = "\u2020 Elected Minnesota governor. Her seat will go to an appointee.";
 
 /* Previous snapshot for the "On the Record" box, plus who moved since then */
-const PREV = { "Support": 14, "Unclear": 18, "No public position": 15, "Will not support": 5, "Support Van Hollen": 4 };
-const PREV_LABEL = "Change since Nov. 13, 10:30 AM";
+const PREV = { "Support": 14, "Unclear": 19, "No public position": 14, "Will not support": 5, "Support Van Hollen": 4 };
+const PREV_LABEL = "Change since Nov. 13, 12:30 PM";
 // When the senators in MOVERS moved (short form, e.g. "Nov. 12, 9 AM"). LAST_UPDATED at the top is the time of the
 // latest check, even when that check found no change; if the two differ, the page says there was no change.
-const LAST_MOVE = "Nov. 13, 12:30 PM";
+const LAST_MOVE = "Nov. 13, 3:30 PM";
 // Each move: [name, moved FROM, moved TO]. Listed in the order they happened; the page animates them one at a time.
 const MOVERS = [
-  ["Chris Coons (DE)", "No public position", "Unclear"],
+  ["Jeff Merkley (OR)", "No public position", "Support Van Hollen"],
 ];
 
 // Previous Updates timeline. One entry per update that moved anyone, oldest first; add new entries at the END.
@@ -798,6 +799,9 @@ const HISTORY = [
   ]],
   ["Nov. 13, 12:30 PM", "Manual update", [
     ["Chris Coons", "DE", "No public position", "Unclear", "Posted on X that the caucus needs \"a leadership team that shows we hear them,\" calling it a vigorous debate, without backing either candidate."],
+  ]],
+  ["Nov. 13, 3:30 PM", "Manual update", [
+    ["Jeff Merkley", "OR", "No public position", "Support Van Hollen", "Posted on X that Americans want government for the people and \"@ChrisVanHollen is that leader.\""],
   ]],
 ];
 
