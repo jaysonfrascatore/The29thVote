@@ -573,7 +573,7 @@ const TOTAL = 56;
 const NEEDED = 29;
 const SUBTITLE = "Public positions of the 56-member Senate Democratic caucus \u00a0\u00b7\u00a0 Assumes Peltola (AK) wins";
 const KOFI_URL = "https://ko-fi.com/jaysonfras";
-const LAST_UPDATED = "Last updated on November 12th, 2026 at 11:00pm";
+const LAST_UPDATED = "Last updated on November 13th, 2026 at 9:00am";
 
 const SENATORS = {
   "Support": [
@@ -590,6 +590,7 @@ const SENATORS = {
     ["Angus King", "ME", "Independent who caucuses with Democrats. Backs Schumer."],
     ["Catherine Cortez Masto", "NV", "Posted on Nov. 12 that Schumer was \"instrumental\" in winning the majority: \"I will be supporting him as our Democratic leader\" (CBC)."],
     ["Jacky Rosen", "NV", "Endorsed Schumer on Nov. 12, saying he has \"the experience and the fight to continue leading our diverse caucus\" (CBS News)."],
+    ["Tim Kaine", "VA", "Asked on CBS's Face the Nation on June 28 whether he'd keep supporting Schumer as leader, he said \"Yes,\" calling him \"one of the best majority leaders we've had in a long time.\""],
     ["Sherrod Brown", "OH", "Senator-elect recruited by Schumer. Publicly supports him.", true],
   ],
   "Unclear": [
@@ -635,22 +636,21 @@ const NO_POSITION = [
   ["John Hickenlooper", "CO"], ["Chris Coons", "DE"], ["Lisa Blunt Rochester", "DE"],
   ["Angela Alsobrooks", "MD"], ["Amy Klobuchar", "MN", "\u2020", "Elected Minnesota governor, so her seat will go to an appointee. Hasn't said publicly where she stands on Schumer."],
   ["Andy Kim", "NJ"], ["Maggie Hassan", "NH"],
-  ["Jeff Merkley", "OR"], ["Ron Wyden", "OR"], ["Tim Kaine", "VA"], ["Peter Welch", "VT"],
+  ["Jeff Merkley", "OR"], ["Ron Wyden", "OR"], ["Peter Welch", "VT"],
   ["Maria Cantwell", "WA"], ["Patty Murray", "WA"],
 ];
 const NO_POSITION_DEFAULT = "Hasn't said publicly whether they'll back Schumer for majority leader.";
 const NO_POSITION_NOTE = "\u2020 Elected Minnesota governor. Her seat will go to an appointee.";
 
 /* Previous snapshot for the "On the Record" box, plus who moved since then */
-const PREV = { "Support": 12, "Unclear": 18, "No public position": 17, "Will not support": 6, "Support Van Hollen": 3 };
-const PREV_LABEL = "Change since Nov. 12, 9 PM";
+const PREV = { "Support": 14, "Unclear": 18, "No public position": 15, "Will not support": 6, "Support Van Hollen": 3 };
+const PREV_LABEL = "Change since Nov. 12, 11 PM";
 // When the senators in MOVERS moved (short form, e.g. "Nov. 12, 9 AM"). LAST_UPDATED at the top is the time of the
 // latest check, even when that check found no change; if the two differ, the page says there was no change.
-const LAST_MOVE = "Nov. 12, 11 PM";
+const LAST_MOVE = "Nov. 13, 9 AM";
 // Each move: [name, moved FROM, moved TO]. Listed in the order they happened; the page animates them one at a time.
 const MOVERS = [
-  ["Catherine Cortez Masto (NV)", "No public position", "Support"],
-  ["Jacky Rosen (NV)", "No public position", "Support"],
+  ["Tim Kaine (VA)", "No public position", "Support"],
 ];
 
 // Senators running for leader. Their own marble gets a green dotted ring, its own color and a label.
