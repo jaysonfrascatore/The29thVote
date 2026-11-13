@@ -546,7 +546,7 @@
       Support The 29th Vote on Ko-fi
     </a>
     <p class="note">Senate Democrats elect their leader by secret ballot, expected in December. Senators with no public position are not committed either way. <span style="white-space:nowrap">* Senator-elect</span></p>
-    <p class="src">Sources: CBS News, CBC, Boston Globe, Roll Call, CNN, The Hill, PolitiFact, Washington Times, Epoch Times, Punchbowl News, New Republic, NBC News &nbsp;·&nbsp; <span style="white-space:nowrap">Created by Jayson Frascatore</span></p>
+    <p class="src">Sources: CBS News, CBC, Boston Globe, Roll Call, CNN, The Hill, PolitiFact, Washington Times, Epoch Times, Punchbowl News, New Republic, NBC News, X &nbsp;·&nbsp; <span style="white-space:nowrap">Created by Jayson Frascatore</span></p>
   </footer>
 </div>
 
@@ -573,7 +573,7 @@ const TOTAL = 56;
 const NEEDED = 29;
 const SUBTITLE = "Public positions of the 56-member Senate Democratic caucus \u00a0\u00b7\u00a0 Assumes Peltola (AK) wins";
 const KOFI_URL = "https://ko-fi.com/jaysonfras";
-const LAST_UPDATED = "Last updated on November 13th, 2026 at 12:00pm";
+const LAST_UPDATED = "Last updated on November 13th, 2026 at 12:30pm";
 
 const SENATORS = {
   "Support": [
@@ -605,6 +605,7 @@ const SENATORS = {
     ["Ed Markey", "MA", "Asked after his reelection whether he'd back Schumer, he sidestepped it and said Schumer had called to congratulate him (Boston Globe, Nov. 5)."],
     ["Mazie Hirono", "HI", "Asked whether she'd back Schumer, she told The Epoch Times: \"Stay tuned.\""],
     ["Tammy Duckworth", "IL", "Told The Epoch Times Schumer is \"the only one who's declared\" so far, and that she'll \"consider all options\" if someone else gets in."],
+    ["Chris Coons", "DE", "Posted on X on Nov. 13 that the caucus needs \"a leadership team that shows we hear them,\" calling it a vigorous debate over experience and vision, without backing either candidate."],
     ["James Talarico", "TX", "Declined to affirm support when asked.", true],
     ["Chris Pappas", "NH", "Declined to affirm support when asked.", true],
     ["Josh Turek", "IA", "Declined to affirm support when asked.", true],
@@ -632,7 +633,7 @@ const SENATORS = {
 // Senators with no public position yet (shown as a plain list, sorted by state). Move a name out of here when they go on the record.
 const NO_POSITION = [
   ["Adam Schiff", "CA"], ["Michael Bennet", "CO", "", "Lost his primary for Colorado governor, so he stays in the Senate. Hasn't said publicly where he stands on Schumer."],
-  ["John Hickenlooper", "CO"], ["Chris Coons", "DE"], ["Lisa Blunt Rochester", "DE"],
+  ["John Hickenlooper", "CO"], ["Lisa Blunt Rochester", "DE"],
   ["Angela Alsobrooks", "MD"], ["Amy Klobuchar", "MN", "\u2020", "Elected Minnesota governor, so her seat will go to an appointee. Hasn't said publicly where she stands on Schumer."],
   ["Andy Kim", "NJ"], ["Maggie Hassan", "NH"],
   ["Jeff Merkley", "OR"], ["Ron Wyden", "OR"], ["Tim Kaine", "VA"], ["Peter Welch", "VT"],
@@ -642,14 +643,14 @@ const NO_POSITION_DEFAULT = "Hasn't said publicly whether they'll back Schumer f
 const NO_POSITION_NOTE = "\u2020 Elected Minnesota governor. Her seat will go to an appointee.";
 
 /* Previous snapshot for the "On the Record" box, plus who moved since then */
-const PREV = { "Support": 14, "Unclear": 18, "No public position": 15, "Will not support": 6, "Support Van Hollen": 3 };
-const PREV_LABEL = "Change since Nov. 12, 11 PM";
+const PREV = { "Support": 14, "Unclear": 18, "No public position": 15, "Will not support": 5, "Support Van Hollen": 4 };
+const PREV_LABEL = "Change since Nov. 13, 10:30 AM";
 // When the senators in MOVERS moved (short form, e.g. "Nov. 12, 9 AM"). LAST_UPDATED at the top is the time of the
 // latest check, even when that check found no change; if the two differ, the page says there was no change.
-const LAST_MOVE = "Nov. 13, 10:30 AM";
+const LAST_MOVE = "Nov. 13, 12:30 PM";
 // Each move: [name, moved FROM, moved TO]. Listed in the order they happened; the page animates them one at a time.
 const MOVERS = [
-  ["Peggy Flanagan (MN)", "Will not support", "Support Van Hollen"],
+  ["Chris Coons (DE)", "No public position", "Unclear"],
 ];
 
 // Senators running for leader. Their own marble gets a green dotted ring, its own color and a label.
