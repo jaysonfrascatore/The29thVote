@@ -1719,7 +1719,8 @@ function trackerShareSpec() {
     subtitle: SUBTITLE.replace(/ /g, " "),
     bar: CATS.map(c => ({ label: c, n: counts[c], color: COLORS[c], text: c === "No public position" ? "#16191d" : c === "Will not support" ? "#0b4655" : "#fff" })),
     legend: CATS.map(c => ({ label: `${L(c)} (${counts[c]})`, color: COLORS[c] }))
-      .concat(candSeats.length ? [{ label: "Running for leader", ring: true }] : []),
+      .concat(candSeats.length && !mapMode ? [{ label: "Running for leader", ring: true }] : []),
+    map: mapMode,
     seatColors: layoutFor(counts).map(c => COLORS[c]),
     candidates: candSeats.map(([i, cand]) => ({ seat: i, color: cand[3], label: cand[2] })),
     box: ({ text, g, RX, RR, y }) => {
@@ -1781,7 +1782,7 @@ async function drawShareImage(spec) {
   const W = 960, PAD = 60, TOP = spec.ribbon ? 26 : 0;
   const cols = splitColumns(spec.groups);
   const rows = Math.max(1, ...spec.groups.map((gr, i) => Math.ceil(gr.names.length / cols[i])));
-  const DY = (spec.candidates || []).length ? 30 : 0;   // room for candidate labels under the chart
+  const DY = spec.map ? 64 : (spec.candidates || []).length ? 30 : 0;   // room for candidate labels / the map key under the chart
   const LH = 13.4, LIST_Y = 738 + DY;
   const H = Math.max(960 + TOP, Math.ceil(TOP + LIST_Y + rows * LH + 72));
   const S = 2;
@@ -1872,6 +1873,63 @@ async function drawShareImage(spec) {
   });
   rule(298);
 
+  if (spec.map) {
+    // US map in place of the seating chart: states colored by where their Democratic senators stand
+    const MW = 572, MS = MW / 1000, MX0 = 92, MY0 = 314;
+    const model = mapModel(16, true);
+    g.save(); g.translate(MX0, MY0); g.scale(MS, MS);
+    model.forEach(m => {
+      const p = new Path2D(m.d);
+      if (m.dc) { g.fillStyle = "#dfe3e7"; g.fill(p); return; }
+      if (m.colors.length === 1) { g.fillStyle = m.colors[0]; g.fill(p); }
+      else {
+        // same diagonal split as the page: top-left half is the first senator's color
+        const nums = m.d.match(/-?\d+(\.\d+)?/g).map(Number);
+        let x0 = 1e9, y0 = 1e9, x1 = -1e9, y1 = -1e9;
+        for (let i = 0; i + 1 < nums.length; i += 2) { x0 = Math.min(x0, nums[i]); x1 = Math.max(x1, nums[i]); y0 = Math.min(y0, nums[i + 1]); y1 = Math.max(y1, nums[i + 1]); }
+        g.save(); g.clip(p);
+        g.fillStyle = m.colors[1]; g.fillRect(x0 - 2, y0 - 2, x1 - x0 + 4, y1 - y0 + 4);
+        g.fillStyle = m.colors[0]; g.beginPath(); g.moveTo(x0, y0); g.lineTo(x1, y0); g.lineTo(x0, y1); g.closePath(); g.fill();
+        g.restore();
+      }
+      g.strokeStyle = "#fff"; g.lineWidth = 1.2; g.lineJoin = "round"; g.stroke(p);
+    });
+    model.forEach(m => { if (m.latest) { g.strokeStyle = INK; g.lineWidth = 3; g.stroke(new Path2D(m.d)); } });
+    model.forEach(m => {
+      if (m.dc) return;
+      const b = m.box;
+      if (m.lead) { g.strokeStyle = "#8c949e"; g.lineWidth = 1.2; g.beginPath(); g.moveTo(m.lead[0], m.lead[1]); g.lineTo(m.lead[2], m.lead[3]); g.stroke(); }
+      g.fillStyle = "#fff"; g.strokeStyle = m.latest ? INK : "rgba(22,25,29,.4)"; g.lineWidth = m.latest ? 3 : 1.3;
+      g.beginPath(); g.roundRect ? g.roundRect(b.x - b.w / 2, b.y - b.h / 2, b.w, b.h, b.fs * .22) : g.rect(b.x - b.w / 2, b.y - b.h / 2, b.w, b.h);
+      g.fill(); g.stroke();
+      font(700, b.fs); g.fillStyle = INK; g.textAlign = "center"; g.fillText(String(m.n), b.x, b.y + b.fs * .36);
+    });
+    g.restore();
+    // Map key under the map
+    const keys = CANDIDATES.map(c => ({ c: c[3], t: `${c[0].replace(/^\S+\s+/, "")} (${c[1]})` }))
+      .concat([{ c: GOP_COLOR, t: "Two Republican senators" }, { split: true, t: "Split: senators in different groups" }, { box: true, t: "Democratic senators in the state" }])
+      .concat(MOVERS.length ? [{ out: true, t: "Latest move" }] : []);
+    font(400, 12); const KG = 20;
+    const kw = keys.map(k2 => (k2.box ? 22 : 13) + 7 + g.measureText(k2.t).width);
+    const rowW = ks => ks.reduce((a, i) => a + kw[i], 0) + KG * (ks.length - 1);
+    // one row if it fits, otherwise two balanced rows
+    let rowsK = [keys.map((_, i) => i)];
+    if (rowW(rowsK[0]) > W - 2 * PAD) { const h2 = Math.ceil(keys.length / 2); rowsK = [rowsK[0].slice(0, h2), rowsK[0].slice(h2)]; }
+    const KPOS = [];
+    rowsK.forEach((ks, r) => { let xx = (W - rowW(ks)) / 2; ks.forEach(i => { KPOS[i] = [xx, 682 + r * 22]; xx += kw[i] + KG; }); });
+    keys.forEach((k2, i) => {
+      let [kx, KY] = KPOS[i];
+      if (k2.split) {
+        g.fillStyle = "#8E5BC8"; g.fillRect(kx, KY - 11, 13, 13);
+        g.fillStyle = "#2F6FD0"; g.beginPath(); g.moveTo(kx, KY - 11); g.lineTo(kx + 13, KY - 11); g.lineTo(kx, KY + 2); g.closePath(); g.fill();
+      } else if (k2.box) {
+        g.fillStyle = "#fff"; g.strokeStyle = "rgba(22,25,29,.4)"; g.lineWidth = 1; g.fillRect(kx, KY - 12, 22, 15); g.strokeRect(kx + .5, KY - 11.5, 21, 14);
+        text("2", kx + 11, KY, { w: 700, px: 11, align: "center" });
+      } else if (k2.out) { g.strokeStyle = INK; g.lineWidth = 2; g.strokeRect(kx + 1, KY - 10, 11, 11); }
+      else { g.fillStyle = k2.c; g.fillRect(kx, KY - 11, 13, 13); }
+      text(k2.t, kx + (k2.box ? 22 : 13) + 7, KY, { px: 12, color: MUTED });
+    });
+  } else {
   // Chamber (same seat geometry as the page, scaled down)
   const k = 0.74, CX2 = W / 2, CY2 = 622;
   const P = (r, th) => [CX2 + r * 330 * k * Math.cos(th), CY2 - r * 330 * k * Math.sin(th)];
@@ -1910,6 +1968,7 @@ async function drawShareImage(spec) {
   } else text(`${NEEDED}th vote`, l2x, l2y - 26, { w: 700, px: 14, color: MARK, align: "center" });
   text(String(TOTAL), CX2, CY2 - 38, { w: 800, px: 48, align: "center" });
   text("Senate Democrats", CX2, CY2 - 10, { px: 14.5, color: MUTED, align: "center" });
+  }
 
   // Right-hand box
   if (spec.box) spec.box({ text, g, RX: 738, RR: W - PAD, y: 336 });
@@ -1962,7 +2021,7 @@ shotBtn.addEventListener("click", async e => {
     shotImg.src = shotUrl;
     shotDl.href = shotUrl;
     const d = new Date();
-    shotDl.download = `the29thvote-${view === "predict" ? "my-prediction-" : ""}${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")}.png`;
+    shotDl.download = `the29thvote-${view === "predict" ? "my-prediction-" : mapMode ? "map-" : ""}${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")}.png`;
     modal.classList.add("open");
   } catch (err) {
     console.error(err);
@@ -2369,45 +2428,58 @@ function senatorsByState() {
   NOPOS_SORTED.forEach((p, i) => (by[p[1]] = by[p[1]] || []).push({ name: p[0], cat: "No public position", idx: i, note: p[3] || NO_POSITION_DEFAULT }));
   return by;
 }
-const senColor = s => {
+const senColor = (s, light) => {
   const c = candFor(s.name); if (c) return c[3];
-  if (s.cat === "No public position") return getComputedStyle(document.documentElement).getPropertyValue("--none").trim() || COLORS[s.cat];
+  if (s.cat === "No public position" && !light) return getComputedStyle(document.documentElement).getPropertyValue("--none").trim() || COLORS[s.cat];
   return COLORS[s.cat];
 };
-function drawMap() {
+// One description of the map, used by both the page and the screenshot. fs = number-box font size in map units.
+function mapModel(fs, light) {
   const by = senatorsByState();
   const latest = new Set(MOVERS.map(m => (m[0].match(/\((\w\w)\)\s*$/) || [])[1]));
-  const k = 1000 / Math.max(280, usMap.getBoundingClientRect().width || 760);
-  const fs = Math.max(13, Math.min(34, 11 * k)), bw = fs * 1.55, bh = fs * 1.35;
-  let defs = "", shapes = "", boxes = "";
-  Object.entries(STATE_PATHS).forEach(([ab, st]) => {
-    if (ab === "DC") { shapes += `<path class="st-dc" d="${st.d}"/>`; return; }
+  const bw = fs * 1.55, bh = fs * 1.35;
+  return Object.entries(STATE_PATHS).map(([ab, st]) => {
+    if (ab === "DC") return { ab, d: st.d, dc: true };
     const sens = by[ab] || [];
-    let fill = GOP_COLOR;
-    if (sens.length === 1 || (sens.length === 2 && senColor(sens[0]) === senColor(sens[1]))) fill = senColor(sens[0]);
-    else if (sens.length === 2) {
-      defs += `<linearGradient id="split-${ab}" x1="0" y1="0" x2="1" y2="1"><stop offset=".5" stop-color="${senColor(sens[0])}"/><stop offset=".5" stop-color="${senColor(sens[1])}"/></linearGradient>`;
-      fill = `url(#split-${ab})`;
-    }
-    shapes += `<path class="st${latest.has(ab) ? " latest" : ""}" data-st="${ab}" d="${st.d}" fill="${fill}"><title>${STATE_NAMES[ab]}</title></path>`;
-    let [x, y] = st.c;
+    let colors = [GOP_COLOR];
+    if (sens.length === 1 || (sens.length === 2 && senColor(sens[0], light) === senColor(sens[1], light))) colors = [senColor(sens[0], light)];
+    else if (sens.length === 2) colors = [senColor(sens[0], light), senColor(sens[1], light)];
+    let [x, y] = st.c, lead = null;
     const ci = CALLOUTS.indexOf(ab);
     if (ci >= 0) {
       const bx = 1000 - bw / 2 - 2, by2 = 100 + ci * (bh + 6);
-      boxes += `<path class="st-lead" d="M${x},${y}L${bx - bw / 2 - 4},${by2}"/>`;
+      lead = [x, y, bx - bw / 2 - 4, by2];
       x = bx; y = by2;
     }
     if (ab === "FL") x += 18; if (ab === "LA") x -= 12; if (ab === "MI") { x += 10; y += 22; }
-    boxes += `<g class="st-box${latest.has(ab) ? " latest" : ""}" data-st="${ab}"><rect x="${x - bw / 2}" y="${y - bh / 2}" width="${bw}" height="${bh}" rx="${fs * .22}"/><text x="${x}" y="${y + fs * .04}" font-size="${fs}">${sens.length}</text></g>`;
+    return { ab, d: st.d, colors, n: sens.length, latest: latest.has(ab), box: { x, y, w: bw, h: bh, fs }, lead };
+  });
+}
+function drawMap() {
+  const k = 1000 / Math.max(280, usMap.getBoundingClientRect().width || 760);
+  const fs = Math.max(13, Math.min(34, 11 * k));
+  let defs = "", shapes = "", boxes = "";
+  mapModel(fs).forEach(m => {
+    if (m.dc) { shapes += `<path class="st-dc" d="${m.d}"/>`; return; }
+    let fill = m.colors[0];
+    if (m.colors.length === 2) {
+      defs += `<linearGradient id="split-${m.ab}" x1="0" y1="0" x2="1" y2="1"><stop offset=".5" stop-color="${m.colors[0]}"/><stop offset=".5" stop-color="${m.colors[1]}"/></linearGradient>`;
+      fill = `url(#split-${m.ab})`;
+    }
+    shapes += `<path class="st${m.latest ? " latest" : ""}" data-st="${m.ab}" d="${m.d}" fill="${fill}"><title>${STATE_NAMES[m.ab]}</title></path>`;
+    const b = m.box;
+    if (m.lead) boxes += `<path class="st-lead" d="M${m.lead[0]},${m.lead[1]}L${m.lead[2]},${m.lead[3]}"/>`;
+    boxes += `<g class="st-box${m.latest ? " latest" : ""}" data-st="${m.ab}"><rect x="${b.x - b.w / 2}" y="${b.y - b.h / 2}" width="${b.w}" height="${b.h}" rx="${b.fs * .22}"/><text x="${b.x}" y="${b.y + b.fs * .04}" font-size="${b.fs}">${m.n}</text></g>`;
   });
   usMap.innerHTML = `<defs>${defs}</defs>${shapes}${boxes}`;
+  const latest = MOVERS.length;
   const sw = (bg, label) => `<span><i style="background:${bg}"></i>${label}</span>`;
   document.getElementById("mapKey").innerHTML =
     CANDIDATES.map(c => sw(c[3], `${c[0].replace(/^\S+\s+/, "")} (${c[1]})`)).join("") +
     sw(GOP_COLOR, "Two Republican senators") +
     sw("linear-gradient(135deg, #2F6FD0 50%, #8E5BC8 50%)", "Split: senators in different groups") +
     `<span><i class="kbox">2</i>Democratic senators in the state</span>` +
-    (latest.size ? `<span><i class="kout"></i>Latest move</span>` : "");
+    (latest ? `<span><i class="kout"></i>Latest move</span>` : "");
 }
 function stateTip(ab, x, y) {
   const sens = senatorsByState()[ab] || [];
