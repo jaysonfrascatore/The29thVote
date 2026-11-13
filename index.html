@@ -170,7 +170,7 @@
   .marble { position: absolute; border-radius: 50%; background: var(--c); box-shadow: 0 0 0 2px #fff; }
   .marble .swirl { display: none; }
   .move-caption {
-    position: absolute; top: 0; left: 0; max-width: 260px; font-size: 14px; line-height: 1.35;
+    position: absolute; top: 46px; left: 0; max-width: 260px; font-size: 14px; line-height: 1.35;
     background: #fff; border: 1px solid var(--rule); border-radius: 10px; padding: 10px 12px;
     box-shadow: 0 6px 20px rgba(16,24,40,.10); opacity: 0; transform: translateY(-6px);
     transition: opacity .25s ease, transform .25s ease; pointer-events: none;
@@ -435,7 +435,7 @@
   .map-key .kbox { width: auto; height: auto; font-style: normal; font-weight: 700; font-size: 11px; color: var(--ink); background: #fff;
     border: 1px solid rgba(22,25,29,.35); border-radius: 3px; padding: 1px 5px; }
   .map-key .kout { background: transparent; border: 2px solid var(--ink); }
-  .chamber.mapmode .seat-wrap, .chamber.mapmode .cand-notes { display: none; }
+  .chamber.mapmode .seat-wrap, .chamber.mapmode .cand-notes, .chamber.mapmode .move-caption { display: none; }
   .tip .t-sen { display: grid; grid-template-columns: 10px 1fr; gap: 0 8px; margin-top: 9px; }
   .tip .t-sen > i { width: 10px; height: 10px; border-radius: 50%; margin-top: 4px; }
   .tip .t-sen b { font-weight: 700; }
@@ -504,6 +504,14 @@
   .qlink:hover:not([disabled]) { color: var(--ink); text-decoration: underline; }
   .qlink[disabled] { opacity: .4; cursor: default; }
   .qdone h2 { margin-top: 8px; }
+  .pseed { max-width: 560px; margin: 26px auto 0; padding-top: 18px; border-top: 1px dashed var(--rule); }
+  .pseed p { font-size: 13px; line-height: 1.5; color: var(--faint); margin: 0 0 12px; }
+  .qb.qremove { background: transparent; color: var(--ink); border: 1.5px solid var(--rule); min-width: 0; padding: 11px 18px; font-size: 14px; }
+  .qb.qremove:hover { border-color: var(--muted); }
+  .plists li.locked { cursor: default; }
+  .pcand-ring { fill: none; stroke: #2e9e5b; stroke-width: 2.4; stroke-dasharray: 4 3; pointer-events: none; }
+  .tracker-hint { text-align: center; font-size: 12.5px; color: var(--faint); margin: 12px auto 0; max-width: 640px; line-height: 1.45; }
+  .tracker-hint svg { vertical-align: -2px; margin-right: 5px; }
   .qdone p { color: var(--muted); margin: 0 0 16px; }
 
   .plists { display: grid; grid-template-columns: repeat(4, 1fr); column-gap: 28px; }
@@ -565,6 +573,7 @@
     <div class="majority-arrow"></div>
     <div class="bar" id="bar"><div class="majority-line"></div></div>
     <div class="legend" id="legend"></div>
+    <p class="tracker-hint" data-noshot><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 3v10l-2.5-2.5a1.8 1.8 0 0 0-2.6 2.5L8.5 18a5 5 0 0 0 3.6 1.5H15a5 5 0 0 0 5-5V10a1.5 1.5 0 0 0-3 0V9a1.5 1.5 0 0 0-3 0v-.5a1.5 1.5 0 0 0-3 0V3a1.5 1.5 0 0 0-3 0z"/></svg>Hover over or tap any seat, name or state on the map to see who the senator is, what they've said, and the phone number for their Senate office.</p>
   </section>
 
   <hr>
@@ -609,7 +618,7 @@
     <header>
       <p class="site-name">The 29th Vote</p>
       <h1>Create your Senate majority prediction</h1>
-      <p class="subtitle">Go senator by senator and decide who you think will back Chuck Schumer for majority leader.</p>
+      <p class="subtitle">Go senator by senator and decide whether they'll back Chuck Schumer or Chris Van Hollen for majority leader.</p>
       <p class="disclaimer"><b>Prediction mode.</b> Everything on this tab is a predicted outcome that you create. It is not where senators actually stand. For reported positions, see the Latest Tracker.</p>
     </header>
 
@@ -1577,7 +1586,7 @@ const nopos = document.getElementById("nopos");
 /* ---------- Tooltip + linked highlighting ---------- */
 const tip = document.getElementById("tip");
 const chamber = document.getElementById("chamber");
-function callRow(name, isElect) {
+function callRow(name, isElect, hint = true) {
   const ext = DC_PHONES[name];
   const num = ext || SWITCHBOARD;
   const pretty = "(202) 224-" + num;
@@ -1586,7 +1595,7 @@ function callRow(name, isElect) {
   return `<a class="t-call" href="tel:+1202224${num}" onclick="event.stopPropagation()">
       <svg viewBox="0 0 24 24" width="14" height="14" aria-hidden="true"><path fill="currentColor" d="M6.6 10.8a15.1 15.1 0 0 0 6.6 6.6l2.2-2.2c.3-.3.7-.4 1-.2 1.1.4 2.3.6 3.6.6.6 0 1 .4 1 1V20c0 .6-.4 1-1 1A17 17 0 0 1 3 4c0-.6.4-1 1-1h3.5c.6 0 1 .4 1 1 0 1.3.2 2.5.6 3.6.1.3 0 .7-.2 1z"/></svg>
       <span class="t-calltext"><span>${label}</span><b>${pretty}</b></span></a>${sub}
-    <div class="t-hint">Click to keep this open</div>`;
+    ${hint ? `<div class="t-hint">Click to keep this open</div>` : ""}`;
 }
 function showTip(cat, idx, x, y) {
   const p = cat === "No public position"
@@ -2060,14 +2069,15 @@ modal.addEventListener("click", e => { if (e.target === modal) modal.classList.r
 document.addEventListener("keydown", e => { if (e.key === "Escape") modal.classList.remove("open"); });
 
 /* ====================== Create Predictions tab ====================== */
+// Two-way race: Schumer (fills from the left) vs. Van Hollen (fills from the right), toss-ups in the middle
 const PRED = {
-  yes:  { label: "Will support",   color: "#2F6FD0", text: "#fff" },
-  toss: { label: "Toss up",        color: "#ffb7ff", text: "#5c1a5c" },
-  none: { label: "Not picked yet", color: "#B8BDC4", text: "#16191d" },
-  no:   { label: "Won't support",  color: "#12A6CC", text: "#fff" },
+  yes:  { label: "Support Schumer",    btn: "Schumer",    color: "#2F6FD0", text: "#fff" },
+  toss: { label: "Toss up",            btn: "Toss Up",    color: "#ffb7ff", text: "#5c1a5c" },
+  none: { label: "Not picked yet",     btn: "",           color: "#B8BDC4", text: "#16191d" },
+  no:   { label: "Support Van Hollen", btn: "Van Hollen", color: "#12A6CC", text: "#fff" },
 };
 const PRED_ORDER = ["yes", "toss", "none", "no"];
-const PRED_KEY = "the29thvote-prediction-v1";
+const PRED_KEY = "the29thvote-prediction-v2";
 
 // Everyone in the caucus, with where the Latest Tracker has them
 const ROSTER = [];
@@ -2075,24 +2085,33 @@ const ROSTER = [];
   (SENATORS[cat] || []).forEach(p => ROSTER.push({ id: `${p[0]}|${p[1]}`, name: p[0], st: p[1], elect: !!p[3], tracker: cat })));
 NO_POSITION.forEach(p => ROSTER.push({ id: `${p[0]}|${p[1]}`, name: p[0], st: p[1], elect: false, tracker: "No public position" }));
 const BY_ID = Object.fromEntries(ROSTER.map(r => [r.id, r]));
-const SELF = ROSTER.find(r => r.name === "Chuck Schumer");   // Schumer is counted as a yes for himself
+// The two candidates vote for themselves and can't be changed
+const SELF = ROSTER.find(r => r.name === "Chuck Schumer");
+const VHSELF = ROSTER.find(r => r.name === "Chris Van Hollen");
+const LOCKED = { ...(SELF ? { [SELF.id]: "yes" } : {}), ...(VHSELF ? { [VHSELF.id]: "no" } : {}) };
+// Senators already publicly backing one of them start out filled in
+const seedOf = r => r.tracker === "Support" ? "yes" : r.tracker === "Support Van Hollen" ? "no" : null;
+const SEEDED = ROSTER.filter(r => !LOCKED[r.id] && seedOf(r));
 
 function shuffle(a) { for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; }
 
 let pState = null;
 function freshState() {
-  const answers = {}; if (SELF) answers[SELF.id] = "yes";
-  return { order: shuffle(ROSTER.filter(r => r !== SELF).map(r => r.id)), answers, history: [], editing: null };
+  const answers = { ...LOCKED };
+  SEEDED.forEach(r => answers[r.id] = seedOf(r));
+  return { order: shuffle(ROSTER.filter(r => !answers[r.id]).map(r => r.id)), answers, history: [], editing: null, cleared: false };
 }
 function loadPred() {
   try {
     const s = JSON.parse(localStorage.getItem(PRED_KEY) || "null");
     if (s && Array.isArray(s.order)) {
-      s.order = s.order.filter(id => BY_ID[id]);
-      shuffle(ROSTER.filter(r => r !== SELF && !s.order.includes(r.id)).map(r => r.id)).forEach(id => s.order.push(id));
       s.answers = Object.fromEntries(Object.entries(s.answers || {}).filter(([id, v]) => BY_ID[id] && PRED[v]));
-      if (SELF) s.answers[SELF.id] = "yes";
+      Object.assign(s.answers, LOCKED);
       s.history = (s.history || []).filter(id => BY_ID[id]);
+      // Senators who announced support since this prediction was saved start filled in too
+      if (!s.cleared) SEEDED.forEach(r => { if (!s.answers[r.id]) s.answers[r.id] = seedOf(r); });
+      s.order = s.order.filter(id => BY_ID[id] && !LOCKED[id] && (!s.answers[id] || s.history.includes(id)));
+      shuffle(ROSTER.filter(r => !s.answers[r.id] && !s.order.includes(r.id)).map(r => r.id)).forEach(id => s.order.push(id));
       s.editing = null;
       return s;
     }
@@ -2100,6 +2119,21 @@ function loadPred() {
   return freshState();
 }
 function savePred() { try { localStorage.setItem(PRED_KEY, JSON.stringify(pState)); } catch (e) {} }
+// "Remove All Support": everyone except the two candidates goes back to being a question
+function removeAllSupport() {
+  const back = SEEDED.filter(r => pState.answers[r.id] === seedOf(r) && !pState.history.includes(r.id)).map(r => r.id);
+  back.forEach(id => delete pState.answers[id]);
+  const rest = pState.order.filter(id => !pState.answers[id]);
+  pState.order = pState.order.filter(id => pState.answers[id]).concat(shuffle(rest.concat(back)));
+  pState.cleared = true; pState.editing = null;
+  savePred(); paintPred();
+}
+function restoreSupport() {
+  SEEDED.forEach(r => { if (!pState.answers[r.id]) pState.answers[r.id] = seedOf(r); });
+  pState.order = pState.order.filter(id => !pState.answers[id] || pState.history.includes(id));
+  pState.cleared = false; pState.editing = null;
+  savePred(); paintPred();
+}
 
 function pCounts() {
   const c = { yes: 0, toss: 0, no: 0 };
@@ -2107,21 +2141,29 @@ function pCounts() {
   c.none = TOTAL - c.yes - c.toss - c.no;
   return c;
 }
-// Yes fills from the left, No from the right, Toss up sits centered on the 29th-vote line
+// Schumer's marble sits in the outer bottom-left seat (index 3) and Van Hollen's in the outer bottom-right,
+// the same spots as on the Latest Tracker. Everyone else fills in around them.
+const SCHUMER_SEAT = 3, VH_SEAT = TOTAL - 1;
+const YES_ORDER = [SCHUMER_SEAT, ...Array.from({ length: TOTAL }, (_, i) => i).filter(i => i !== SCHUMER_SEAT)];
 function pLayout(c) {
   const out = new Array(TOTAL).fill("none");
-  for (let i = 0; i < c.yes; i++) out[i] = "yes";
+  for (let i = 0; i < c.yes; i++) out[YES_ORDER[i]] = "yes";
   for (let i = 0; i < c.no; i++) out[TOTAL - 1 - i] = "no";
   const lo = c.yes, hi = TOTAL - c.no - c.toss;
-  const start = Math.min(Math.max(Math.floor((TOTAL - c.toss) / 2), lo), hi);
-  for (let i = 0; i < c.toss; i++) out[start + i] = "toss";
+  let i = Math.min(Math.max(Math.floor((TOTAL - c.toss) / 2), lo), hi), placed = 0;
+  for (; i < TOTAL && placed < c.toss; i++) if (out[i] === "none") { out[i] = "toss"; placed++; }
   return out;
 }
 function landingSeat(kind, c, layout) {
-  if (kind === "yes") return c.yes - 1;
+  if (kind === "yes") return YES_ORDER[c.yes - 1];
   if (kind === "no") return TOTAL - c.no;
-  const idx = layout.lastIndexOf("toss"); return idx;
+  return layout.lastIndexOf("toss");
 }
+const candColor = (i, k) => {
+  if (i === SCHUMER_SEAT && k === "yes" && SELF) { const c = candFor(SELF.name); if (c) return c[3]; }
+  if (i === VH_SEAT && k === "no" && VHSELF) { const c = candFor(VHSELF.name); if (c) return c[3]; }
+  return null;
+};
 
 /* ----- Build the prediction chamber (same geometry as the tracker) ----- */
 const pSvg = document.getElementById("pSeats");
@@ -2137,6 +2179,14 @@ const pCircles = seats.map(st => {
 (() => {
   const l = line.cloneNode(true), t = tri.cloneNode(true);
   pSvg.insertBefore(l, pSvg.firstChild); pSvg.appendChild(t);
+  // dotted green rings around the two candidates, like the Latest Tracker
+  [SCHUMER_SEAT, VH_SEAT].forEach(i => {
+    const ring = document.createElementNS(NS, "circle");
+    ring.setAttribute("cx", pCircles[i].getAttribute("cx")); ring.setAttribute("cy", pCircles[i].getAttribute("cy"));
+    ring.setAttribute("r", (0.066 * SCALE + 4.5).toFixed(2));
+    ring.setAttribute("class", "pcand-ring");
+    pSvg.appendChild(ring);
+  });
 })();
 document.getElementById("pOv56").textContent = TOTAL;
 
@@ -2152,15 +2202,21 @@ PRED_ORDER.forEach(k => {
 });
 
 const inflight = new Map(); // seat index -> kind, while a marble is falling
+function pOutcome(c) {
+  if (c.yes >= NEEDED) return "schumer";
+  if (c.no >= NEEDED) return "vh";
+  return null;
+}
 function paintPred() {
   const c = pCounts(), lay = pLayout(c);
   lay.forEach((k, i) => {
     const el = pCircles[i];
     if (inflight.get(i) === k) { el.classList.add("gap"); return; }
     el.classList.remove("gap");
-    el.setAttribute("fill", PRED[k].color);
+    el.setAttribute("fill", candColor(i, k) || PRED[k].color);
     el.dataset.color = k === "none" ? "No public position" : k;
   });
+  pSvg.querySelectorAll(".pcand-ring").forEach((ring, j) => ring.style.display = lay[j === 0 ? SCHUMER_SEAT : VH_SEAT] === (j === 0 ? "yes" : "no") ? "" : "none");
   // bar
   const visible = PRED_ORDER.filter(k => c[k] > 0);
   const bw = pBar.clientWidth || 800;
@@ -2178,18 +2234,17 @@ function paintPred() {
   document.getElementById("pLegend").innerHTML = PRED_ORDER.map(k =>
     `<span><i class="chip${k === "none" ? " c-none" : ""}" style="background:${PRED[k].color}"></i>${PRED[k].label} (${c[k]})</span>`).join("");
   // 29 reached?
-  const won = c.yes >= NEEDED, lost = c.no > TOTAL - NEEDED;
-  document.getElementById("viewPredict").classList.toggle("won", won);
-  document.getElementById("pOv29").innerHTML = won ? `<span class="check">✓</span> 29th vote` : "29th vote";
+  const out = pOutcome(c);
+  document.getElementById("viewPredict").classList.toggle("won", !!out);
+  document.getElementById("pOv29").innerHTML = out ? `<span class="check">✓</span> 29th vote` : "29th vote";
   // status box
-  const need = NEEDED - c.yes;
   document.getElementById("pRecord").innerHTML = `
     <h3>YOUR PREDICTION</h3>
     ${PRED_ORDER.map(k => `<div class="row"><span class="lab"><i class="chip${k === "none" ? " c-none" : ""}" style="background:${PRED[k].color}"></i>${PRED[k].label}</span><b>${c[k]}</b></div>`).join("")}
-    <div class="pstatus ${won ? "ok" : lost ? "short" : ""}">
-      ${won ? `<span class="check big">✓</span><div><b>Schumer gets to 29</b><span>${c.yes} senators back him in your prediction.</span></div>`
-            : lost ? `<div><b>Schumer can't reach 29</b><span>${c.no} senators won't back him in your prediction.</span></div>`
-            : `<div><b>${need} more to reach 29</b><span>${c.yes} of 29 so far</span></div>`}
+    <div class="pstatus ${out ? "ok" : ""}">
+      ${out === "schumer" ? `<span class="check big">✓</span><div><b>Schumer gets to 29</b><span>${c.yes} senators back him in your prediction.</span></div>`
+        : out === "vh" ? `<span class="check big">✓</span><div><b>Van Hollen gets to 29</b><span>${c.no} senators back him in your prediction.</span></div>`
+        : `<div><b>No one has 29 yet</b><span>Schumer ${c.yes} of 29 · Van Hollen ${c.no} of 29</span></div>`}
     </div>`;
   renderPredLists(c);
   renderQuestion();
@@ -2200,50 +2255,63 @@ function currentId() {
   if (pState.editing) return pState.editing;
   return pState.order.find(id => !pState.answers[id]) || null;
 }
+function seedBlurb() {
+  const ns = SEEDED.filter(r => seedOf(r) === "yes").length + (SELF ? 1 : 0);
+  const nv = SEEDED.filter(r => seedOf(r) === "no").length + (VHSELF ? 1 : 0);
+  return pState.cleared
+    ? `<div class="pseed"><p>You've cleared everyone's current support, so you're picking every senator yourself. Schumer and Van Hollen still count as votes for themselves.</p>
+         <button type="button" class="qlink" id="pRestore">Bring back current support</button></div>`
+    : `<div class="pseed"><p>Your prediction starts from the Latest Tracker: ${ns} senators who already back Schumer and ${nv} who back Van Hollen are filled in, including the two candidates. Think some of them could switch? Remove their support and decide every senator yourself.</p>
+         <button type="button" class="qb qremove" id="pRemoveAll">Remove All Support</button></div>`;
+}
 function renderQuestion() {
   const q = document.getElementById("pQuestion");
   const id = currentId(), c = pCounts();
   const asked = pState.order.filter(x => pState.answers[x]).length, total = pState.order.length;
   if (!id) {
+    const out = pOutcome(c);
     q.innerHTML = `
       <div class="qdone">
         <div class="qprog">All ${TOTAL} senators picked</div>
-        <h2>${c.yes >= NEEDED ? "In your prediction, Schumer is majority leader." : "In your prediction, Schumer comes up short."}</h2>
+        <h2>${out === "schumer" ? "In your prediction, Schumer stays majority leader." : out === "vh" ? "In your prediction, Van Hollen becomes majority leader." : "In your prediction, neither candidate gets to 29."}</h2>
         <p>Tap any name below to change your pick, or save your prediction as an image.</p>
         <div class="qbtns">
           <button type="button" class="qb qshot" id="pShot">Save my prediction</button>
           <button type="button" class="qlink" id="pReset">Start over</button>
         </div>
-      </div>`;
+      </div>${seedBlurb()}`;
     document.getElementById("pShot").onclick = e => { e.stopPropagation(); shotBtn.click(); };
   } else {
     const r = BY_ID[id], cur = pState.answers[id];
     q.innerHTML = `
       <div class="qprog">${pState.editing ? "Changing your pick" : `Senator ${Math.min(asked + 1, total)} of ${total}`} <span>· random order</span></div>
-      <h2>Do you think <b>${r.name} (${r.st})</b> will support Chuck Schumer?</h2>
+      <h2>Will <b>${r.name} (${r.st})</b> support Chuck Schumer or Chris Van Hollen?</h2>
       <div class="qtracker">${r.elect ? "Senator-elect &nbsp;·&nbsp; " : ""}On the Latest Tracker: <b style="color:${TEXT_COLORS[r.tracker]}">${L(r.tracker)}</b></div>
       <div class="qbtns">
-        <button type="button" class="qb yes${cur === "yes" ? " picked" : ""}" data-pick="yes">Yes</button>
-        <button type="button" class="qb toss${cur === "toss" ? " picked" : ""}" data-pick="toss">Toss Up</button>
-        <button type="button" class="qb no${cur === "no" ? " picked" : ""}" data-pick="no">No</button>
+        <button type="button" class="qb yes${cur === "yes" ? " picked" : ""}" data-pick="yes">${PRED.yes.btn}</button>
+        <button type="button" class="qb toss${cur === "toss" ? " picked" : ""}" data-pick="toss">${PRED.toss.btn}</button>
+        <button type="button" class="qb no${cur === "no" ? " picked" : ""}" data-pick="no">${PRED.no.btn}</button>
       </div>
       <div class="qfoot">
         <button type="button" class="qlink" id="pBack" ${pState.history.length || pState.editing ? "" : "disabled"}>${pState.editing ? "Cancel" : "← Back"}</button>
         <button type="button" class="qlink" id="pReset">Start over</button>
-      </div>`;
+      </div>${seedBlurb()}`;
     q.querySelectorAll("[data-pick]").forEach(b => b.onclick = e => { e.stopPropagation(); answer(id, b.dataset.pick); });
     document.getElementById("pBack").onclick = e => { e.stopPropagation(); goBack(); };
   }
   document.getElementById("pReset").onclick = e => {
     e.stopPropagation();
-    if (Object.keys(pState.answers).length > 1 && !confirmReset()) return;
+    if (pState.history.length && !confirmReset()) return;
     pState = freshState(); savePred(); paintPred();
   };
+  const rm = document.getElementById("pRemoveAll"), rs = document.getElementById("pRestore");
+  if (rm) rm.onclick = e => { e.stopPropagation(); removeAllSupport(); };
+  if (rs) rs.onclick = e => { e.stopPropagation(); restoreSupport(); };
 }
 function confirmReset() {
   const b = document.getElementById("pReset");
   if (b.dataset.arm === "1") return true;
-  b.dataset.arm = "1"; b.textContent = "Tap again to clear all picks";
+  b.dataset.arm = "1"; b.textContent = "Tap again to clear your picks";
   setTimeout(() => { if (b.isConnected) { b.dataset.arm = ""; b.textContent = "Start over"; } }, 3000);
   return false;
 }
@@ -2251,24 +2319,24 @@ function confirmReset() {
 async function answer(id, kind) {
   unlockAudio();
   const prev = pState.answers[id];
+  const before = pOutcome(pCounts());
   pState.answers[id] = kind;
-  if (!pState.editing) pState.history.push(id);
+  if (!pState.editing && !pState.history.includes(id)) pState.history.push(id);
   pState.editing = null;
   savePred();
   if (prev === kind) { paintPred(); return; }
   const c = pCounts(), lay = pLayout(c), i = landingSeat(kind, c, lay);
-  const wasWon = (c.yes - (kind === "yes") + (prev === "yes")) >= NEEDED;
-  if (reduceMotion || i < 0) { paintPred(); celebrate(wasWon); return; }
+  if (reduceMotion || i < 0) { paintPred(); celebrate(before); return; }
   inflight.set(i, kind);
   paintPred();
   await pDrop(i, kind);
   inflight.delete(i);
   paintPred();
-  celebrate(wasWon);
+  celebrate(before);
 }
-function celebrate(wasWon) {
-  const c = pCounts();
-  if (!wasWon && c.yes >= NEEDED) {
+function celebrate(before) {
+  const now = pOutcome(pCounts());
+  if (now && now !== before) {
     const el = document.getElementById("pWin");
     el.classList.remove("show"); void el.offsetWidth; el.classList.add("show");
     if (canPlay()) { clinkBounce(window.innerWidth / 2); setTimeout(() => clinkBounce(window.innerWidth / 2), 140); }
@@ -2309,46 +2377,45 @@ function renderPredLists(c) {
   document.getElementById("pLists").innerHTML = gs.map((g, i) => `
     <div class="pcol" style="--span:${cols[i]}">
       <h2><span class="big" style="color:${g.color}">${g.list.length}</span><span class="lbl">${g.label}</span></h2>
-      <ul style="columns:${cols[i]}">${g.list.map(r => `<li data-id="${r.id}" title="Change your pick"><i class="ndot" style="background:${PRED[g.k].color}"></i>${r.name} (${r.st})${r.elect ? "*" : ""}</li>`).join("") || `<li class="empty">No one yet</li>`}</ul>
+      <ul style="columns:${cols[i]}">${g.list.map(r => `<li data-id="${r.id}" title="${LOCKED[r.id] ? "Running for leader" : "Change your pick"}"${LOCKED[r.id] ? ' class="locked"' : ""}><i class="ndot" style="background:${PRED[g.k].color}"></i>${r.name} (${r.st})${r.elect ? "*" : ""}</li>`).join("") || `<li class="empty">No one yet</li>`}</ul>
     </div>`).join("");
 }
 document.getElementById("pLists").addEventListener("click", e => {
   const li = e.target.closest("li[data-id]"); if (!li) return;
   e.stopPropagation();
-  if (SELF && li.dataset.id === SELF.id) return;
+  if (LOCKED[li.dataset.id]) return;
   pState.editing = li.dataset.id; paintPred();
   document.getElementById("pQuestion").scrollIntoView({ behavior: reduceMotion ? "auto" : "smooth", block: "center" });
 });
 
 function predShareSpec() {
-  const c = pCounts(), gs = pickGroups();
-  const won = c.yes >= NEEDED, lost = c.no > TOTAL - NEEDED;
+  const c = pCounts(), gs = pickGroups(), out = pOutcome(c), lay = pLayout(c);
   return {
     ribbon: "MY PREDICTION",
-    won,
+    won: !!out,
     title: "Senate Majority Prediction",
-    subtitle: "Will the Senate Democratic caucus re-elect Chuck Schumer as leader?",
+    subtitle: "Who will Senate Democrats pick as leader: Chuck Schumer or Chris Van Hollen?",
     bar: PRED_ORDER.map(k => ({ label: PRED[k].label, n: c[k], color: PRED[k].color, text: PRED[k].text })),
     legend: PRED_ORDER.map(k => ({ label: `${PRED[k].label} (${c[k]})`, color: PRED[k].color })),
-    seatColors: pLayout(c).map(k => PRED[k].color),
+    seatColors: lay.map((k, i) => candColor(i, k) || PRED[k].color),
     box: ({ text, g, RX, RR, y }) => {
       text("MY PREDICTION", RX, y, { w: 700, px: 12.5 }); y += 22;
       PRED_ORDER.forEach(k => {
         g.fillStyle = PRED[k].color; g.fillRect(RX, y - 9, 9, 9);
-        text(PRED[k].label, RX + 15, y, { px: 12 });
+        text(PRED[k].label, RX + 15, y, { px: 12, maxW: RR - RX - 40 });
         text(String(c[k]), RR, y, { w: 700, px: 12, align: "right" });
         y += 19;
       });
       y += 14;
-      if (won) {
+      if (out) {
         g.fillStyle = "#2e9e5b"; g.beginPath(); g.arc(RX + 13, y + 4, 13, 0, Math.PI * 2); g.fill();
         g.strokeStyle = "#fff"; g.lineWidth = 3; g.lineCap = "round"; g.lineJoin = "round";
         g.beginPath(); g.moveTo(RX + 7, y + 4); g.lineTo(RX + 11.5, y + 9); g.lineTo(RX + 19.5, y - 1); g.stroke();
-        text("Schumer gets to 29", RX + 34, y + 1, { w: 700, px: 13, color: "#1f7a45", maxW: RR - RX - 34 });
-        text(`${c.yes} votes`, RX + 34, y + 17, { px: 11.5, color: "#5b636d" });
+        text(out === "schumer" ? "Schumer gets to 29" : "Van Hollen gets to 29", RX + 34, y + 1, { w: 700, px: 13, color: "#1f7a45", maxW: RR - RX - 34 });
+        text(`${out === "schumer" ? c.yes : c.no} votes`, RX + 34, y + 17, { px: 11.5, color: "#5b636d" });
       } else {
-        text(lost ? "Schumer can't reach 29" : `${NEEDED - c.yes} more to reach 29`, RX, y + 1, { w: 700, px: 13, maxW: RR - RX });
-        text(`${c.yes} of 29 so far`, RX, y + 17, { px: 11.5, color: "#5b636d" });
+        text("No one has 29 yet", RX, y + 1, { w: 700, px: 13, maxW: RR - RX });
+        text(`Schumer ${c.yes} · Van Hollen ${c.no}`, RX, y + 17, { px: 11.5, color: "#5b636d", maxW: RR - RX });
       }
     },
     groups: gs.map(g => ({ label: g.label, n: g.list.length, color: g.color, dot: PRED[g.k].color, names: g.list.map(r => `${r.name} (${r.st})${r.elect ? "*" : ""}`) })),
@@ -2512,9 +2579,10 @@ function stateTip(ab, x, y) {
   if (!sens.length) h += `<div class="t-gop">Both senators are Republicans, so neither votes in the Democratic leader race.</div>`;
   sens.forEach(s => {
     h += `<div class="t-sen"><i style="background:${senColor(s)}"></i><div><b>${s.name}</b>${s.elect ? ` <span style="font-weight:400;color:#8c949e;font-size:12px">Senator-elect</span>` : ""}
-      <div class="t-cat" style="color:${TEXT_COLORS[s.cat]}">${L(s.cat)}</div><div class="t-note">${s.note}</div></div></div>`;
+      <div class="t-cat" style="color:${TEXT_COLORS[s.cat]}">${L(s.cat)}</div><div class="t-note">${s.note}</div>${callRow(s.name, s.elect, false)}</div></div>`;
   });
   if (sens.length === 1) h += `<div class="t-gop">The state's other senator is a Republican.</div>`;
+  if (sens.length) h += `<div class="t-hint">Click the state to keep this open</div>`;
   tip.innerHTML = h;
   tip.classList.add("show");
   placeTip(x, y);
