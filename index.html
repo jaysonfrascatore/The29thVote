@@ -1776,7 +1776,7 @@ function trackerShareSpec() {
       { label: "Opposing Schumer, no pick", n: counts["Will not support"], color: TEXT_COLORS["Will not support"], names: SENATORS["Will not support"].map(name) },
     ],
     note: "Senate Democrats elect their leader by secret ballot, expected in December. Senators with no public position are not committed either way.   * Senator-elect",
-    sources: `${src}  ·  As of ${stamp}  ·  Created by Jayson Frascatore`,
+    sources: `${src}  ·  As of ${stamp}`,
   };
 }
 
@@ -1802,7 +1802,7 @@ async function drawShareImage(spec) {
   const rows = Math.max(1, ...spec.groups.map((gr, i) => Math.ceil(gr.names.length / cols[i])));
   const DY = spec.map ? 64 : (spec.candidates || []).length ? 30 : 0;   // room for candidate labels / the map key under the chart
   const LH = 13.4, LIST_Y = 738 + DY;
-  const H = Math.max(960 + TOP, Math.ceil(TOP + LIST_Y + rows * LH + 72));
+  const H = Math.max(990 + TOP, Math.ceil(TOP + LIST_Y + rows * LH + 104));
   const S = 2;
   const cv = document.createElement("canvas");
   cv.width = W * S; cv.height = H * S;
@@ -2012,10 +2012,17 @@ async function drawShareImage(spec) {
   });
 
   // Footer
-  const FY = H - TOP - 62;
+  const FY = H - TOP - 94;
   rule(FY);
-  text(spec.note, W / 2, FY + 26, { px: 12, color: MUTED, align: "center", maxW: W - 2 * PAD });
-  text(spec.sources, W / 2, FY + 46, { px: 10.5, color: FAINT, align: "center", maxW: W - 2 * PAD + 10 });
+  text(spec.note, W / 2, FY + 26, { px: 12.5, color: MUTED, align: "center", maxW: W - 2 * PAD });
+  text(spec.sources, W / 2, FY + 48, { px: 12, color: FAINT, align: "center", maxW: W - 2 * PAD + 10 });
+  // Where to find it: site name, address and byline, big enough to read in a shared image
+  const brand = [["The 29th Vote", 800, INK], ["  ·  ", 400, FAINT], ["jaysonfrascatore.github.io/The29thVote", 600, "#2F6FD0"],
+    ["  ·  ", 400, FAINT], ["Created by Jayson Frascatore", 700, INK]];
+  const BPX = 15.5;
+  const bw = brand.map(([t, w]) => { font(w, BPX); return g.measureText(t).width; });
+  let bx = (W - bw.reduce((a, b) => a + b, 0)) / 2;
+  brand.forEach(([t, w, c], i) => { text(t, bx, FY + 78, { w, px: BPX, color: c }); bx += bw[i]; });
   g.restore();
 
   return new Promise(r => cv.toBlob(r, "image/png"));
@@ -2346,7 +2353,7 @@ function predShareSpec() {
     },
     groups: gs.map(g => ({ label: g.label, n: g.list.length, color: g.color, dot: PRED[g.k].color, names: g.list.map(r => `${r.name} (${r.st})${r.elect ? "*" : ""}`) })),
     note: "This is a predicted outcome made by a reader, not where senators actually stand.   * Senator-elect",
-    sources: "Make your own at jaysonfrascatore.github.io/The29thVote  ·  Created by Jayson Frascatore",
+    sources: "Make your own prediction on the Create Predictions tab",
   };
 }
 
