@@ -534,7 +534,7 @@ const TOTAL = 56;
 const NEEDED = 29;
 const SUBTITLE = "Public positions of the 56-member Senate Democratic caucus \u00a0\u00b7\u00a0 Assumes Peltola (AK) wins";
 const KOFI_URL = "https://ko-fi.com/jaysonfras";
-const LAST_UPDATED = "Last updated on November 12th, 2026 at 6:00pm";
+const LAST_UPDATED = "Last updated on November 12th, 2026 at 9:00pm";
 
 const SENATORS = {
   "Support": [
@@ -552,7 +552,6 @@ const SENATORS = {
     ["Sherrod Brown", "OH", "Senator-elect recruited by Schumer. Publicly supports him.", true],
   ],
   "Unclear": [
-    ["Chris Van Hollen", "MD", "Possible challenger. Says he's in “active listening mode” about a run."],
     ["Cory Booker", "NJ", "Praised Schumer's handling of the midterms but hasn't committed."],
     ["Raphael Warnock", "GA", "Won't commit. Says he wants to hear from anyone who thinks they should lead."],
     ["Elizabeth Warren", "MA", "Reported member of the anti-Schumer “Fight Club.” No recent public answer."],
@@ -575,6 +574,7 @@ const SENATORS = {
   "Will not support": [
     ["Bernie Sanders", "VT", "Says “the time is now for change” and won't support Schumer."],
     ["Elissa Slotkin", "MI", "A no unless someone shows a concrete, different plan. Floated withholding quorum."],
+    ["Chris Van Hollen", "MD", "Announced Nov. 12 that he's running against Schumer for majority leader, saying \"we need new leadership\" (AP, The Washington Sun)."],
     ["Peggy Flanagan", "MN", "Says it's time for new leadership.", true],
     ["Troy Jackson", "ME", "Told Schumer he'll support somebody else.", true],
     ["Abdul El-Sayed", "MI", "Backs Chris Van Hollen for leader.", true],
@@ -597,15 +597,14 @@ const NO_POSITION_DEFAULT = "Hasn't said publicly whether they'll back Schumer f
 const NO_POSITION_NOTE = "\u2020 Elected Minnesota governor. Her seat will go to an appointee.";
 
 /* Previous snapshot for the "On the Record" box, plus who moved since then */
-const PREV = { "Support": 12, "Unclear": 17, "No public position": 19, "Will not support": 8 };
-const PREV_LABEL = "Change since Nov. 12, 9 AM";
+const PREV = { "Support": 12, "Unclear": 19, "No public position": 17, "Will not support": 8 };
+const PREV_LABEL = "Change since Nov. 12, 6 PM";
 // When the senators in MOVERS moved (short form, e.g. "Nov. 12, 9 AM"). LAST_UPDATED at the top is the time of the
 // latest check, even when that check found no change; if the two differ, the page says there was no change.
-const LAST_MOVE = "Nov. 12, 6 PM";
+const LAST_MOVE = "Nov. 12, 9 PM";
 // Each move: [name, moved FROM, moved TO]. Listed in the order they happened; the page animates them one at a time.
 const MOVERS = [
-  ["Mazie Hirono (HI)", "No public position", "Unclear"],
-  ["Tammy Duckworth (IL)", "No public position", "Unclear"],
+  ["Chris Van Hollen (MD)", "Unclear", "Will not support"],
 ];
 /* ======================================================================== */
 
