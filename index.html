@@ -400,7 +400,7 @@
     border: 0; color: #fff; transition: transform .08s ease, box-shadow .15s; box-shadow: 0 2px 0 rgba(0,0,0,.12); }
   .qb:active { transform: translateY(1px) scale(.98); }
   .qb.yes { background: #2F6FD0; }
-  .qb.toss { background: #00f5d4; color: #0b3b35; }
+  .qb.toss { background: #ffb7ff; color: #5c1a5c; }
   .qb.no { background: #12A6CC; }
   .qb.qshot { background: #76c893; color: #0f2e1c; }
   .qb.picked { box-shadow: 0 0 0 3px var(--bg, #fff), 0 0 0 5px var(--ink); }
@@ -1828,7 +1828,7 @@ document.addEventListener("keydown", e => { if (e.key === "Escape") modal.classL
 /* ====================== Create Predictions tab ====================== */
 const PRED = {
   yes:  { label: "Will support",   color: "#2F6FD0", text: "#fff" },
-  toss: { label: "Toss up",        color: "#00f5d4", text: "#0b3b35" },
+  toss: { label: "Toss up",        color: "#ffb7ff", text: "#5c1a5c" },
   none: { label: "Not picked yet", color: "#B8BDC4", text: "#16191d" },
   no:   { label: "Won't support",  color: "#12A6CC", text: "#fff" },
 };
@@ -2067,7 +2067,7 @@ async function pDrop(i, kind) {
 function pickGroups() {
   const by = { yes: [], toss: [], no: [] };
   ROSTER.forEach(r => { const v = pState.answers[r.id]; if (v) by[v].push(r); });
-  return ["yes", "toss", "no"].map(k => ({ k, label: PRED[k].label, color: k === "toss" ? "#00b89f" : PRED[k].color, list: by[k] }));
+  return ["yes", "toss", "no"].map(k => ({ k, label: PRED[k].label, color: k === "toss" ? "#b84db8" : PRED[k].color, list: by[k] }));
 }
 function renderPredLists(c) {
   const gs = pickGroups();
