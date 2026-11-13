@@ -223,6 +223,11 @@
   .unclear-head .big { color: var(--unclear); }
   .oppose-h .big { color: var(--oppose); }
   #seats { overflow: visible; }
+  .seg[data-cat="Will not support"] { color: #0b4655; }
+  .seg.tight .pct, .seg.tight .w { display: none; }
+  .seg.tight .cnt { font-size: clamp(14px, 2vw, 20px); }
+  .col .nopick { font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: .02em; line-height: 1.3; color: #3c9fb5; margin: 18px 0 8px; }
+  .col .nopick .big { display: inline-block; font-size: 26px; letter-spacing: -.01em; margin-right: 6px; color: #3c9fb5; }
   .cand-ring { fill: none; stroke: #2e9e5b; stroke-width: 2.4; stroke-dasharray: 3.5 2.6; pointer-events: none; }
   .cand-line { stroke: #16191d; stroke-width: 1.5; stroke-linecap: round; pointer-events: none; }
   html.dark .cand-line { stroke: #e8eaed; }
@@ -607,13 +612,17 @@ const SENATORS = {
     ["Scott Colom", "MS", "Won his Mississippi race. Noncommittal on Schumer; wants more geographic diversity in party leadership.", true],
     ["Mary Peltola", "AK", "Race still being counted. No stated position since the election.", true],
   ],
-  "Will not support": [
-    ["Bernie Sanders", "VT", "Says “the time is now for change” and won't support Schumer."],
-    ["Elissa Slotkin", "MI", "A no unless someone shows a concrete, different plan. Floated withholding quorum."],
+  // Backing Chris Van Hollen for leader. Van Hollen himself goes first.
+  "Support Van Hollen": [
     ["Chris Van Hollen", "MD", "Announced Nov. 12 that he's running against Schumer for majority leader, saying \"we need new leadership\" (AP, The Washington Sun)."],
+    ["Bernie Sanders", "VT", "Posted on Nov. 12 that he is \"supporting Senator Chris Van Hollen to lead Senate Democrats\" (CNN). Had already said he won't back Schumer."],
+    ["Abdul El-Sayed", "MI", "Reiterated his support for Van Hollen after Van Hollen announced on Nov. 12 (CNN). First backed him for leader in April.", true],
+  ],
+  // Against Schumer, but haven't said who they'd back instead
+  "Will not support": [
+    ["Elissa Slotkin", "MI", "A no unless someone shows a concrete, different plan. Floated withholding quorum."],
     ["Peggy Flanagan", "MN", "Says it's time for new leadership.", true],
     ["Troy Jackson", "ME", "Told Schumer he'll support somebody else.", true],
-    ["Abdul El-Sayed", "MI", "Backs Chris Van Hollen for leader.", true],
     ["Juliana Stratton", "IL", "Said through a spokesperson she won't support Schumer.", true],
     ["Adam Hamilton", "KS", "Has said repeatedly he won't vote for Schumer.", true],
     ["Annie Andrews", "SC", "Has said she won't support Schumer and wants generational change.", true],
@@ -633,7 +642,7 @@ const NO_POSITION_DEFAULT = "Hasn't said publicly whether they'll back Schumer f
 const NO_POSITION_NOTE = "\u2020 Elected Minnesota governor. Her seat will go to an appointee.";
 
 /* Previous snapshot for the "On the Record" box, plus who moved since then */
-const PREV = { "Support": 12, "Unclear": 18, "No public position": 17, "Will not support": 9 };
+const PREV = { "Support": 12, "Unclear": 18, "No public position": 17, "Will not support": 6, "Support Van Hollen": 3 };
 const PREV_LABEL = "Change since Nov. 12, 9 PM";
 // When the senators in MOVERS moved (short form, e.g. "Nov. 12, 9 AM"). LAST_UPDATED at the top is the time of the
 // latest check, even when that check found no change; if the two differ, the page says there was no change.
@@ -645,17 +654,17 @@ const MOVERS = [
 ];
 
 // Senators running for leader. Their own marble gets a green dotted ring, its own color and a label.
-// This doesn't change the bar or the counts. [name, state, label, marble color, locked seat (optional)]
-// Locked seat N keeps the marble in the Nth seat of its color block, counted from that block's outside edge
-// (from the left for Support, from the right for Opposing Schumer). Van Hollen stays in the 9th Opposing seat.
+// This doesn't change the bar or the counts. Each candidate's marble is the darkest shade of their supporters' color
+// and sits in the outside bottom corner of their block. [name, state, label, marble color, locked seat (optional)]
+// Locked seat N keeps the marble in the Nth seat of its color block, counted from that block's outside edge.
 const CANDIDATES = [
   ["Chuck Schumer", "NY", "Sen. Chuck Schumer running for a 3rd term as Majority Leader", "#03045E"],
-  ["Chris Van Hollen", "MD", "Sen. Chris Van Hollen announces his run for Majority Leader", "#3bf4fb", 9],
+  ["Chris Van Hollen", "MD", "Sen. Chris Van Hollen announces his run for Majority Leader", "#06566B"],
 ];
 /* ======================================================================== */
 
 /* ---------- Display names for the categories (data keys stay the same) ---------- */
-const LABEL = { "Support": "Support Schumer", "Unclear": "Unclear", "No public position": "No public position", "Will not support": "Opposing Schumer" };
+const LABEL = { "Support": "Support Schumer", "Unclear": "Unclear", "No public position": "No public position", "Will not support": "Opposing Schumer, no pick yet", "Support Van Hollen": "Support Van Hollen" };
 const L = c => LABEL[c] || c;
 
 
@@ -710,16 +719,17 @@ const DC_PHONES = {
 };
 
 
-const COLORS = { "Support": "#2F6FD0", "Unclear": "#8E5BC8", "No public position": "#B8BDC4", "Will not support": "#12A6CC" };
-const TEXT_COLORS = { ...COLORS, "No public position": "#7d848d" };
-const CATS = ["Support", "Unclear", "No public position", "Will not support"];
+const COLORS = { "Support": "#2F6FD0", "Unclear": "#8E5BC8", "No public position": "#B8BDC4", "Will not support": "#9ADBEA", "Support Van Hollen": "#12A6CC" };
+const TEXT_COLORS = { ...COLORS, "No public position": "#7d848d", "Will not support": "#3c9fb5" };
+const CATS = ["Support", "Unclear", "No public position", "Will not support", "Support Van Hollen"];
 
 const counts = {
   "Support": SENATORS["Support"].length,
   "Unclear": SENATORS["Unclear"].length,
   "Will not support": SENATORS["Will not support"].length,
+  "Support Van Hollen": (SENATORS["Support Van Hollen"] || []).length,
 };
-counts["No public position"] = TOTAL - counts["Support"] - counts["Unclear"] - counts["Will not support"];
+counts["No public position"] = TOTAL - counts["Support"] - counts["Unclear"] - counts["Will not support"] - counts["Support Van Hollen"];
 
 /* ---------- Bar + legend ---------- */
 const bar = document.getElementById("bar");
@@ -731,6 +741,7 @@ CATS.forEach(cat => {
   d.style.flex = n;
   d.style.background = COLORS[cat];
   d.innerHTML = `<span class="pct"><span class="rv">${(n / TOTAL * 100).toFixed(1)}%</span></span><span class="cnt"><span class="rv">${n}</span><span class="w"> senators</span></span>`;
+  if (n / TOTAL < 0.13) d.classList.add("tight");
   bar.insertBefore(d, bar.querySelector(".majority-line"));
 });
 document.getElementById("legend").innerHTML = CATS.map(cat =>
@@ -796,7 +807,7 @@ function layoutFor(cn) {
   const gr = cn["No public position"] - gl;
   const out = [];
   [["Support", cn["Support"]], ["No public position", gl], ["Unclear", cn["Unclear"]],
-   ["No public position", gr], ["Will not support", cn["Will not support"]]]
+   ["No public position", gr], ["Will not support", cn["Will not support"]], ["Support Van Hollen", cn["Support Van Hollen"] || 0]]
     .forEach(([cat, n]) => { for (let k = 0; k < n; k++) out.push(cat); });
   return out;
 }
@@ -915,13 +926,13 @@ function senatorIdx(cat, label) {
 function assignNames() {
   clearNames();
   const lay = layoutFor(counts);
-  const taken = new Set(), used = { "Support": new Set(), "Unclear": new Set(), "Will not support": new Set() };
+  const taken = new Set(), used = { "Support": new Set(), "Unclear": new Set(), "Will not support": new Set(), "Support Van Hollen": new Set() };
   // Candidates with a locked seat go there first, so nobody else's marble ever lands on it
   (typeof CANDIDATES !== "undefined" ? CANDIDATES : []).forEach(cand => {
     const n = cand[4];
     if (!n) return;
     const label = `${cand[0]} (${cand[1]})`;
-    for (const cat of ["Support", "Will not support"]) {
+    for (const cat of ["Support", "Will not support", "Support Van Hollen"]) {
       const idx = senatorIdx(cat, label);
       if (idx < 0) continue;
       const seat = cat === "Support" ? n - 1 : TOTAL - n;
@@ -937,7 +948,7 @@ function assignNames() {
   // Candidates who didn't just move get a set spot
   (typeof CANDIDATES !== "undefined" ? CANDIDATES : []).forEach(cand => {
     const label = `${cand[0]} (${cand[1]})`;
-    for (const cat of ["Support", "Unclear", "Will not support"]) {
+    for (const cat of ["Support", "Unclear", "Will not support", "Support Van Hollen"]) {
       const idx = senatorIdx(cat, label);
       if (idx < 0) continue;
       if (!used[cat].has(idx)) {
@@ -948,7 +959,7 @@ function assignNames() {
       if (seat >= 0) candSeats.push([seat, cand]);
     }
   });
-  const next = { "Support": 0, "Unclear": 0, "Will not support": 0 };
+  const next = { "Support": 0, "Unclear": 0, "Will not support": 0, "Support Van Hollen": 0 };
   lay.forEach((cat, i) => {
     if (cat === "No public position" || taken.has(i)) return;
     while (used[cat].has(next[cat])) next[cat]++;
@@ -988,8 +999,8 @@ const NO_CHANGE = typeof LAST_MOVE === "string" && LAST_MOVE !== CHECKED;
 
 /* ---------- On the Record box (only shows what changed) ---------- */
 const rec = document.getElementById("record");
-const onNow = counts["Support"] + counts["Unclear"] + counts["Will not support"];
-const onPrev = PREV["Support"] + PREV["Unclear"] + PREV["Will not support"];
+const onNow = TOTAL - counts["No public position"];
+const onPrev = TOTAL - PREV["No public position"];
 const changed = CATS.filter(c => PREV[c] !== counts[c]);
 if (changed.length || onPrev !== onNow) {
   let h = `<h3>ON THE RECORD</h3>`;
@@ -1203,7 +1214,7 @@ function seatBox(i) {
   return { x: r.left + r.width / 2, y: r.top + r.height / 2, d: r.width };
 }
 function floorY() { const r = svg.getBoundingClientRect(); return r.bottom + 4; }
-function sideOf(cat) { return cat === "Support" ? "left" : cat === "Will not support" ? "right" : "center"; }
+function sideOf(cat) { return cat === "Support" ? "left" : (cat === "Will not support" || cat === "Support Van Hollen") ? "right" : "center"; }
 
 function makeMarble(cat, d) {
   const m = document.createElement("div");
@@ -1386,11 +1397,13 @@ const half = Math.ceil(counts["Unclear"] / 2);
 lists.innerHTML = `
   <div class="col support-h"><h2><span class="big" data-big="Support">${counts["Support"]}</span><span class="lbl">Support Schumer</span></h2></div>
   <div class="col unclear-head"><h2><span class="big" data-big="Unclear">${counts["Unclear"]}</span><span class="lbl">Unclear</span></h2></div>
-  <div class="col oppose-h"><h2><span class="big" data-big="Will not support">${counts["Will not support"]}</span><span class="lbl">Opposing Schumer</span></h2></div>
+  <div class="col oppose-h"><h2><span class="big" data-big="Support Van Hollen">${counts["Support Van Hollen"]}</span><span class="lbl">Support Van Hollen</span></h2></div>
   <div class="col support"><ul>${SENATORS["Support"].map((_, i) => li("Support", i)).join("")}</ul></div>
   <div class="col unclear-a"><ul>${SENATORS["Unclear"].slice(0, half).map((_, i) => li("Unclear", i)).join("")}</ul></div>
   <div class="col unclear-b"><ul>${SENATORS["Unclear"].slice(half).map((_, i) => li("Unclear", i + half)).join("")}</ul></div>
-  <div class="col oppose"><ul>${SENATORS["Will not support"].map((_, i) => li("Will not support", i)).join("")}</ul></div>
+  <div class="col oppose"><ul>${(SENATORS["Support Van Hollen"] || []).map((_, i) => li("Support Van Hollen", i)).join("")}</ul>
+    <h3 class="nopick"><b class="big" data-big="Will not support">${counts["Will not support"]}</b>Opposing Schumer, no pick yet</h3>
+    <ul>${SENATORS["Will not support"].map((_, i) => li("Will not support", i)).join("")}</ul></div>
   <div class="ldiv ldiv-1" aria-hidden="true"></div><div class="ldiv ldiv-2" aria-hidden="true"></div>`;
 
 /* ---------- No public position list ---------- */
@@ -1568,7 +1581,7 @@ function trackerShareSpec() {
   return {
     title: document.querySelector("#viewTracker h1").textContent,
     subtitle: SUBTITLE.replace(/ /g, " "),
-    bar: CATS.map(c => ({ label: c, n: counts[c], color: COLORS[c], text: c === "No public position" ? "#16191d" : "#fff" })),
+    bar: CATS.map(c => ({ label: c, n: counts[c], color: COLORS[c], text: c === "No public position" ? "#16191d" : c === "Will not support" ? "#0b4655" : "#fff" })),
     legend: CATS.map(c => ({ label: `${L(c)} (${counts[c]})`, color: COLORS[c] }))
       .concat(candSeats.length ? [{ label: "Running for leader", ring: true }] : []),
     seatColors: layoutFor(counts).map(c => COLORS[c]),
@@ -1604,7 +1617,8 @@ function trackerShareSpec() {
     groups: [
       { label: L("Support"), n: counts["Support"], color: COLORS["Support"], names: SENATORS["Support"].map(name) },
       { label: "Unclear", n: counts["Unclear"], color: COLORS["Unclear"], names: SENATORS["Unclear"].map(name) },
-      { label: L("Will not support"), n: counts["Will not support"], color: COLORS["Will not support"], names: SENATORS["Will not support"].map(name) },
+      { label: L("Support Van Hollen"), n: counts["Support Van Hollen"], color: COLORS["Support Van Hollen"], names: (SENATORS["Support Van Hollen"] || []).map(name) },
+      { label: "Opposing Schumer, no pick", n: counts["Will not support"], color: TEXT_COLORS["Will not support"], names: SENATORS["Will not support"].map(name) },
     ],
     note: "Senate Democrats elect their leader by secret ballot, expected in December. Senators with no public position are not committed either way.   * Senator-elect",
     sources: `${src}  ·  As of ${stamp}  ·  Created by Jayson Frascatore`,
@@ -1837,8 +1851,8 @@ const PRED_KEY = "the29thvote-prediction-v1";
 
 // Everyone in the caucus, with where the Latest Tracker has them
 const ROSTER = [];
-["Support", "Unclear", "Will not support"].forEach(cat =>
-  SENATORS[cat].forEach(p => ROSTER.push({ id: `${p[0]}|${p[1]}`, name: p[0], st: p[1], elect: !!p[3], tracker: cat })));
+["Support", "Unclear", "Will not support", "Support Van Hollen"].forEach(cat =>
+  (SENATORS[cat] || []).forEach(p => ROSTER.push({ id: `${p[0]}|${p[1]}`, name: p[0], st: p[1], elect: !!p[3], tracker: cat })));
 NO_POSITION.forEach(p => ROSTER.push({ id: `${p[0]}|${p[1]}`, name: p[0], st: p[1], elect: false, tracker: "No public position" }));
 const BY_ID = Object.fromEntries(ROSTER.map(r => [r.id, r]));
 const SELF = ROSTER.find(r => r.name === "Chuck Schumer");   // Schumer is counted as a yes for himself

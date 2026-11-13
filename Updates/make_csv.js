@@ -20,8 +20,8 @@ const block = html.slice(start, end);
 const data = new Function(block + "; return { TOTAL, NEEDED, SENATORS, NO_POSITION };")();
 
 const rows = [];
-for (const cat of ["Support", "Unclear", "Will not support"])
-  for (const p of data.SENATORS[cat]) rows.push({ name: p[0], st: p[1], cat });
+for (const cat of ["Support", "Unclear", "Will not support", "Support Van Hollen"])
+  for (const p of data.SENATORS[cat] || []) rows.push({ name: p[0], st: p[1], cat });
 for (const p of data.NO_POSITION) rows.push({ name: p[0], st: p[1], cat: "No public position" });
 rows.sort((a, b) => a.st.localeCompare(b.st) || a.name.localeCompare(b.name));
 
