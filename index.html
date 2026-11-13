@@ -214,15 +214,25 @@
   .unclear-head .big { color: var(--unclear); }
   .oppose-h .big { color: var(--oppose); }
   #seats { overflow: visible; }
-  .cand-ring { fill: none; stroke: #2e9e5b; stroke-width: 2.6; stroke-dasharray: 4 3; pointer-events: none; }
-  .cand-line { fill: none; stroke: #16191d; stroke-width: 1.4; pointer-events: none; }
+  .cand-ring { fill: none; stroke: #2e9e5b; stroke-width: 2.4; stroke-dasharray: 3.5 2.6; pointer-events: none; }
+  .cand-line { stroke: #16191d; stroke-width: 1.5; stroke-linecap: round; pointer-events: none; }
   html.dark .cand-line { stroke: #e8eaed; }
-  .cand-notes { position: absolute; left: 0; right: 0; top: 100%; display: flex; justify-content: space-between; gap: 12px; pointer-events: none; }
-  .cand-note { max-width: 46%; font-size: max(11px, 1.75cqw); font-weight: 700; line-height: 1.25; color: var(--ink);
-    border-top: 1.5px solid var(--ink); padding-top: 5px; }
-  .cand-note.l { text-align: left; } .cand-note.r { text-align: right; margin-left: auto; }
-  .seat-wrap.has-cands { margin-bottom: 50px; }
-  @media (max-width: 520px) { .seat-wrap.has-cands { margin-bottom: 64px; } }
+  .cand-float { position: absolute; width: max-content; max-width: 165px; font-size: 12.5px; font-weight: 700; line-height: 1.3;
+    color: var(--ink); pointer-events: none; }
+  .cand-float.r { transform: translate(6px, -50%); text-align: left; }
+  .cand-float.l { transform: translate(calc(-100% - 6px), -50%); text-align: right; }
+  .cand-notes { display: none; }
+  .seat-wrap.has-cands { margin-bottom: 26px; }
+  .cand-mini { display: inline-block; width: 10px; height: 10px; border-radius: 50%; box-shadow: 0 0 0 1.5px #fff, 0 0 0 3px #2e9e5b;
+    margin-right: 8px; vertical-align: 0; }
+  html.dark .cand-mini { box-shadow: 0 0 0 1.5px #111418, 0 0 0 3px #2e9e5b; }
+  @media (max-width: 1060px) {
+    .cand-line, .cand-float { display: none; }
+    .cand-notes { display: flex; flex-direction: column; align-items: center; gap: 6px; margin: 14px auto 6px; max-width: 520px; }
+    .cand-notes:empty { display: none; }
+    .cand-note { font-size: 12.5px; font-weight: 700; line-height: 1.35; color: var(--ink); text-align: center; }
+    .seat-wrap.has-cands { margin-bottom: 0; }
+  }
   .cand-icon { display: inline-block; width: 12px; height: 12px; border-radius: 50%; border: 2px dashed #2e9e5b; vertical-align: -2px; margin-right: 6px; box-sizing: border-box; }
   .lg-cand .cand-icon { width: 14px; height: 14px; margin-right: 0; }
   .tip .t-cand { font-size: 12px; font-weight: 600; color: #1f7a45; margin: -2px 0 6px; }
@@ -460,8 +470,8 @@
       <div class="ov ov-29" id="ov29">29th vote</div>
       <div class="ov ov-56" id="ov56"></div>
       <div class="ov ov-sub">Senate Democrats</div>
-      <div class="cand-notes" id="candNotes"></div>
     </div>
+    <div class="cand-notes" id="candNotes"></div>
     <aside class="record" id="record"></aside>
     <div class="move-caption" id="moveCaption" aria-live="polite" data-noshot></div>
   </section>
@@ -625,8 +635,8 @@ const MOVERS = [
 // Senators running for leader. Their own marble gets a green dotted ring, its own color and a label.
 // This doesn't change the bar or the counts. [name, state, label, marble color]
 const CANDIDATES = [
-  ["Chuck Schumer", "NY", "Sen. Chuck Schumer running for a 3rd term as Majority Leader", "#001c55"],
-  ["Chris Van Hollen", "MD", "Sen. Chris Van Hollen declares Majority Leader run", "#3bf4fb"],
+  ["Chuck Schumer", "NY", "Sen. Chuck Schumer running for a 3rd term as Majority Leader", "#03045E"],
+  ["Chris Van Hollen", "MD", "Sen. Chris Van Hollen announces his run for Majority Leader", "#3bf4fb"],
 ];
 /* ======================================================================== */
 
@@ -812,13 +822,13 @@ const candLayer = document.createElementNS(NS, "g");
 candLayer.setAttribute("class", "cand-layer");
 svg.appendChild(candLayer);
 let candSeats = [];   // [seatIndex, candidate] for the chart labels and the screenshot
-// The best spot for a candidate who isn't a mover: Support -> bottom seat nearest the center; Opposing -> same on the right
+// The best spot for a candidate who isn't a mover: the outside bottom seat of their block (bottom-left for Support, bottom-right otherwise)
 function candidateSpot(cat, lay, taken) {
   let best = -1, bestKey = null;
   lay.forEach((c, i) => {
     if (c !== cat || taken.has(i)) return;
     const st = seats[i], x = CX + st.r * SCALE * Math.cos(st.theta), y = CY - st.r * SCALE * Math.sin(st.theta);
-    const key = [Math.round(y), cat === "Will not support" ? -x : x];
+    const key = [Math.round(y), cat === "Support" ? -x : x];
     if (!bestKey || key[0] > bestKey[0] || (key[0] === bestKey[0] && key[1] > bestKey[1])) { best = i; bestKey = key; }
   });
   return best;
@@ -827,29 +837,35 @@ function seatXY(i) { const st = seats[i]; return [CX + st.r * SCALE * Math.cos(s
 function drawCandidates() {
   candLayer.innerHTML = "";
   const notes = document.getElementById("candNotes");
+  const wrap = document.getElementById("seatWrap");
   notes.innerHTML = "";
-  document.getElementById("seatWrap").classList.toggle("has-cands", candSeats.length > 0);
-  const R = 0.066 * SCALE;
+  wrap.querySelectorAll(".cand-float").forEach(n => n.remove());
+  wrap.classList.toggle("has-cands", candSeats.length > 0);
+  const R = 0.066 * SCALE, RING = R + 3.5, LEN = 34;
   candSeats.forEach(([i, cand]) => {
     const [x, y] = seatXY(i);
     circles[i].setAttribute("fill", cand[3]);
     circles[i].classList.add("cand");
     const ring = document.createElementNS(NS, "circle");
-    ring.setAttribute("cx", x.toFixed(2)); ring.setAttribute("cy", y.toFixed(2)); ring.setAttribute("r", (R + 6).toFixed(2));
+    ring.setAttribute("cx", x.toFixed(2)); ring.setAttribute("cy", y.toFixed(2)); ring.setAttribute("r", RING.toFixed(2));
     ring.setAttribute("class", "cand-ring");
     candLayer.appendChild(ring);
-    // leader line: straight down for seats on the bottom row, otherwise out to the side and then down
-    const right = x > CX;
-    const pts = y > CY - 5
-      ? [[x, y + R + 6], [x, 440]]
-      : [[right ? x + R + 6 : x - R - 6, y], [right ? 806 : 14, y], [right ? 806 : 14, 440]];
-    const pl = document.createElementNS(NS, "polyline");
-    pl.setAttribute("points", pts.map(p => p.map(v => v.toFixed(1)).join(",")).join(" "));
-    pl.setAttribute("class", "cand-line");
-    candLayer.appendChild(pl);
+    // a short line at 45 degrees, down and away from the center
+    const right = x > CX, dx = right ? 1 : -1, k = Math.SQRT1_2;
+    const x1 = x + dx * (RING + 1) * k, y1 = y + (RING + 1) * k, x2 = x1 + dx * LEN, y2 = y1 + LEN;
+    const ln = document.createElementNS(NS, "line");
+    ln.setAttribute("x1", x1.toFixed(1)); ln.setAttribute("y1", y1.toFixed(1)); ln.setAttribute("x2", x2.toFixed(1)); ln.setAttribute("y2", y2.toFixed(1));
+    ln.setAttribute("class", "cand-line");
+    candLayer.appendChild(ln);
+    const f = document.createElement("div");
+    f.className = "cand-float " + (right ? "r" : "l");
+    f.style.left = (x2 / 820 * 100) + "%"; f.style.top = (y2 / 440 * 100) + "%";
+    f.textContent = cand[2];
+    wrap.appendChild(f);
+    // on narrow screens the labels sit under the chart instead, each with a matching marble
     const n = document.createElement("div");
     n.className = "cand-note " + (right ? "r" : "l");
-    n.innerHTML = cand[2];
+    n.innerHTML = `<i class="cand-mini" style="background:${cand[3]}"></i>${cand[2]}`;
     notes.appendChild(n);
   });
 }
@@ -1589,7 +1605,7 @@ async function drawShareImage(spec) {
   const W = 960, PAD = 60, TOP = spec.ribbon ? 26 : 0;
   const cols = splitColumns(spec.groups);
   const rows = Math.max(1, ...spec.groups.map((gr, i) => Math.ceil(gr.names.length / cols[i])));
-  const DY = (spec.candidates || []).length ? 16 : 0;   // room for candidate labels under the chart
+  const DY = (spec.candidates || []).length ? 30 : 0;   // room for candidate labels under the chart
   const LH = 13.4, LIST_Y = 738 + DY;
   const H = Math.max(960 + TOP, Math.ceil(TOP + LIST_Y + rows * LH + 72));
   const S = 2;
@@ -1689,21 +1705,23 @@ async function drawShareImage(spec) {
     const [sx, sy] = P(st.r, st.theta);
     g.fillStyle = candBySeat[i] ? candBySeat[i].color : spec.seatColors[i]; g.beginPath(); g.arc(sx, sy, SR, 0, Math.PI * 2); g.fill();
   });
-  const NOTE_Y = CY2 + 30;   // labels sit just under the chart
+  // Candidates: dotted green ring, a short 45-degree line and a wrapped label beside it
+  const wrapLines = (str, px, maxW) => {
+    font(700, px); const out = []; let line = "";
+    str.split(" ").forEach(w => { const t = line ? line + " " + w : w; if (g.measureText(t).width > maxW && line) { out.push(line); line = w; } else line = t; });
+    if (line) out.push(line); return out;
+  };
   (spec.candidates || []).forEach(c => {
-    const st = seats[c.seat], [sx, sy] = P(st.r, st.theta), right = sx > CX2;
-    g.save(); g.strokeStyle = "#2e9e5b"; g.lineWidth = 2.2; g.setLineDash([3.5, 2.6]);
-    g.beginPath(); g.arc(sx, sy, SR + 4.5, 0, Math.PI * 2); g.stroke(); g.restore();
-    g.save(); g.strokeStyle = INK; g.lineWidth = 1.2; g.beginPath();
-    const edge = right ? W - PAD + 2 : PAD - 2;
-    if (sy > CY2 - 4) { g.moveTo(sx, sy + SR + 4.5); g.lineTo(sx, NOTE_Y - 12); }
-    else { g.moveTo(right ? sx + SR + 4.5 : sx - SR - 4.5, sy); g.lineTo(edge, sy); g.lineTo(edge, NOTE_Y - 12); }
-    g.stroke(); g.restore();
-    font(700, 11);
-    const tw = Math.min(g.measureText(c.label).width, 330);
-    const x0 = right ? W - PAD + 2 - tw : PAD - 2;
-    g.fillStyle = INK; g.fillRect(x0, NOTE_Y - 12, tw, 1.3);
-    text(c.label, right ? W - PAD + 2 : PAD - 2, NOTE_Y, { w: 700, px: 11, align: right ? "right" : "left", maxW: 330 });
+    const st = seats[c.seat], [sx, sy] = P(st.r, st.theta), right = sx > CX2, d = right ? 1 : -1, q = Math.SQRT1_2;
+    const RING = SR + 2.6;
+    g.save(); g.strokeStyle = "#2e9e5b"; g.lineWidth = 2; g.setLineDash([3, 2.2]);
+    g.beginPath(); g.arc(sx, sy, RING, 0, Math.PI * 2); g.stroke(); g.restore();
+    const x1 = sx + d * (RING + 1) * q, y1 = sy + (RING + 1) * q, x2 = x1 + d * 24, y2 = y1 + 24;
+    g.save(); g.strokeStyle = INK; g.lineWidth = 1.3; g.lineCap = "round"; g.beginPath(); g.moveTo(x1, y1); g.lineTo(x2, y2); g.stroke(); g.restore();
+    const maxW = right ? W - PAD + 4 - (x2 + 5) : (x2 - 5) - (PAD - 4);
+    const lines = wrapLines(c.label, 11.5, Math.max(90, maxW));
+    const lh = 14, top = y2 - (lines.length * lh) / 2 + 10;
+    lines.forEach((ln, j) => text(ln, right ? x2 + 5 : x2 - 5, top + j * lh, { w: 700, px: 11.5, align: right ? "left" : "right" }));
   });
   const mt = (seats[NEEDED - 2].theta + seats[NEEDED - 1].theta) / 2;
   const [l1x, l1y] = P(0.44, mt), [l2x, l2y] = P(1.12, mt);
