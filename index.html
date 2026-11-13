@@ -272,6 +272,13 @@
     font: 600 14px/1 "Inter", system-ui, sans-serif; color: #fff; background: #FF5E5B; border-radius: 999px; text-decoration: none; }
   .kofi:hover { background: #f04d4a; }
   .kofi[hidden] { display: none; }
+  .footer-btns { display: flex; justify-content: center; flex-wrap: wrap; gap: 10px; margin: 0 0 18px; }
+  .footer-btns .kofi { margin: 0; }
+  .xbtn { display: inline-flex; align-items: center; gap: 8px; padding: 11px 18px; font: 600 14px/1 "Inter", system-ui, sans-serif;
+    color: #fff; background: #000; border-radius: 999px; text-decoration: none; }
+  .xbtn:hover { background: #26292d; }
+  .updated .byline { white-space: nowrap; }
+  html.dark .xbtn { box-shadow: inset 0 0 0 1px #3d434a; }
   footer .note { font-size: 13.5px; color: var(--muted); margin: 0 0 8px; }
   footer .src { font-size: 12px; color: var(--faint); margin: 0; }
 
@@ -640,10 +647,16 @@
   <hr>
 
   <footer>
+    <div class="footer-btns" data-noshot>
     <a class="kofi" id="kofi" href="#" target="_blank" rel="noopener" data-noshot hidden>
       <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 8h1a4 4 0 0 1 0 8h-1"/><path d="M3 8h14v9a4 4 0 0 1-4 4H7a4 4 0 0 1-4-4z"/><line x1="6" y1="2" x2="6" y2="4"/><line x1="10" y1="2" x2="10" y2="4"/><line x1="14" y1="2" x2="14" y2="4"/></svg>
       Support The 29th Vote on Ko-fi
     </a>
+    <a class="xbtn" href="https://x.com/JaysonFras" target="_blank" rel="noopener" data-noshot>
+      <svg width="15" height="15" viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M18.9 2H22l-6.8 7.8L23.2 22h-6.3l-4.9-6.4L6.4 22H3.3l7.3-8.3L2.9 2h6.4l4.4 5.9L18.9 2zm-1.1 18.1h1.7L8.3 3.8H6.5l11.3 16.3z"/></svg>
+      Follow @JaysonFras on X
+    </a>
+    </div>
     <p class="note">Senate Democrats elect their leader by secret ballot, expected in December. Senators with no public position are not committed either way. <span style="white-space:nowrap">* Senator-elect</span></p>
     <p class="src">Sources: CBS News, CBC, Boston Globe, Roll Call, CNN, The Hill, PolitiFact, Washington Times, Epoch Times, Punchbowl News, New Republic, NBC News, X &nbsp;·&nbsp; <span style="white-space:nowrap">Created by Jayson Frascatore</span></p>
   </footer>
@@ -1699,7 +1712,8 @@ window.addEventListener("resize", () => { if (pinned) placePinned(); });
 
 /* ---------- Header text ---------- */
 document.getElementById("subtitle").textContent = SUBTITLE;
-document.getElementById("updated").textContent = LAST_UPDATED + (NO_CHANGE ? ` \u00a0·\u00a0 No change since ${LAST_MOVE}` : "");
+document.getElementById("updated").innerHTML = LAST_UPDATED + (NO_CHANGE ? ` \u00a0·\u00a0 No change since ${LAST_MOVE}` : "") +
+  ` \u00a0·\u00a0 <span class="byline">Created by Jayson Frascatore</span>`;
 if (KOFI_URL) { const k = document.getElementById("kofi"); k.href = KOFI_URL; k.hidden = false; }
 
 /* ---------- Screenshot ---------- */
