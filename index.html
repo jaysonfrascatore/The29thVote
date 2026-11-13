@@ -213,6 +213,30 @@
   .support-h .big { color: var(--support); }
   .unclear-head .big { color: var(--unclear); }
   .oppose-h .big { color: var(--oppose); }
+  #seats { overflow: visible; }
+  .cand-ring { fill: none; stroke: #2e9e5b; stroke-width: 2.4; stroke-dasharray: 3.5 2.6; pointer-events: none; }
+  .cand-line { stroke: #16191d; stroke-width: 1.5; stroke-linecap: round; pointer-events: none; }
+  html.dark .cand-line { stroke: #e8eaed; }
+  .cand-float { position: absolute; width: max-content; max-width: 165px; font-size: 12.5px; font-weight: 700; line-height: 1.3;
+    color: var(--ink); pointer-events: none; }
+  .cand-float.r { transform: translate(6px, -50%); text-align: left; }
+  .cand-float.l { transform: translate(calc(-100% - 6px), -50%); text-align: right; }
+  .cand-notes { display: none; }
+  .seat-wrap.has-cands { margin-bottom: 26px; }
+  .cand-mini { display: inline-block; width: 10px; height: 10px; border-radius: 50%; box-shadow: 0 0 0 1.5px #fff, 0 0 0 3px #2e9e5b;
+    margin-right: 8px; vertical-align: 0; }
+  html.dark .cand-mini { box-shadow: 0 0 0 1.5px #111418, 0 0 0 3px #2e9e5b; }
+  @media (max-width: 1060px) {
+    .cand-line, .cand-float { display: none; }
+    .cand-notes { display: flex; flex-direction: column; align-items: center; gap: 6px; margin: 14px auto 6px; max-width: 520px; }
+    .cand-notes:empty { display: none; }
+    .cand-note { font-size: 12.5px; font-weight: 700; line-height: 1.35; color: var(--ink); text-align: center; }
+    .seat-wrap.has-cands { margin-bottom: 0; }
+  }
+  .cand-icon { display: inline-block; width: 12px; height: 12px; border-radius: 50%; border: 2px dashed #2e9e5b; vertical-align: -2px; margin-right: 6px; box-sizing: border-box; }
+  .lg-cand .cand-icon { width: 14px; height: 14px; margin-right: 0; }
+  .tip .t-cand { font-size: 12px; font-weight: 600; color: #1f7a45; margin: -2px 0 6px; }
+  html.dark .tip .t-cand { color: #5fd08f; }
   .ndot { display: inline-block; width: 8px; height: 8px; border-radius: 50%; margin-right: 8px; vertical-align: 1px; flex: none; }
   .nopos .ndot { background: #9aa1a9; }
   .ldiv { grid-row: 1 / 3; width: 1px; background: var(--rule); justify-self: start; margin-left: -14px; }
@@ -424,7 +448,7 @@
   <div id="viewTracker">
   <header>
     <p class="site-name">The 29th Vote</p>
-    <h1>Who's backing Schumer for Majority Leader?</h1>
+    <h1>Who will become Senate Majority Leader?</h1>
     <p class="subtitle" id="subtitle"></p>
     <p class="updated" id="updated"></p>
   </header>
@@ -447,6 +471,7 @@
       <div class="ov ov-56" id="ov56"></div>
       <div class="ov ov-sub">Senate Democrats</div>
     </div>
+    <div class="cand-notes" id="candNotes"></div>
     <aside class="record" id="record"></aside>
     <div class="move-caption" id="moveCaption" aria-live="polite" data-noshot></div>
   </section>
@@ -606,7 +631,19 @@ const LAST_MOVE = "Nov. 12, 9 PM";
 const MOVERS = [
   ["Chris Van Hollen (MD)", "Unclear", "Will not support"],
 ];
+
+// Senators running for leader. Their own marble gets a green dotted ring, its own color and a label.
+// This doesn't change the bar or the counts. [name, state, label, marble color]
+const CANDIDATES = [
+  ["Chuck Schumer", "NY", "Sen. Chuck Schumer running for a 3rd term as Majority Leader", "#03045E"],
+  ["Chris Van Hollen", "MD", "Sen. Chris Van Hollen announces his run for Majority Leader", "#3bf4fb"],
+];
 /* ======================================================================== */
+
+/* ---------- Display names for the categories (data keys stay the same) ---------- */
+const LABEL = { "Support": "Support Schumer", "Unclear": "Unclear", "No public position": "No public position", "Will not support": "Opposing Schumer" };
+const L = c => LABEL[c] || c;
+
 
 /* ===== DC office phone numbers (last 4 digits after 202-224-) =====
    From the Senate Sergeant at Arms suite & telephone list (Aug. 3, 2026).
@@ -683,7 +720,8 @@ CATS.forEach(cat => {
   bar.insertBefore(d, bar.querySelector(".majority-line"));
 });
 document.getElementById("legend").innerHTML = CATS.map(cat =>
-  `<span><i class="chip${cat === "No public position" ? " c-none" : ""}" style="background:${COLORS[cat]}"></i><span>${cat} (<span class="rv" data-lg="${cat}">${counts[cat]}</span>)</span></span>`).join("");
+  `<span><i class="chip${cat === "No public position" ? " c-none" : ""}" style="background:${COLORS[cat]}"></i><span>${L(cat)} (<span class="rv" data-lg="${cat}">${counts[cat]}</span>)</span></span>`).join("")
+  + (typeof CANDIDATES !== "undefined" && CANDIDATES.length ? `<span class="lg-cand"><i class="cand-icon"></i><span>Running for leader</span></span>` : "");
 
 /* ---------- Counts that roll up or down as the marbles land ---------- */
 function rollTo(el, text, dir, animate) {
@@ -770,19 +808,73 @@ function paint(layout) { layout.forEach((cat, i) => setSeat(i, cat)); }
 
 const seatEls = {}; // key "Cat|index" -> circle
 function clearNames() {
+  candSeats = [];
+  if (typeof candLayer !== "undefined") { candLayer.innerHTML = ""; const n = document.getElementById("candNotes"); if (n) n.innerHTML = ""; }
   circles.forEach(c => {
-    c.classList.remove("onrecord", "active");
+    c.classList.remove("onrecord", "active", "cand");
     delete c.dataset.cat; delete c.dataset.idx;
     c.removeAttribute("tabindex"); c.removeAttribute("aria-label");
   });
   for (const k in seatEls) delete seatEls[k];
+}
+const candFor = name => (typeof CANDIDATES !== "undefined" ? CANDIDATES : []).find(c => c[0] === name);
+const candLayer = document.createElementNS(NS, "g");
+candLayer.setAttribute("class", "cand-layer");
+svg.appendChild(candLayer);
+let candSeats = [];   // [seatIndex, candidate] for the chart labels and the screenshot
+// The best spot for a candidate who isn't a mover: the outside bottom seat of their block (bottom-left for Support, bottom-right otherwise)
+function candidateSpot(cat, lay, taken) {
+  let best = -1, bestKey = null;
+  lay.forEach((c, i) => {
+    if (c !== cat || taken.has(i)) return;
+    const st = seats[i], x = CX + st.r * SCALE * Math.cos(st.theta), y = CY - st.r * SCALE * Math.sin(st.theta);
+    const key = [Math.round(y), cat === "Support" ? -x : x];
+    if (!bestKey || key[0] > bestKey[0] || (key[0] === bestKey[0] && key[1] > bestKey[1])) { best = i; bestKey = key; }
+  });
+  return best;
+}
+function seatXY(i) { const st = seats[i]; return [CX + st.r * SCALE * Math.cos(st.theta), CY - st.r * SCALE * Math.sin(st.theta)]; }
+function drawCandidates() {
+  candLayer.innerHTML = "";
+  const notes = document.getElementById("candNotes");
+  const wrap = document.getElementById("seatWrap");
+  notes.innerHTML = "";
+  wrap.querySelectorAll(".cand-float").forEach(n => n.remove());
+  wrap.classList.toggle("has-cands", candSeats.length > 0);
+  const R = 0.066 * SCALE, RING = R + 3.5, LEN = 34;
+  candSeats.forEach(([i, cand]) => {
+    const [x, y] = seatXY(i);
+    circles[i].setAttribute("fill", cand[3]);
+    circles[i].classList.add("cand");
+    const ring = document.createElementNS(NS, "circle");
+    ring.setAttribute("cx", x.toFixed(2)); ring.setAttribute("cy", y.toFixed(2)); ring.setAttribute("r", RING.toFixed(2));
+    ring.setAttribute("class", "cand-ring");
+    candLayer.appendChild(ring);
+    // a short line at 45 degrees, down and away from the center
+    const right = x > CX, dx = right ? 1 : -1, k = Math.SQRT1_2;
+    const x1 = x + dx * (RING + 1) * k, y1 = y + (RING + 1) * k, x2 = x1 + dx * LEN, y2 = y1 + LEN;
+    const ln = document.createElementNS(NS, "line");
+    ln.setAttribute("x1", x1.toFixed(1)); ln.setAttribute("y1", y1.toFixed(1)); ln.setAttribute("x2", x2.toFixed(1)); ln.setAttribute("y2", y2.toFixed(1));
+    ln.setAttribute("class", "cand-line");
+    candLayer.appendChild(ln);
+    const f = document.createElement("div");
+    f.className = "cand-float " + (right ? "r" : "l");
+    f.style.left = (x2 / 820 * 100) + "%"; f.style.top = (y2 / 440 * 100) + "%";
+    f.textContent = cand[2];
+    wrap.appendChild(f);
+    // on narrow screens the labels sit under the chart instead, each with a matching marble
+    const n = document.createElement("div");
+    n.className = "cand-note " + (right ? "r" : "l");
+    n.innerHTML = `<i class="cand-mini" style="background:${cand[3]}"></i>${cand[2]}`;
+    notes.appendChild(n);
+  });
 }
 function nameSeat(i, cat, idx) {
   const p = SENATORS[cat][idx], c = circles[i];
   c.classList.add("onrecord");
   c.dataset.cat = cat; c.dataset.idx = idx;
   c.setAttribute("tabindex", "0");
-  c.setAttribute("aria-label", `${p[0]} (${p[1]}): ${cat}`);
+  c.setAttribute("aria-label", `${p[0]} (${p[1]}): ${L(cat)}`);
   seatEls[cat + "|" + idx] = c;
 }
 // Where each mover's marble lands, replaying the moves from the previous update (same math as the animation)
@@ -816,6 +908,20 @@ function assignNames() {
     if (idx < 0 || lay[seat] !== cat || taken.has(seat) || used[cat].has(idx)) return;
     nameSeat(seat, cat, idx); taken.add(seat); used[cat].add(idx);
   });
+  // Candidates who didn't just move get a set spot
+  (typeof CANDIDATES !== "undefined" ? CANDIDATES : []).forEach(cand => {
+    const label = `${cand[0]} (${cand[1]})`;
+    for (const cat of ["Support", "Unclear", "Will not support"]) {
+      const idx = senatorIdx(cat, label);
+      if (idx < 0) continue;
+      if (!used[cat].has(idx)) {
+        const spot = candidateSpot(cat, lay, taken);
+        if (spot >= 0) { nameSeat(spot, cat, idx); taken.add(spot); used[cat].add(idx); }
+      }
+      const seat = circles.findIndex(c => c.dataset.cat === cat && +c.dataset.idx === idx);
+      if (seat >= 0) candSeats.push([seat, cand]);
+    }
+  });
   const next = { "Support": 0, "Unclear": 0, "Will not support": 0 };
   lay.forEach((cat, i) => {
     if (cat === "No public position" || taken.has(i)) return;
@@ -824,6 +930,7 @@ function assignNames() {
     if (idx >= SENATORS[cat].length) return;
     nameSeat(i, cat, idx); used[cat].add(idx);
   });
+  drawCandidates();
 }
 
 // 29th vote marker
@@ -862,13 +969,13 @@ if (changed.length || onPrev !== onNow) {
   let h = `<h3>ON THE RECORD</h3>`;
   if (onPrev !== onNow) h += `<div class="total">${onPrev} → ${onNow} of ${TOTAL} senators</div>`;
   changed.forEach(c => {
-    h += `<div class="row"><span class="lab"><i class="chip${c === "No public position" ? " c-none" : ""}" style="background:${COLORS[c]}"></i>${c}</span>
+    h += `<div class="row"><span class="lab"><i class="chip${c === "No public position" ? " c-none" : ""}" style="background:${COLORS[c]}"></i>${L(c)}</span>
           <b style="color:${TEXT_COLORS[c]}">${PREV[c]} → ${counts[c]}</b></div>`;
   });
   if (MOVERS.length) {
     h += `<div class="latest-h">Latest${typeof LAST_MOVE === "string" ? ` <span>(${LAST_MOVE})</span>` : ""}:</div>`;
     MOVERS.forEach(([nm, , to]) => {
-      h += `<div class="mover" style="color:${TEXT_COLORS[to]}"><span>${nm}</span><small>→ ${to}</small></div>`;
+      h += `<div class="mover" style="color:${TEXT_COLORS[to]}"><span>${nm}</span><small>→ ${L(to)}</small></div>`;
     });
   }
   h += `<div class="since">${PREV_LABEL}</div>`;
@@ -1159,7 +1266,7 @@ async function shootInto(i, cat, fromSide) {
 }
 
 function showCaption(name, from, to) {
-  caption.innerHTML = `<b style="color:${TEXT_COLORS[to]}">${name}</b> <span>${from} → <b style="color:${TEXT_COLORS[to]}">${to}</b></span>`;
+  caption.innerHTML = `<b style="color:${TEXT_COLORS[to]}">${name}</b> <span>${L(from)} → <b style="color:${TEXT_COLORS[to]}">${L(to)}</b></span>`;
   caption.classList.add("show");
 }
 function hideCaption() { caption.classList.remove("show"); }
@@ -1251,9 +1358,9 @@ const li = (cat, idx) => {
 };
 const half = Math.ceil(counts["Unclear"] / 2);
 lists.innerHTML = `
-  <div class="col support-h"><h2><span class="big" data-big="Support">${counts["Support"]}</span><span class="lbl">Support</span></h2></div>
+  <div class="col support-h"><h2><span class="big" data-big="Support">${counts["Support"]}</span><span class="lbl">Support Schumer</span></h2></div>
   <div class="col unclear-head"><h2><span class="big" data-big="Unclear">${counts["Unclear"]}</span><span class="lbl">Unclear</span></h2></div>
-  <div class="col oppose-h"><h2><span class="big" data-big="Will not support">${counts["Will not support"]}</span><span class="lbl">Will not support</span></h2></div>
+  <div class="col oppose-h"><h2><span class="big" data-big="Will not support">${counts["Will not support"]}</span><span class="lbl">Opposing Schumer</span></h2></div>
   <div class="col support"><ul>${SENATORS["Support"].map((_, i) => li("Support", i)).join("")}</ul></div>
   <div class="col unclear-a"><ul>${SENATORS["Unclear"].slice(0, half).map((_, i) => li("Unclear", i)).join("")}</ul></div>
   <div class="col unclear-b"><ul>${SENATORS["Unclear"].slice(half).map((_, i) => li("Unclear", i + half)).join("")}</ul></div>
@@ -1294,7 +1401,8 @@ function showTip(cat, idx, x, y) {
     ? [NOPOS_SORTED[idx][0], NOPOS_SORTED[idx][1], NOPOS_SORTED[idx][3] || NO_POSITION_DEFAULT]
     : SENATORS[cat][idx];
   tip.innerHTML = `<div class="t-name">${p[0]} (${p[1]})${p[3] ? " <span style='font-weight:400;color:#8c949e;font-size:12px'>Senator-elect</span>" : ""}</div>
-    <div class="t-cat" style="color:${TEXT_COLORS[cat]}">${cat}</div>
+    <div class="t-cat" style="color:${TEXT_COLORS[cat]}">${L(cat)}</div>
+    ${candFor(p[0]) ? `<div class="t-cand"><i class="cand-icon"></i>Running for Senate majority leader</div>` : ""}
     <div class="t-note">${p[2]}</div>
     ${callRow(p[0], !!p[3])}`;
   tip.classList.add("show");
@@ -1435,23 +1543,29 @@ function trackerShareSpec() {
     title: document.querySelector("#viewTracker h1").textContent,
     subtitle: SUBTITLE.replace(/ /g, " "),
     bar: CATS.map(c => ({ label: c, n: counts[c], color: COLORS[c], text: c === "No public position" ? "#16191d" : "#fff" })),
-    legend: CATS.map(c => ({ label: `${c} (${counts[c]})`, color: COLORS[c] })),
+    legend: CATS.map(c => ({ label: `${L(c)} (${counts[c]})`, color: COLORS[c] }))
+      .concat(candSeats.length ? [{ label: "Running for leader", ring: true }] : []),
     seatColors: layoutFor(counts).map(c => COLORS[c]),
+    candidates: candSeats.map(([i, cand]) => ({ seat: i, color: cand[3], label: cand[2] })),
     box: ({ text, g, RX, RR, y }) => {
       if (!(changed.length || onPrev !== onNow)) return;
       text("ON THE RECORD", RX, y, { w: 700, px: 12.5 }); y += 19;
       if (onPrev !== onNow) { text(`${onPrev} → ${onNow} of ${TOTAL} senators`, RX, y, { px: 12, color: "#5b636d" }); y += 24; }
       changed.forEach(c => {
         g.fillStyle = COLORS[c]; g.fillRect(RX, y - 9, 9, 9);
-        text(c, RX + 15, y, { px: 12, maxW: RR - RX - 70 });
+        text(L(c), RX + 15, y, { px: 12, maxW: RR - RX - 70 });
         text(`${PREV[c]} → ${counts[c]}`, RR, y, { w: 700, px: 12, color: TEXT_COLORS[c], align: "right" });
         y += 19;
       });
       if (MOVERS.length) {
         y += 5; text(typeof LAST_MOVE === "string" ? `Latest (${LAST_MOVE}):` : "Latest:", RX, y, { px: 12, color: "#5b636d", maxW: RR - RX }); y += 18;
         MOVERS.slice(-5).forEach(([nm, , to]) => {
-          text(nm, RX, y, { w: 700, px: 12, color: TEXT_COLORS[to], maxW: RR - RX - 62 });
-          text(`→ ${to}`, RR, y, { px: 11, color: TEXT_COLORS[to], align: "right" });
+          // name on its own line when the name and the arrow don't both fit
+          g.font = `700 12px Inter, system-ui, sans-serif`; const nw = g.measureText(nm).width;
+          g.font = `400 11px Inter, system-ui, sans-serif`; const aw = g.measureText(`→ ${L(to)}`).width;
+          text(nm, RX, y, { w: 700, px: 12, color: TEXT_COLORS[to], maxW: RR - RX });
+          if (nw + aw + 10 > RR - RX) y += 15;
+          text(`→ ${L(to)}`, RR, y, { px: 11, color: TEXT_COLORS[to], align: "right" });
           y += 17;
         });
       }
@@ -1462,9 +1576,9 @@ function trackerShareSpec() {
       }
     },
     groups: [
-      { label: "Support", n: counts["Support"], color: COLORS["Support"], names: SENATORS["Support"].map(name) },
+      { label: L("Support"), n: counts["Support"], color: COLORS["Support"], names: SENATORS["Support"].map(name) },
       { label: "Unclear", n: counts["Unclear"], color: COLORS["Unclear"], names: SENATORS["Unclear"].map(name) },
-      { label: "Will not support", n: counts["Will not support"], color: COLORS["Will not support"], names: SENATORS["Will not support"].map(name) },
+      { label: L("Will not support"), n: counts["Will not support"], color: COLORS["Will not support"], names: SENATORS["Will not support"].map(name) },
     ],
     note: "Senate Democrats elect their leader by secret ballot, expected in December. Senators with no public position are not committed either way.   * Senator-elect",
     sources: `${src}  ·  As of ${stamp}  ·  Created by Jayson Frascatore`,
@@ -1491,7 +1605,8 @@ async function drawShareImage(spec) {
   const W = 960, PAD = 60, TOP = spec.ribbon ? 26 : 0;
   const cols = splitColumns(spec.groups);
   const rows = Math.max(1, ...spec.groups.map((gr, i) => Math.ceil(gr.names.length / cols[i])));
-  const LH = 13.4, LIST_Y = 738;
+  const DY = (spec.candidates || []).length ? 30 : 0;   // room for candidate labels under the chart
+  const LH = 13.4, LIST_Y = 738 + DY;
   const H = Math.max(960 + TOP, Math.ceil(TOP + LIST_Y + rows * LH + 72));
   const S = 2;
   const cv = document.createElement("canvas");
@@ -1561,13 +1676,22 @@ async function drawShareImage(spec) {
   dashed(MX, 162, MX, BY + BH + 4);
 
   // Legend
-  font(400, 13.5);
-  const widths = spec.legend.map(l => 14 + 9 + g.measureText(l.label).width);
-  const LG = 38, total = widths.reduce((a, b) => a + b, 0) + LG * (spec.legend.length - 1);
+  // shrink the legend to fit when there are more items
+  let LPX = 13.5, LG = 38, widths, total;
+  for (;;) {
+    font(400, LPX);
+    widths = spec.legend.map(l => 14 + 9 + g.measureText(l.label).width);
+    total = widths.reduce((a, b) => a + b, 0) + LG * (spec.legend.length - 1);
+    if (total <= W - 2 * PAD || LPX <= 10) break;
+    if (LG > 22) LG -= 4; else LPX -= 0.5;
+  }
   let lx = (W - total) / 2;
   spec.legend.forEach((l, i) => {
-    g.fillStyle = l.color; g.fillRect(lx, 260, 14, 14);
-    text(l.label, lx + 23, 272, { px: 13.5, color: INK });
+    if (l.ring) {
+      g.save(); g.strokeStyle = "#2e9e5b"; g.lineWidth = 2; g.setLineDash([3, 2.4]);
+      g.beginPath(); g.arc(lx + 7, 267, 6.2, 0, Math.PI * 2); g.stroke(); g.restore();
+    } else { g.fillStyle = l.color; g.fillRect(lx, 260, 14, 14); }
+    text(l.label, lx + 23, 272, { px: LPX, color: INK });
     lx += widths[i] + LG;
   });
   rule(298);
@@ -1575,9 +1699,29 @@ async function drawShareImage(spec) {
   // Chamber (same seat geometry as the page, scaled down)
   const k = 0.74, CX2 = W / 2, CY2 = 622;
   const P = (r, th) => [CX2 + r * 330 * k * Math.cos(th), CY2 - r * 330 * k * Math.sin(th)];
+  const SR = 0.066 * 330 * k;
+  const candBySeat = Object.fromEntries((spec.candidates || []).map(c => [c.seat, c]));
   seats.forEach((st, i) => {
     const [sx, sy] = P(st.r, st.theta);
-    g.fillStyle = spec.seatColors[i]; g.beginPath(); g.arc(sx, sy, 0.066 * 330 * k, 0, Math.PI * 2); g.fill();
+    g.fillStyle = candBySeat[i] ? candBySeat[i].color : spec.seatColors[i]; g.beginPath(); g.arc(sx, sy, SR, 0, Math.PI * 2); g.fill();
+  });
+  // Candidates: dotted green ring, a short 45-degree line and a wrapped label beside it
+  const wrapLines = (str, px, maxW) => {
+    font(700, px); const out = []; let line = "";
+    str.split(" ").forEach(w => { const t = line ? line + " " + w : w; if (g.measureText(t).width > maxW && line) { out.push(line); line = w; } else line = t; });
+    if (line) out.push(line); return out;
+  };
+  (spec.candidates || []).forEach(c => {
+    const st = seats[c.seat], [sx, sy] = P(st.r, st.theta), right = sx > CX2, d = right ? 1 : -1, q = Math.SQRT1_2;
+    const RING = SR + 2.6;
+    g.save(); g.strokeStyle = "#2e9e5b"; g.lineWidth = 2; g.setLineDash([3, 2.2]);
+    g.beginPath(); g.arc(sx, sy, RING, 0, Math.PI * 2); g.stroke(); g.restore();
+    const x1 = sx + d * (RING + 1) * q, y1 = sy + (RING + 1) * q, x2 = x1 + d * 24, y2 = y1 + 24;
+    g.save(); g.strokeStyle = INK; g.lineWidth = 1.3; g.lineCap = "round"; g.beginPath(); g.moveTo(x1, y1); g.lineTo(x2, y2); g.stroke(); g.restore();
+    const maxW = right ? W - PAD + 4 - (x2 + 5) : (x2 - 5) - (PAD - 4);
+    const lines = wrapLines(c.label, 11.5, Math.max(90, maxW));
+    const lh = 14, top = y2 - (lines.length * lh) / 2 + 10;
+    lines.forEach((ln, j) => text(ln, right ? x2 + 5 : x2 - 5, top + j * lh, { w: 700, px: 11.5, align: right ? "left" : "right" }));
   });
   const mt = (seats[NEEDED - 2].theta + seats[NEEDED - 1].theta) / 2;
   const [l1x, l1y] = P(0.44, mt), [l2x, l2y] = P(1.12, mt);
@@ -1593,7 +1737,7 @@ async function drawShareImage(spec) {
 
   // Right-hand box
   if (spec.box) spec.box({ text, g, RX: 738, RR: W - PAD, y: 336 });
-  rule(656);
+  rule(656 + DY);
 
   // Name lists
   const colW = (W - 2 * PAD - 24) / 4, X0 = 84;
@@ -1602,10 +1746,10 @@ async function drawShareImage(spec) {
     const n = cols[gi], x0 = X0 + ci * colW, span = n * colW;
     const center = n > 1 ? x0 + (span - colW) / 2 + 75 : x0;
     const al = n > 1 ? "center" : "left";
-    text(String(gr.n), center, 702, { w: 800, px: 36, color: gr.color, align: al });
-    text(gr.label.toUpperCase(), center, 720, { w: 700, px: 13, color: INK, align: al, maxW: span - 10 });
+    text(String(gr.n), center, 702 + DY, { w: 800, px: 36, color: gr.color, align: al });
+    text(gr.label.toUpperCase(), center, 720 + DY, { w: 700, px: 13, color: INK, align: al, maxW: span - 10 });
     const per = Math.ceil(gr.names.length / n) || 1;
-    if (gi > 0) { g.fillStyle = RULE; g.fillRect(x0 - 14, 672, 1.2, Math.max(60, LIST_Y + rows * LH - 672 - 4)); }
+    if (gi > 0) { g.fillStyle = RULE; g.fillRect(x0 - 14, 672 + DY, 1.2, Math.max(60, LIST_Y + rows * LH - 672 - DY - 4)); }
     gr.names.forEach((nm, j) => {
       const c = Math.floor(j / per), r = j % per, nx = x0 + c * colW, ny = LIST_Y + r * LH;
       g.fillStyle = gr.dot || gr.color; g.beginPath(); g.arc(nx + 3.5, ny - 4.2, 3.4, 0, Math.PI * 2); g.fill();
@@ -1817,7 +1961,7 @@ function renderQuestion() {
     q.innerHTML = `
       <div class="qprog">${pState.editing ? "Changing your pick" : `Senator ${Math.min(asked + 1, total)} of ${total}`} <span>· random order</span></div>
       <h2>Do you think <b>${r.name} (${r.st})</b> will support Chuck Schumer?</h2>
-      <div class="qtracker">${r.elect ? "Senator-elect &nbsp;·&nbsp; " : ""}On the Latest Tracker: <b style="color:${TEXT_COLORS[r.tracker]}">${r.tracker}</b></div>
+      <div class="qtracker">${r.elect ? "Senator-elect &nbsp;·&nbsp; " : ""}On the Latest Tracker: <b style="color:${TEXT_COLORS[r.tracker]}">${L(r.tracker)}</b></div>
       <div class="qbtns">
         <button type="button" class="qb yes${cur === "yes" ? " picked" : ""}" data-pick="yes">Yes</button>
         <button type="button" class="qb toss${cur === "toss" ? " picked" : ""}" data-pick="toss">Toss Up</button>
