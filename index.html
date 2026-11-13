@@ -532,7 +532,7 @@
       Support The 29th Vote on Ko-fi
     </a>
     <p class="note">Senate Democrats elect their leader by secret ballot, expected in December. Senators with no public position are not committed either way. <span style="white-space:nowrap">* Senator-elect</span></p>
-    <p class="src">Sources: CBS News, Boston Globe, Roll Call, CNN, The Hill, PolitiFact, Washington Times, Epoch Times, Punchbowl News, New Republic, NBC News &nbsp;·&nbsp; <span style="white-space:nowrap">Created by Jayson Frascatore</span></p>
+    <p class="src">Sources: CBS News, CBC, Boston Globe, Roll Call, CNN, The Hill, PolitiFact, Washington Times, Epoch Times, Punchbowl News, New Republic, NBC News &nbsp;·&nbsp; <span style="white-space:nowrap">Created by Jayson Frascatore</span></p>
   </footer>
 </div>
 
@@ -559,7 +559,7 @@ const TOTAL = 56;
 const NEEDED = 29;
 const SUBTITLE = "Public positions of the 56-member Senate Democratic caucus \u00a0\u00b7\u00a0 Assumes Peltola (AK) wins";
 const KOFI_URL = "https://ko-fi.com/jaysonfras";
-const LAST_UPDATED = "Last updated on November 12th, 2026 at 9:00pm";
+const LAST_UPDATED = "Last updated on November 12th, 2026 at 11:00pm";
 
 const SENATORS = {
   "Support": [
@@ -574,6 +574,8 @@ const SENATORS = {
     ["Brian Schatz", "HI", "Listed by the Washington Times among senators backing Schumer. In line for the No. 2 job."],
     ["Jack Reed", "RI", "Listed by the Washington Times among senators backing Schumer."],
     ["Angus King", "ME", "Independent who caucuses with Democrats. Backs Schumer."],
+    ["Catherine Cortez Masto", "NV", "Posted on Nov. 12 that Schumer was \"instrumental\" in winning the majority: \"I will be supporting him as our Democratic leader\" (CBC)."],
+    ["Jacky Rosen", "NV", "Endorsed Schumer on Nov. 12, saying he has \"the experience and the fight to continue leading our diverse caucus\" (CBS News)."],
     ["Sherrod Brown", "OH", "Senator-elect recruited by Schumer. Publicly supports him.", true],
   ],
   "Unclear": [
@@ -614,7 +616,7 @@ const NO_POSITION = [
   ["Adam Schiff", "CA"], ["Michael Bennet", "CO", "", "Lost his primary for Colorado governor, so he stays in the Senate. Hasn't said publicly where he stands on Schumer."],
   ["John Hickenlooper", "CO"], ["Chris Coons", "DE"], ["Lisa Blunt Rochester", "DE"],
   ["Angela Alsobrooks", "MD"], ["Amy Klobuchar", "MN", "\u2020", "Elected Minnesota governor, so her seat will go to an appointee. Hasn't said publicly where she stands on Schumer."],
-  ["Andy Kim", "NJ"], ["Maggie Hassan", "NH"], ["Catherine Cortez Masto", "NV"], ["Jacky Rosen", "NV"],
+  ["Andy Kim", "NJ"], ["Maggie Hassan", "NH"],
   ["Jeff Merkley", "OR"], ["Ron Wyden", "OR"], ["Tim Kaine", "VA"], ["Peter Welch", "VT"],
   ["Maria Cantwell", "WA"], ["Patty Murray", "WA"],
 ];
@@ -622,14 +624,15 @@ const NO_POSITION_DEFAULT = "Hasn't said publicly whether they'll back Schumer f
 const NO_POSITION_NOTE = "\u2020 Elected Minnesota governor. Her seat will go to an appointee.";
 
 /* Previous snapshot for the "On the Record" box, plus who moved since then */
-const PREV = { "Support": 12, "Unclear": 19, "No public position": 17, "Will not support": 8 };
-const PREV_LABEL = "Change since Nov. 12, 6 PM";
+const PREV = { "Support": 12, "Unclear": 18, "No public position": 17, "Will not support": 9 };
+const PREV_LABEL = "Change since Nov. 12, 9 PM";
 // When the senators in MOVERS moved (short form, e.g. "Nov. 12, 9 AM"). LAST_UPDATED at the top is the time of the
 // latest check, even when that check found no change; if the two differ, the page says there was no change.
-const LAST_MOVE = "Nov. 12, 9 PM";
+const LAST_MOVE = "Nov. 12, 11 PM";
 // Each move: [name, moved FROM, moved TO]. Listed in the order they happened; the page animates them one at a time.
 const MOVERS = [
-  ["Chris Van Hollen (MD)", "Unclear", "Will not support"],
+  ["Catherine Cortez Masto (NV)", "No public position", "Support"],
+  ["Jacky Rosen (NV)", "No public position", "Support"],
 ];
 
 // Senators running for leader. Their own marble gets a green dotted ring, its own color and a label.
