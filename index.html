@@ -203,6 +203,19 @@
   .tip .t-name { font-weight: 700; font-size: 15px; }
   .tip .t-cat { font-weight: 700; font-size: 12px; letter-spacing: .04em; text-transform: uppercase; margin: 3px 0 6px; }
   .tip .t-note { color: var(--muted); }
+  /* Senator photos (cut-out PNGs in "Senator Images"); initials show until a photo exists */
+  .avatar { --sz: 48px; position: relative; flex: none; width: var(--sz); height: var(--sz); border-radius: 50%; overflow: hidden;
+    background: color-mix(in srgb, var(--av) 22%, #fff); box-shadow: inset 0 0 0 2px var(--av); display: inline-grid; place-items: center; }
+  .avatar .av-ini { font-weight: 700; font-size: calc(var(--sz) * .36); color: color-mix(in srgb, var(--av) 70%, #16191d); letter-spacing: .02em; }
+  .avatar img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: 50% 12%; }
+  .avatar::after { content: ""; position: absolute; inset: 0; border-radius: 50%; box-shadow: inset 0 0 0 2px var(--av); pointer-events: none; }
+  html.dark .avatar { background: color-mix(in srgb, var(--av) 30%, #1b1f24); }
+  html.dark .avatar .av-ini { color: color-mix(in srgb, var(--av) 55%, #fff); }
+  .tip .t-head { display: flex; align-items: center; gap: 12px; margin-bottom: 4px; }
+  .tip .t-head .t-cat { margin-bottom: 0; }
+  .tip .t-sen.has-av { grid-template-columns: 40px 1fr; gap: 0 10px; }
+  .tl-move.has-av { grid-template-columns: 38px 1fr; gap: 0 12px; }
+  .q-av { display: flex; justify-content: center; margin: 10px 0 12px; }
 
   /* Name lists */
   .lists { display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; column-gap: 28px; }
@@ -1609,12 +1622,28 @@ function callRow(name, isElect, hint = true) {
       <span class="t-calltext"><span>${label}</span><b>${pretty}</b></span></a>${sub}
     ${hint ? `<div class="t-hint">Click to keep this open</div>` : ""}`;
 }
+const PHOTO_DIR = "Senator Images/";
+const MULTI_LAST = { "Chris Van Hollen": "Van Hollen", "Catherine Cortez Masto": "Cortez Masto", "Lisa Blunt Rochester": "Blunt Rochester", "Ben Ray Luján": "Luján" };
+// File name rule: last name, dash, state, .png (spaces become dashes, accents dropped), e.g. Van-Hollen-MD.png
+function photoFile(name, st) {
+  const last = MULTI_LAST[name] || name.split(" ").slice(-1)[0];
+  return PHOTO_DIR + last.normalize("NFKD").replace(/[\u0300-\u036f]/g, "").replace(/ /g, "-") + `-${st}.png`;
+}
+const NO_PHOTO = new Set();
+function avatar(name, st, color, size) {
+  const ini = name.split(" ").filter(w => /^[A-Z]/.test(w)).map(w => w[0]).filter((_, i, a) => i === 0 || i === a.length - 1).join("");
+  const f = photoFile(name, st);
+  const img = NO_PHOTO.has(f) ? "" : `<img src="${encodeURI(f)}" alt="" loading="lazy" onerror="NO_PHOTO.add(${JSON.stringify(f).replace(/"/g, "&quot;")});this.remove()">`;
+  return `<span class="avatar" style="--av:${color};--sz:${size}px"><span class="av-ini">${ini}</span>${img}</span>`;
+}
 function showTip(cat, idx, x, y) {
   const p = cat === "No public position"
     ? [NOPOS_SORTED[idx][0], NOPOS_SORTED[idx][1], NOPOS_SORTED[idx][3] || NO_POSITION_DEFAULT]
     : SENATORS[cat][idx];
-  tip.innerHTML = `<div class="t-name">${p[0]} (${p[1]})${p[3] ? " <span style='font-weight:400;color:#8c949e;font-size:12px'>Senator-elect</span>" : ""}</div>
-    <div class="t-cat" style="color:${TEXT_COLORS[cat]}">${L(cat)}</div>
+  const cc = candFor(p[0]);
+  tip.innerHTML = `<div class="t-head">${avatar(p[0], p[1], cc ? cc[3] : COLORS[cat], 56)}<div>
+    <div class="t-name">${p[0]} (${p[1]})${p[3] ? " <span style='font-weight:400;color:#8c949e;font-size:12px'>Senator-elect</span>" : ""}</div>
+    <div class="t-cat" style="color:${TEXT_COLORS[cat]}">${L(cat)}</div></div></div>
     ${candFor(p[0]) ? `<div class="t-cand"><i class="cand-icon"></i>Running for Senate majority leader</div>` : ""}
     <div class="t-note">${p[2]}</div>
     ${callRow(p[0], !!p[3])}`;
@@ -2297,6 +2326,7 @@ function renderQuestion() {
     const r = BY_ID[id], cur = pState.answers[id];
     q.innerHTML = `
       <div class="qprog">${pState.editing ? "Changing your pick" : `Senator ${Math.min(asked + 1, total)} of ${total}`} <span>· random order</span></div>
+      <div class="q-av">${avatar(r.name, r.st, cur ? PRED[cur].color : "#B8BDC4", 84)}</div>
       <h2>Will <b>${r.name} (${r.st})</b> support Chuck Schumer or Chris Van Hollen?</h2>
       <div class="qtracker">${r.elect ? "Senator-elect &nbsp;·&nbsp; " : ""}On the Latest Tracker: <b style="color:${TEXT_COLORS[r.tracker]}">${L(r.tracker)}</b></div>
       <div class="qbtns">
@@ -2486,7 +2516,7 @@ function renderHistory() {
     h += `<li class="tl-item" style="--dot:${HD(moves[0][3])}">
       <div class="tl-when"><b>${when}</b></div>`;
     moves.forEach(([nm, st, from, to, why]) => {
-      h += `<div class="tl-move"><i style="background:${HD(to)}"></i><div>
+      h += `<div class="tl-move has-av">${avatar(nm, st, HD(to), 38)}<div>
         <div class="tl-who"><b>${nm}</b> · ${STATE_NAMES[st] || st}</div>
         <div class="tl-what"><span style="color:${HC(from)}">${HL(from)}</span><span class="arr">→</span><span style="color:${HC(to)}">${HL(to)}</span></div>
         <div class="tl-why">${why}</div></div></div>`;
@@ -2590,7 +2620,7 @@ function stateTip(ab, x, y) {
   let h = `<div class="t-name">${STATE_NAMES[ab]}</div>`;
   if (!sens.length) h += `<div class="t-gop">Both senators are Republicans, so neither votes in the Democratic leader race.</div>`;
   sens.forEach(s => {
-    h += `<div class="t-sen"><i style="background:${senColor(s)}"></i><div><b>${s.name}</b>${s.elect ? ` <span style="font-weight:400;color:#8c949e;font-size:12px">Senator-elect</span>` : ""}
+    h += `<div class="t-sen has-av">${avatar(s.name, ab, senColor(s), 40)}<div><b>${s.name}</b>${s.elect ? ` <span style="font-weight:400;color:#8c949e;font-size:12px">Senator-elect</span>` : ""}
       <div class="t-cat" style="color:${TEXT_COLORS[s.cat]}">${L(s.cat)}</div><div class="t-note">${s.note}</div>${callRow(s.name, s.elect, false)}</div></div>`;
   });
   if (sens.length === 1) h += `<div class="t-gop">The state's other senator is a Republican.</div>`;
