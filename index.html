@@ -1814,6 +1814,7 @@ function trackerShareSpec() {
     title: document.querySelector("#viewTracker h1").textContent,
     subtitle: SUBTITLE.replace(/ /g, " "),
     bar: CATS.map(c => ({ label: c, n: counts[c], color: COLORS[c], text: c === "No public position" ? "#16191d" : c === "Will not support" ? "#0b4655" : "#fff" })),
+    barCands: [{ label: "Support", name: "Chuck Schumer", st: "NY" }, { label: "Support Van Hollen", name: "Chris Van Hollen", st: "MD" }],
     legend: CATS.map(c => ({ label: `${L(c)} (${counts[c]})`, color: COLORS[c] }))
       .concat(candSeats.length && !mapMode ? [{ label: "Running for leader", ring: true }] : []),
     map: mapMode,
@@ -1948,17 +1949,35 @@ async function drawShareImage(spec, dark = false) {
     text(barLabel, W / 2 + 13, 131, { w: 700, px: 15, color: GREEN_T, align: "center" });
   } else text(barLabel, W / 2, 131, { w: 700, px: 15, color: MARK, align: "center" });
   const segs = spec.bar.filter(s => s.n > 0);
+  const segMid = {};
   let x = BX;
   segs.forEach((s, i) => {
     const w = BW * s.n / TOTAL, last = i === segs.length - 1, ww = w - (last ? 0 : GAP);
     g.fillStyle = s.color; g.fillRect(x, BY, ww, BH);
     const cx = x + ww / 2;
+    segMid[s.label] = cx;
     if (ww > 14) {
       if (ww > 50) text((100 * s.n / TOTAL).toFixed(1) + "%", cx, BY + 30, { w: 700, px: 22, color: s.text, align: "center", maxW: ww - 8 });
       text(ww > 90 ? `${s.n} senator${s.n === 1 ? "" : "s"}` : String(s.n), cx, BY + 50, { w: 700, px: ww > 50 ? 14 : 15, color: s.text, align: "center", maxW: ww - 4 });
     }
     x += w;
   });
+  // Candidate photos over the middle of their own segment, like the page
+  const loadImg = src => new Promise(res => { const im = new Image(); im.onload = () => res(im); im.onerror = () => res(null); im.src = src; });
+  for (const bc of (spec.barCands || [])) {
+    const cx = segMid[bc.label]; if (cx === undefined) continue;
+    const c = candFor(bc.name), col = c ? c[3] : "#2F6FD0", R = 21, CY0 = 139;
+    const im = await loadImg(encodeURI(photoFile(bc.name, bc.st)));
+    g.save(); g.beginPath(); g.arc(cx, CY0, R, 0, Math.PI * 2); g.closePath();
+    g.fillStyle = dark ? "#1b1f24" : "#eef1f6"; g.fill(); g.clip();
+    if (im) {
+      const sc = Math.max(2 * R / im.naturalWidth, 2 * R / im.naturalHeight), dw = im.naturalWidth * sc, dh = im.naturalHeight * sc;
+      g.drawImage(im, cx - dw / 2, CY0 - R - (dh - 2 * R) * 0.12, dw, dh);
+    } else text(bc.name.split(" ").map(w => w[0]).join(""), cx, CY0 + 5, { w: 700, px: 14, color: col, align: "center" });
+    g.restore();
+    g.strokeStyle = col; g.lineWidth = 2.5; g.beginPath(); g.arc(cx, CY0, R, 0, Math.PI * 2); g.stroke();
+    tri(cx, CY0 + R + 2, 11, 7, col);
+  }
   const MX = BX + BW * (NEEDED - 0.5) / TOTAL;
   tri(MX, 140, 22, 22, MARKF);
   dashed(MX, 162, MX, BY + BH + 4);
@@ -2489,6 +2508,7 @@ function predShareSpec() {
     title: "Senate Majority Prediction",
     subtitle: "Who will Senate Democrats pick as leader: Chuck Schumer or Chris Van Hollen?",
     bar: PRED_ORDER.map(k => ({ label: PRED[k].label, n: c[k], color: PRED[k].color, text: PRED[k].text })),
+    barCands: [{ label: PRED.yes.label, name: "Chuck Schumer", st: "NY" }, { label: PRED.no.label, name: "Chris Van Hollen", st: "MD" }],
     legend: PRED_ORDER.map(k => ({ label: `${PRED[k].label} (${c[k]})`, color: PRED[k].color })),
     seatColors: lay.map((k, i) => candColor(i, k) || PRED[k].color),
     box: ({ text, g, RX, RR, y }) => {
