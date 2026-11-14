@@ -6,7 +6,7 @@ The live site doesn't use this folder yet, so adding photos here won't change an
 **How to name them:** just the last name and `.png`. Two-word last names use an underscore (`Van_Hollen.png`, `Blunt_Rochester.png`, `Cortez_Masto.png`), and accents are dropped (`Lujan.png`). Capital letters matter.
 Transparent background, head and shoulders, about 320×320 pixels.
 
-4 of 56 added so far.
+10 of 56 added so far.
 
 | Senator | File name | Added |
 |---|---|---|
@@ -16,11 +16,11 @@ Transparent background, head and shoulders, about 320×320 pixels.
 | Michael Bennet (CO) | `Bennet.png` |  |
 | Richard Blumenthal (CT) | `Blumenthal.png` |  |
 | Lisa Blunt Rochester (DE) | `Blunt_Rochester.png` | ✓ |
-| Cory Booker (NJ) | `Booker.png` |  |
-| Sherrod Brown (OH) * | `Brown.png` |  |
+| Cory Booker (NJ) | `Booker.png` | ✓ |
+| Sherrod Brown (OH) * | `Brown.png` | ✓ |
 | Maria Cantwell (WA) | `Cantwell.png` |  |
 | Scott Colom (MS) * | `Colom.png` | ✓ |
-| Chris Coons (DE) | `Coons.png` |  |
+| Chris Coons (DE) | `Coons.png` | ✓ |
 | Roy Cooper (NC) * | `Cooper.png` |  |
 | Catherine Cortez Masto (NV) | `Cortez_Masto.png` |  |
 | Tammy Duckworth (IL) | `Duckworth.png` |  |
@@ -56,7 +56,7 @@ Transparent background, head and shoulders, about 320×320 pixels.
 | Adam Schiff (CA) | `Schiff.png` |  |
 | Chuck Schumer (NY) | `Schumer.png` |  |
 | Elissa Slotkin (MI) | `Slotkin.png` |  |
-| Juliana Stratton (IL) * | `Stratton.png` |  |
+| Juliana Stratton (IL) * | `Stratton.png` | ✓ |
 | James Talarico (TX) * | `Talarico.png` |  |
 | Josh Turek (IA) * | `Turek.png` |  |
 | Chris Van Hollen (MD) | `Van_Hollen.png` |  |
@@ -64,7 +64,7 @@ Transparent background, head and shoulders, about 320×320 pixels.
 | Raphael Warnock (GA) | `Warnock.png` |  |
 | Elizabeth Warren (MA) | `Warren.png` |  |
 | Peter Welch (VT) | `Welch.png` |  |
-| Sheldon Whitehouse (RI) | `Whitehouse.png` |  |
-| Ron Wyden (OR) | `Wyden.png` |  |
+| Sheldon Whitehouse (RI) | `Whitehouse.png` | ✓ |
+| Ron Wyden (OR) | `Wyden.png` | ✓ |
 
 \* Senator-elect
