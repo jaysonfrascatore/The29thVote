@@ -104,6 +104,14 @@
 
   /* Bar */
   .bar-wrap { position: relative; padding-top: 78px; }
+  /* Candidate photos riding above the middle of their own bar segment */
+  .bar-cand { position: absolute; top: 12px; z-index: 2; transform: translateX(-50%); display: flex; flex-direction: column; align-items: center;
+    cursor: pointer; transition: opacity .3s; }
+  .bar-cand[hidden] { display: none; }
+  .bar-cand::after { content: ""; width: 0; height: 0; margin-top: 2px; border-left: 6px solid transparent; border-right: 6px solid transparent;
+    border-top: 7px solid var(--av); }
+  .bar-cand .avatar { box-shadow: 0 2px 8px rgba(0,0,0,.18); }
+  @media (max-width: 860px) { .bar-cand { top: 20px; } }
   .majority-label {
     position: absolute; top: 0; left: 50%; transform: translateX(-50%);
     font-size: clamp(13px, 1.8vw, 17px); font-weight: 700; color: var(--marker); white-space: nowrap;
@@ -2706,6 +2714,49 @@ usMap.addEventListener("click", e => {
 document.addEventListener("click", () => { if (mapPinned) { mapPinned = null; hotState(null); } });
 let mapResizeT; window.addEventListener("resize", () => { clearTimeout(mapResizeT); mapResizeT = setTimeout(() => { if (mapMode) drawMap(); }, 150); });
 setMap(false);
+/* ---------- Candidate photos above the bar ---------- */
+// Each candidate's photo sits over the middle of their own segment and follows it as the bar animates or resizes
+function barCandidates(bar, items) {
+  const wrap = bar.parentElement;
+  const els = items.map(it => {
+    const el = document.createElement("div");
+    el.className = "bar-cand"; el.style.setProperty("--av", it.color); el.title = it.title;
+    wrap.appendChild(el);
+    return { ...it, el };
+  });
+  const place = () => {
+    const small = window.innerWidth <= 860;
+    els.forEach(it => {
+      const seg = it.seg();
+      const sz = small ? 38 : 50;
+      if (it.el.dataset.sz !== String(sz)) { it.el.innerHTML = avatar(it.name, it.st, it.color, sz); it.el.dataset.sz = sz; }
+      if (!seg || !seg.offsetWidth) { it.el.hidden = true; return; }
+      it.el.hidden = false;
+      it.el.style.left = (bar.offsetLeft + seg.offsetLeft + seg.offsetWidth / 2) + "px";
+    });
+  };
+  const ro = new ResizeObserver(place);
+  ro.observe(bar); els.forEach(it => { const sg = it.seg(); if (sg) ro.observe(sg); });
+  place();
+  return { els, place };
+}
+const CAND_C = n => { const c = candFor(n); return c ? c[3] : "#2F6FD0"; };
+const trackerBarCands = barCandidates(document.getElementById("bar"), [
+  { name: "Chuck Schumer", st: "NY", color: CAND_C("Chuck Schumer"), title: "Chuck Schumer: Support Schumer", seg: () => document.querySelector('#bar .seg[data-cat="Support"]'), cat: "Support" },
+  { name: "Chris Van Hollen", st: "MD", color: CAND_C("Chris Van Hollen"), title: "Chris Van Hollen: Support Van Hollen", seg: () => document.querySelector('#bar .seg[data-cat="Support Van Hollen"]'), cat: "Support Van Hollen" },
+]);
+trackerBarCands.els.forEach(it => it.el.addEventListener("click", e => {
+  e.stopPropagation();
+  const idx = (SENATORS[it.cat] || []).findIndex(p => p[0] === it.name);
+  if (idx < 0) return;
+  const r = it.el.getBoundingClientRect();
+  clearActive(); showTip(it.cat, idx, r.left + r.width / 2, r.bottom); tip.classList.add("pinned");
+}));
+barCandidates(document.getElementById("pBar"), [
+  { name: "Chuck Schumer", st: "NY", color: CAND_C("Chuck Schumer"), title: "Chuck Schumer", seg: () => pSegs.yes },
+  { name: "Chris Van Hollen", st: "MD", color: CAND_C("Chris Van Hollen"), title: "Chris Van Hollen", seg: () => pSegs.no },
+]);
+
 renderHistory();
 if (location.hash === "#predict") setView("predict");
 if (location.hash === "#history") setView("history");
