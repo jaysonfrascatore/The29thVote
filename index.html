@@ -667,7 +667,7 @@
     </a>
     </div>
     <p class="note">Senate Democrats elect their leader by secret ballot, expected in December. Senators with no public position are not committed either way. <span style="white-space:nowrap">* Senator-elect</span></p>
-    <p class="src">Sources: CBS News, CBC, Boston Globe, Roll Call, CNN, The Hill, PolitiFact, Washington Times, Epoch Times, Punchbowl News, New Republic, NBC News, Spokesman-Review, NBC5 (WPTZ), X &nbsp;·&nbsp; <span style="white-space:nowrap">Created by Jayson Frascatore</span></p>
+    <p class="src">Sources: CBS News, CBC, Boston Globe, Roll Call, CNN, The Hill, PolitiFact, Washington Times, Epoch Times, Punchbowl News, New Republic, NBC News, Spokesman-Review, NBC5 (WPTZ), States Newsroom, X &nbsp;·&nbsp; <span style="white-space:nowrap">Created by Jayson Frascatore</span></p>
   </footer>
 </div>
 
@@ -694,7 +694,7 @@ const TOTAL = 56;
 const NEEDED = 29;
 const SUBTITLE = "Public positions of the 56-member Senate Democratic caucus \u00a0\u00b7\u00a0 Assumes Peltola (AK) wins";
 const KOFI_URL = "https://ko-fi.com/jaysonfras";
-const LAST_UPDATED = "Last updated on November 13th, 2026 at 10:00pm";
+const LAST_UPDATED = "Last updated on November 13th, 2026 at 11:00pm";
 
 const SENATORS = {
   "Support": [
@@ -731,6 +731,7 @@ const SENATORS = {
     ["Patty Murray", "WA", "Told the Spokesman-Review on Nov. 4 the caucus will \"make a decision as a whole\" and that she's \"not going to litigate that in the press.\""],
     ["Peter Welch", "VT", "Told NBC5 on Nov. 11 that \"whether it's Schumer or not, we absolutely are committed to change,\" noting no one else was running yet."],
     ["Ron Wyden", "OR", "Posted on X on Nov. 13 that whoever backs Medicare for All will have his vote for leader, without naming Schumer or Van Hollen."],
+    ["Tim Kaine", "VA", "Told States Newsroom on Nov. 10 that he's keeping his discussions about caucus leadership with his colleagues, and didn't say whether he'd back Schumer."],
     ["James Talarico", "TX", "Declined to affirm support when asked.", true],
     ["Chris Pappas", "NH", "Declined to affirm support when asked.", true],
     ["Josh Turek", "IA", "Declined to affirm support when asked.", true],
@@ -762,23 +763,19 @@ const NO_POSITION = [
   ["John Hickenlooper", "CO"], ["Lisa Blunt Rochester", "DE"],
   ["Angela Alsobrooks", "MD"], ["Amy Klobuchar", "MN", "\u2020", "Elected Minnesota governor, so her seat will go to an appointee. Hasn't said publicly where she stands on Schumer."],
   ["Andy Kim", "NJ"], ["Maggie Hassan", "NH"],
-  ["Tim Kaine", "VA"],
 ];
 const NO_POSITION_DEFAULT = "Hasn't said publicly whether they'll back Schumer for majority leader.";
 const NO_POSITION_NOTE = "\u2020 Elected Minnesota governor. Her seat will go to an appointee.";
 
 /* Previous snapshot for the "On the Record" box, plus who moved since then */
-const PREV = { "Support": 14, "Unclear": 19, "No public position": 13, "Will not support": 5, "Support Van Hollen": 5 };
-const PREV_LABEL = "Change since Nov. 13, 3:30 PM";
+const PREV = { "Support": 14, "Unclear": 23, "No public position": 9, "Will not support": 5, "Support Van Hollen": 5 };
+const PREV_LABEL = "Change since Nov. 13, 7 PM";
 // When the senators in MOVERS moved (short form, e.g. "Nov. 12, 9 AM"). LAST_UPDATED at the top is the time of the
 // latest check, even when that check found no change; if the two differ, the page says there was no change.
-const LAST_MOVE = "Nov. 13, 7 PM";
+const LAST_MOVE = "Nov. 13, 11 PM";
 // Each move: [name, moved FROM, moved TO]. Listed in the order they happened; the page animates them one at a time.
 const MOVERS = [
-  ["Maria Cantwell (WA)", "No public position", "Unclear"],
-  ["Patty Murray (WA)", "No public position", "Unclear"],
-  ["Peter Welch (VT)", "No public position", "Unclear"],
-  ["Ron Wyden (OR)", "No public position", "Unclear"],
+  ["Tim Kaine (VA)", "No public position", "Unclear"],
 ];
 
 // Previous Updates timeline. One entry per update that moved anyone, oldest first; add new entries at the END.
@@ -823,6 +820,9 @@ const HISTORY = [
     ["Patty Murray", "WA", "No public position", "Unclear", "Told the Spokesman-Review the caucus will \"make a decision as a whole\" and that she's \"not going to litigate that in the press.\""],
     ["Peter Welch", "VT", "No public position", "Unclear", "Told NBC5 that \"whether it's Schumer or not, we absolutely are committed to change,\" noting no one else was running yet."],
     ["Ron Wyden", "OR", "No public position", "Unclear", "Posted on X that whoever backs Medicare for All will have his vote for leader, without naming Schumer or Van Hollen."],
+  ]],
+  ["Nov. 13, 11 PM", "", [
+    ["Tim Kaine", "VA", "No public position", "Unclear", "Told States Newsroom he's keeping his discussions about caucus leadership with his colleagues, and didn't say whether he'd back Schumer."],
   ]],
 ];
 
