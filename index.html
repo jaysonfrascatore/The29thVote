@@ -90,6 +90,16 @@
   .modal-actions a.primary { background: var(--ink); color: #fff; border-color: var(--ink); }
   .modal-body { overflow: auto; padding: 14px; background: #f3f4f6; }
   .modal-body img { display: block; width: 100%; height: auto; border-radius: 6px; box-shadow: 0 2px 10px rgba(0,0,0,.08); }
+  .modal-card { max-width: 980px; }
+  .shot-choices { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; align-items: start; }
+  .shot-opt { padding: 8px; border: 3px solid transparent; border-radius: 14px; background: transparent; cursor: pointer; text-align: center;
+    font: 700 13.5px/1 "Inter", system-ui, sans-serif; color: var(--ink); transition: border-color .15s, background .15s; }
+  .shot-opt:hover { background: rgba(46,158,91,.06); }
+  .shot-opt[aria-pressed="true"] { border-color: #2e9e5b; background: rgba(46,158,91,.08); }
+  .shot-lbl { display: inline-flex; align-items: center; gap: 7px; margin-top: 10px; }
+  .shot-check { width: 18px; height: 18px; border-radius: 50%; display: inline-grid; place-items: center; font-style: normal; font-size: 11px;
+    color: transparent; box-shadow: inset 0 0 0 1.5px var(--faint); }
+  .shot-opt[aria-pressed="true"] .shot-check { background: #2e9e5b; color: #fff; box-shadow: none; }
   hr { border: 0; border-top: 1.5px solid var(--rule); margin: 26px 0; }
 
   /* Bar */
@@ -677,13 +687,16 @@
 <div class="modal" id="shotModal" role="dialog" aria-modal="true" aria-label="Screenshot preview">
   <div class="modal-card">
     <div class="modal-top">
-      <div><b>Screenshot ready</b><div class="hint">On a phone, press and hold the image to save it.</div></div>
+      <div><b>Screenshot ready</b><div class="hint">Pick light or dark, then download. On a phone, press and hold your pick to save it.</div></div>
       <div class="modal-actions">
         <a id="shotDownload" class="primary" href="#" download="the29thvote.png">Download</a>
         <button id="shotClose" type="button">Close</button>
       </div>
     </div>
-    <div class="modal-body"><img id="shotImg" alt="Screenshot of The 29th Vote"></div>
+    <div class="modal-body shot-choices">
+      <button type="button" class="shot-opt" data-theme="light" aria-pressed="true"><img id="shotImgLight" alt="Light version of the screenshot"><span class="shot-lbl"><i class="shot-check">✓</i>Light</span></button>
+      <button type="button" class="shot-opt" data-theme="dark" aria-pressed="false"><img id="shotImgDark" alt="Dark version of the screenshot"><span class="shot-lbl"><i class="shot-check">✓</i>Dark</span></button>
+    </div>
   </div>
 </div>
 
@@ -1812,12 +1825,18 @@ function splitColumns(groups, total = 4) {
   return cols;
 }
 
-async function drawShareImage(spec) {
+async function drawShareImage(spec, dark = false) {
   const F = "Inter, system-ui, -apple-system, Segoe UI, sans-serif";
   if (document.fonts && document.fonts.load) {
     try { await Promise.all(["400", "500", "600", "700", "800"].map(w => document.fonts.load(`${w} 20px Inter`))); } catch (e) {}
   }
-  const INK = "#16191d", MUTED = "#5b636d", FAINT = "#8c949e", RULE = "#e3e6ea", MARK = "#3d434a", MARKF = "#6b7078";
+  // Dark version swaps the page colors (text, rules, greys) and keeps the group colors
+  const DARK_MAP = { "#16191d": "#e8eaed", "#5b636d": "#a6adb6", "#8c949e": "#7d858f", "#e3e6ea": "#2c3238", "#3d434a": "#cfd4da",
+    "#6b7078": "#9aa1a9", "#2b3036": "#d6dade", "#b8bdc4": "#4b525b", "#1f7a45": "#5fd08d", "#dfe3e7": "#2a2f35",
+    "rgba(22,25,29,.4)": "rgba(255,255,255,.35)" };
+  const INK = dark ? "#e8eaed" : "#16191d", MUTED = dark ? "#a6adb6" : "#5b636d", FAINT = dark ? "#7d858f" : "#8c949e",
+    RULE = dark ? "#2c3238" : "#e3e6ea", MARK = dark ? "#cfd4da" : "#3d434a", MARKF = dark ? "#9aa1a9" : "#6b7078";
+  const BG = dark ? "#111418" : "#fff", CARD = dark ? "#1b1f24" : "#fff";
   const W = 960, PAD = 60, TOP = spec.ribbon ? 26 : 0;
   const cols = splitColumns(spec.groups);
   const rows = Math.max(1, ...spec.groups.map((gr, i) => Math.ceil(gr.names.length / cols[i])));
@@ -1828,8 +1847,17 @@ async function drawShareImage(spec) {
   const cv = document.createElement("canvas");
   cv.width = W * S; cv.height = H * S;
   const g = cv.getContext("2d");
+  if (dark) {
+    // every color set on this canvas goes through the dark palette (covers the record box and map too)
+    const P2 = CanvasRenderingContext2D.prototype;
+    ["fillStyle", "strokeStyle"].forEach(k => {
+      const d = Object.getOwnPropertyDescriptor(P2, k);
+      Object.defineProperty(g, k, { get() { return d.get.call(this); },
+        set(v) { d.set.call(this, typeof v === "string" ? (DARK_MAP[v.toLowerCase().replace(/\s+/g, "")] || v) : v); } });
+    });
+  }
   g.scale(S, S);
-  g.fillStyle = "#fff"; g.fillRect(0, 0, W, H);
+  g.fillStyle = BG; g.fillRect(0, 0, W, H);
   g.textBaseline = "alphabetic";
   const font = (w, px) => { g.font = `${w} ${px}px ${F}`; };
   const text = (s, x, y, { w = 400, px = 14, color = INK, align = "left", maxW } = {}) => {
@@ -1931,14 +1959,14 @@ async function drawShareImage(spec) {
         g.fillStyle = m.colors[0]; g.beginPath(); g.moveTo(x0, y0); g.lineTo(x1, y0); g.lineTo(x0, y1); g.closePath(); g.fill();
         g.restore();
       }
-      g.strokeStyle = "#fff"; g.lineWidth = 1.2; g.lineJoin = "round"; g.stroke(p);
+      g.strokeStyle = BG; g.lineWidth = 1.2; g.lineJoin = "round"; g.stroke(p);
     });
     model.forEach(m => { if (m.latest) { g.strokeStyle = INK; g.lineWidth = 3; g.stroke(new Path2D(m.d)); } });
     model.forEach(m => {
       if (m.dc) return;
       const b = m.box;
       if (m.lead) { g.strokeStyle = "#8c949e"; g.lineWidth = 1.2; g.beginPath(); g.moveTo(m.lead[0], m.lead[1]); g.lineTo(m.lead[2], m.lead[3]); g.stroke(); }
-      g.fillStyle = "#fff"; g.strokeStyle = m.latest ? INK : "rgba(22,25,29,.4)"; g.lineWidth = m.latest ? 3 : 1.3;
+      g.fillStyle = CARD; g.strokeStyle = m.latest ? INK : "rgba(22,25,29,.4)"; g.lineWidth = m.latest ? 3 : 1.3;
       g.beginPath(); g.roundRect ? g.roundRect(b.x - b.w / 2, b.y - b.h / 2, b.w, b.h, b.fs * .22) : g.rect(b.x - b.w / 2, b.y - b.h / 2, b.w, b.h);
       g.fill(); g.stroke();
       font(700, b.fs); g.fillStyle = INK; g.textAlign = "center"; g.fillText(String(m.n), b.x, b.y + b.fs * .36);
@@ -1962,7 +1990,7 @@ async function drawShareImage(spec) {
         g.fillStyle = "#8E5BC8"; g.fillRect(kx, KY - 11, 13, 13);
         g.fillStyle = "#2F6FD0"; g.beginPath(); g.moveTo(kx, KY - 11); g.lineTo(kx + 13, KY - 11); g.lineTo(kx, KY + 2); g.closePath(); g.fill();
       } else if (k2.box) {
-        g.fillStyle = "#fff"; g.strokeStyle = "rgba(22,25,29,.4)"; g.lineWidth = 1; g.fillRect(kx, KY - 12, 22, 15); g.strokeRect(kx + .5, KY - 11.5, 21, 14);
+        g.fillStyle = CARD; g.strokeStyle = "rgba(22,25,29,.4)"; g.lineWidth = 1; g.fillRect(kx, KY - 12, 22, 15); g.strokeRect(kx + .5, KY - 11.5, 21, 14);
         text("2", kx + 11, KY, { w: 700, px: 11, align: "center" });
       } else if (k2.out) { g.strokeStyle = INK; g.lineWidth = 2; g.strokeRect(kx + 1, KY - 10, 11, 11); }
       else { g.fillStyle = k2.c; g.fillRect(kx, KY - 11, 13, 13); }
@@ -2038,7 +2066,7 @@ async function drawShareImage(spec) {
   text(spec.note, W / 2, FY + 26, { px: 12.5, color: MUTED, align: "center", maxW: W - 2 * PAD });
   text(spec.sources, W / 2, FY + 48, { px: 12, color: FAINT, align: "center", maxW: W - 2 * PAD + 10 });
   // Where to find it: site name, address and byline, big enough to read in a shared image
-  const brand = [["The 29th Vote", 800, INK], ["  ·  ", 400, FAINT], ["jaysonfrascatore.github.io/The29thVote", 600, "#2F6FD0"],
+  const brand = [["The 29th Vote", 800, INK], ["  ·  ", 400, FAINT], ["jaysonfrascatore.github.io/The29thVote", 600, dark ? "#7fb0ff" : "#2F6FD0"],
     ["  ·  ", 400, FAINT], ["Created by Jayson Frascatore", 700, INK]];
   const BPX = 15.5;
   const bw = brand.map(([t, w]) => { font(w, BPX); return g.measureText(t).width; });
@@ -2049,9 +2077,16 @@ async function drawShareImage(spec) {
   return new Promise(r => cv.toBlob(r, "image/png"));
 }
 
-const shotImg = document.getElementById("shotImg");
+const shotImgs = { light: document.getElementById("shotImgLight"), dark: document.getElementById("shotImgDark") };
 const shotDl = document.getElementById("shotDownload");
-let shotUrl = null;
+let shotUrls = {}, shotPick = "light", shotBase = "the29thvote";
+function pickShot(t) {
+  shotPick = t;
+  document.querySelectorAll(".shot-opt").forEach(b => b.setAttribute("aria-pressed", String(b.dataset.theme === t)));
+  shotDl.href = shotUrls[t] || "#";
+  shotDl.download = `${shotBase}${t === "dark" ? "-dark" : ""}.png`;
+}
+document.querySelectorAll(".shot-opt").forEach(b => b.addEventListener("click", e => { e.stopPropagation(); pickShot(b.dataset.theme); }));
 shotBtn.addEventListener("click", async e => {
   e.stopPropagation();
   pinned = null; hideTip();
@@ -2061,13 +2096,14 @@ shotBtn.addEventListener("click", async e => {
   const label = shotBtn.lastChild.textContent;
   shotBtn.lastChild.textContent = " Working…";
   try {
-    const blob = await drawShareImage(view === "predict" ? predShareSpec() : trackerShareSpec());
-    if (shotUrl) URL.revokeObjectURL(shotUrl);
-    shotUrl = URL.createObjectURL(blob);
-    shotImg.src = shotUrl;
-    shotDl.href = shotUrl;
+    const spec = view === "predict" ? predShareSpec() : trackerShareSpec();
+    const [lb, db] = await Promise.all([drawShareImage(spec, false), drawShareImage(spec, true)]);
+    Object.values(shotUrls).forEach(u => URL.revokeObjectURL(u));
+    shotUrls = { light: URL.createObjectURL(lb), dark: URL.createObjectURL(db) };
+    shotImgs.light.src = shotUrls.light; shotImgs.dark.src = shotUrls.dark;
     const d = new Date();
-    shotDl.download = `the29thvote-${view === "predict" ? "my-prediction-" : mapMode ? "map-" : ""}${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")}.png`;
+    shotBase = `the29thvote-${view === "predict" ? "my-prediction-" : mapMode ? "map-" : ""}${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")}`;
+    pickShot(document.documentElement.classList.contains("dark") ? "dark" : "light");
     modal.classList.add("open");
   } catch (err) {
     console.error(err);
