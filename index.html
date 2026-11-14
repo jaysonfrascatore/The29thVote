@@ -795,12 +795,14 @@ const MOVERS = [
 // Previous Updates timeline. One entry per update that moved anyone, oldest first; add new entries at the END.
 // [when (short form, like LAST_MOVE), "" (spare label, not shown), [[name, state, moved FROM, moved TO, what led to it], ...]]
 // FROM/TO use the data keys. "Opposing Schumer" is the old name of "Will not support" from before Support Van Hollen existed.
+// A roster note with no moves: [when, "", [], "what happened", "STATE"] (e.g. a race being called).
 const HISTORY_START = ["Nov. 11, 2026", { "Support": 12, "Unclear": 14, "No public position": 22, "Will not support": 8, "Support Van Hollen": 0 }];
 const HISTORY = [
   ["Nov. 11, 3 PM", "Manual update", [
     ["Mark Warner", "VA", "No public position", "Unclear", "Won't commit, though he praised Schumer's fundraising."],
     ["Martin Heinrich", "NM", "No public position", "Unclear", "Won't publicly commit to backing Schumer yet."],
   ]],
+  ["Nov. 11, 5 PM", "", [], "Scott Colom becomes a senator-elect after winning Mississippi's Senate race, joining the caucus as a new member.", "MS"],
   ["Nov. 12, 9 AM", "Manual update", [
     ["Ed Markey", "MA", "No public position", "Unclear", "Asked after his reelection whether he'd back Schumer, he sidestepped it and said Schumer had called to congratulate him (Boston Globe)."],
   ]],
@@ -2521,7 +2523,12 @@ function renderHistory() {
     ? `${c["Support Van Hollen"]} for Van Hollen · ${c["Unclear"]} unclear · ${c["Will not support"]} opposing Schumer with no pick · `
     : `${c["Unclear"]} unclear · ${c["Will not support"]} opposing Schumer · `) + `${c["No public position"]} no public position`;
   let h = "";
-  HISTORY.map((e, i) => [e, i]).reverse().forEach(([[when, kind, moves], i]) => {
+  HISTORY.map((e, i) => [e, i]).reverse().forEach(([[when, kind, moves, note, nst], i]) => {
+    if (!moves.length) {   // roster note, e.g. a race called
+      h += `<li class="tl-item" style="--dot:#f2f3ae"><div class="tl-when"><b>${when}</b></div>
+        <div class="tl-move"><i style="background:#c9cb5e"></i><div>${nst ? `<div class="tl-who"><b>Roster</b> · ${STATE_NAMES[nst] || nst}</div>` : ""}<div class="tl-why">${note || ""}</div></div></div></li>`;
+      return;
+    }
     h += `<li class="tl-item" style="--dot:${HD(moves[0][3])}">
       <div class="tl-when"><b>${when}</b></div>`;
     moves.forEach(([nm, st, from, to, why]) => {
