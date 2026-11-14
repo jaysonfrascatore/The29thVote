@@ -6,15 +6,15 @@ The live site doesn't use this folder yet, so adding photos here won't change an
 **How to name them:** just the last name and `.png`. Two-word last names use an underscore (`Van_Hollen.png`, `Blunt_Rochester.png`, `Cortez_Masto.png`), and accents are dropped (`Lujan.png`). Capital letters matter.
 Transparent background, head and shoulders, about 320×320 pixels.
 
-52 of 56 added so far.
+56 of 56 added so far.
 
 | Senator | File name | Added |
 |---|---|---|
 | Angela Alsobrooks (MD) | `Alsobrooks.png` | ✓ |
 | Annie Andrews (SC) * | `Andrews.png` | ✓ |
-| Tammy Baldwin (WI) | `Baldwin.png` |  |
-| Michael Bennet (CO) | `Bennet.png` |  |
-| Richard Blumenthal (CT) | `Blumenthal.png` |  |
+| Tammy Baldwin (WI) | `Baldwin.png` | ✓ |
+| Michael Bennet (CO) | `Bennet.png` | ✓ |
+| Richard Blumenthal (CT) | `Blumenthal.png` | ✓ |
 | Lisa Blunt Rochester (DE) | `Blunt_Rochester.png` | ✓ |
 | Cory Booker (NJ) | `Booker.png` | ✓ |
 | Sherrod Brown (OH) * | `Brown.png` | ✓ |
@@ -46,7 +46,7 @@ Transparent background, head and shoulders, about 320×320 pixels.
 | Chris Murphy (CT) | `Murphy.png` | ✓ |
 | Patty Murray (WA) | `Murray.png` | ✓ |
 | Jon Ossoff (GA) | `Ossoff.png` | ✓ |
-| Alex Padilla (CA) | `Padilla.png` |  |
+| Alex Padilla (CA) | `Padilla.png` | ✓ |
 | Chris Pappas (NH) * | `Pappas.png` | ✓ |
 | Mary Peltola (AK) * | `Peltola.png` | ✓ |
 | Jack Reed (RI) | `Reed.png` | ✓ |
