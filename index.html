@@ -75,6 +75,15 @@
     border: 1.5px solid var(--rule); border-radius: 8px; padding: 9px 12px; cursor: pointer;
   }
   .shot-btn:hover { background: #f6f7f9; }
+  .tool-right { display: inline-flex; align-items: center; gap: 8px; flex-wrap: wrap; justify-content: center; }
+  .next-up { display: inline-flex; align-items: center; gap: 6px; font: 600 10.5px/1 "Inter", system-ui, sans-serif; color: var(--ink);
+    background: #fff; border: 1.5px solid var(--rule); border-radius: 6px; padding: 5px 8px; white-space: nowrap; }
+  .next-up:empty { display: none; }
+  .next-up svg { flex: none; opacity: .7; }
+  .next-up .cd { font-variant-numeric: tabular-nums; color: var(--muted); padding-left: 6px; border-left: 1px solid var(--rule); }
+  .next-up.now .cd { color: #1a8f4c; }
+  html.dark .next-up { background: #1b1f24; }
+  html.dark .next-up.now .cd { color: #5fd08f; }
   .shot-btn[disabled] { opacity: .6; cursor: progress; }
   .modal { position: fixed; inset: 0; z-index: 20; background: rgba(16,24,40,.55); display: none;
     align-items: center; justify-content: center; padding: 20px; }
@@ -440,6 +449,39 @@
   html.dark .timeline::before { background: #4a4b2a; }
   html.dark .tl-item::before { border-color: #111418; }
   html.dark .tl-after { border-top-color: #3a3c2a; }
+  /* ---------- News tab ---------- */
+  .tab-news { --tc: #FFC8DD; background: #FFC8DD; border-color: #f4a6c4; color: #3a1424; }
+  .tab-news::before { background: #d4648f; }
+  .tab-news[aria-selected="true"] { background: #FFC8DD; border-color: #b8466f; color: #3a1424; }
+  .tab-news[aria-selected="true"]::before { background: #9c2f58; opacity: 1; }
+  .tab-news:hover:not([aria-selected="true"]) { background: #ffb8d2; }
+  html.dark .tab-news, html.dark .tab-news[aria-selected="true"] { color: #3a1424; }
+  .news-key { display: flex; flex-wrap: wrap; justify-content: center; gap: 6px 14px; margin: 10px 0 0; font-size: 12.5px; }
+  .news-key span { display: inline-flex; align-items: center; gap: 6px; }
+  .newsline::before { background: #ffd9e7; }
+  .newsline .tl-item::before { background: var(--dot, #FFC8DD); box-shadow: 0 0 0 1.5px #e79ab8; }
+  .nw-day { position: relative; list-style: none; padding: 18px 0 4px 40px; font-size: 12px; font-weight: 800; letter-spacing: .06em;
+    text-transform: uppercase; color: #b8466f; }
+  .nw-day::before { content: ""; position: absolute; left: 1px; top: 18px; width: 22px; height: 14px; border-radius: 4px; background: #FFC8DD; }
+  .nw-tag { font-style: normal; font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: .05em; padding: 3px 7px; border-radius: 5px;
+    background: #FFC8DD; color: #7a2347; white-space: nowrap; }
+  .nw-tag.moved { background: #b8466f; color: #fff; }
+  .nw-tag.report { background: transparent; color: #8a5a6c; box-shadow: inset 0 0 0 1.5px #e9b3c8; }
+  .nw-tag.milestone { background: #e8e4ff; color: #4a3c99; }
+  .nw-head { font-size: 16.5px; font-weight: 700; line-height: 1.3; margin: 2px 0 4px; }
+  .nw-sum { font-size: 14px; line-height: 1.5; opacity: .9; }
+  .nw-effect { font-size: 13px; line-height: 1.45; margin-top: 8px; padding: 7px 10px; border-radius: 8px; background: #fff0f6; color: #6b2a43; }
+  .nw-effect b { font-weight: 700; }
+  .nw-links { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 9px; }
+  .nw-links a { font-size: 12.5px; font-weight: 600; text-decoration: none; color: #9c2f58; background: #fff; border: 1.5px solid #f4bcd2;
+    border-radius: 999px; padding: 4px 10px; }
+  .nw-links a:hover { background: #fff0f6; }
+  .nw-links a::after { content: " \2197"; font-size: 11px; opacity: .7; }
+  html.dark .newsline::before { background: #4a2a38; }
+  html.dark .nw-day { color: #ff9fc3; }
+  html.dark .nw-effect { background: #2a1a21; color: #f5c6d8; }
+  html.dark .nw-links a { background: #1b1416; border-color: #5a3344; color: #ffb3cf; }
+  html.dark .nw-tag.report { color: #d7a9bb; box-shadow: inset 0 0 0 1.5px #5a3344; }
 
   /* ---------- Map view ---------- */
   .map-btn { position: absolute; left: 0; top: 0; z-index: 3; font: 700 13px/1 "Inter", system-ui, sans-serif; padding: 9px 13px;
@@ -583,11 +625,15 @@
       <button class="tab tab-tracker" role="tab" data-view="tracker" aria-selected="true" type="button">Latest Tracker</button>
       <button class="tab tab-predict" role="tab" data-view="predict" aria-selected="false" type="button">Create Predictions</button>
       <button class="tab tab-history" role="tab" data-view="history" aria-selected="false" type="button">Previous Updates</button>
+      <button class="tab tab-news" role="tab" data-view="news" aria-selected="false" type="button">News</button>
     </nav>
+    <div class="tool-right">
+    <div class="next-up" id="nextUp" title="The tracker is checked every hour from 8 AM to 3 AM Eastern"></div>
     <button class="shot-btn" id="shotBtn" type="button" data-noshot>
       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
       Screenshot
     </button>
+    </div>
   </div>
   <div id="viewTracker">
   <header>
@@ -643,6 +689,17 @@
     </header>
     <hr>
     <ol class="timeline" id="timeline"></ol>
+  </div>
+
+  <div id="viewNews" hidden>
+    <header class="tl-intro">
+      <p class="site-name">The 29th Vote</p>
+      <h1>News</h1>
+      <p class="subtitle">Everything that's happened in the race for Senate Democratic leader, with links to the reporting. Some of it moved the tracker. A lot of it didn't, and each entry says why. Newest first.</p>
+      <p class="news-key"><span><i class="nw-tag moved">Movement</i></span><span><i class="nw-tag report">No movement</i></span><span><i class="nw-tag milestone">Significant event</i></span></p>
+    </header>
+    <hr>
+    <ol class="timeline newsline" id="newsline"></ol>
   </div>
 
   <div id="viewPredict" hidden>
@@ -874,6 +931,107 @@ const HISTORY = [
 const CANDIDATES = [
   ["Chuck Schumer", "NY", "Sen. Chuck Schumer running for a 3rd term as Majority Leader", "#03045E"],
   ["Chris Van Hollen", "MD", "Sen. Chris Van Hollen announces his run for Majority Leader", "#06566B"],
+];
+/* ======================================================================== */
+
+/* ================= NEWS (News tab; add new entries at the END) ================= */
+// One entry per news event, oldest first; the page shows them newest first, grouped by day.
+// [day (e.g. "Nov. 13"), time or "" , kind, headline, what happened, what it meant for the tracker, [[outlet, url], ...]]
+// kind: "movement" (moved someone on the tracker), "no movement" (reported, but nobody moved), "significant" (a big moment:
+// a race called, someone announcing, a wave of support, big reported support or rumors, someone reaching 29, a vote date change)
+const NEWS = [
+  ["Nov. 3", "", "significant", "Democrats win back the Senate majority",
+    "Democrats flip enough seats on election night to take control of the Senate. Schumer calls it a \"generational remake\" of the chamber, and the question of whether he stays on as leader takes off right away.",
+    "Sets up the race the tracker follows.",
+    [["NPR (via OPB)", "https://www.opb.org/article/2026/11/04/2026-midterms-schumer-heralds-generational-remake-of-senate/"], ["The Hill", "https://thehill.com/homenews/senate/6185385-democrats-win-senate-midterms/amp/"]]],
+  ["Nov. 4", "", "significant", "Klobuchar elected Minnesota governor",
+    "Sen. Amy Klobuchar wins the governor's race, so her Senate seat will go to someone she appoints once she takes office.",
+    "Klobuchar stays on the tracker, marked with a †, until her appointee is named.",
+    [["KTTC", "https://www.kttc.com/2026/11/04/amy-klobuchar-is-new-governor-elect-what-happens-her-us-senate-seat/"]]],
+  ["Nov. 4", "", "no movement", "Cantwell and Murray won't say how they'll vote",
+    "Washington's two senators tell the Spokesman-Review they'll listen to the debate. Cantwell gives Schumer \"points for this big victory,\" and Murray says she's \"not going to litigate that in the press.\"",
+    "Counted later: both moved to Unclear on Nov. 13 at 7 PM.",
+    [["Spokesman-Review", "https://www.spokesman.com/stories/2026/nov/04/impeach-trump-work-with-him-washington-democrats-c/"]]],
+  ["Nov. 5", "", "no movement", "Democrats split over Schumer's future",
+    "Al Jazeera looks at the divide inside the party over whether Schumer should keep leading Senate Democrats after the win.",
+    "Background reporting. It didn't move anyone.",
+    [["Al Jazeera", "https://www.aljazeera.com/amp/news/2026/11/5/division-among-us-democrats-over-schumers-leadership-role"]]],
+  ["Nov. 10", "", "no movement", "Kaine keeps his leadership talks private",
+    "Sen. Tim Kaine tells States Newsroom he's keeping his conversations about caucus leadership with his colleagues, without saying whether he'd back Schumer.",
+    "Counted later: Kaine moved to Unclear on Nov. 13 at 11 PM.",
+    [["States Newsroom", "https://rapidcitypost.com/southdakotasearchlight-government-f4972ddfd6"]]],
+  ["Nov. 11", "", "significant", "The 29th Vote launches",
+    "The tracker goes live with 12 senators backing Schumer, 14 unclear, 8 opposing him and 22 with no public position.",
+    "",
+    []],
+  ["Nov. 11", "", "no movement", "Welch: \"Whether it's Schumer or not\"",
+    "Sen. Peter Welch tells NBC5 Democrats are \"absolutely committed to change\" whether or not Schumer stays, noting no one else was running yet.",
+    "Counted later: Welch moved to Unclear on Nov. 13 at 7 PM.",
+    [["NBC5", "https://www.mynbc5.com/article/welch-democratic-senate-majority-leader/74404630"]]],
+  ["Nov. 11", "5 PM", "significant", "Scott Colom wins in Mississippi",
+    "Colom's win adds a new member to the caucus. He tells MS NOW he's not committing to Schumer yet: \"I gotta know my options.\"",
+    "Added to the tracker as a senator-elect in Unclear.",
+    []],
+  ["Nov. 12", "9 PM", "significant", "Van Hollen says he'll run against Schumer",
+    "Sen. Chris Van Hollen announces he's challenging Schumer for majority leader, saying \"we need new leadership.\" It's the first contested race for the job since 1994.",
+    "Van Hollen moved out of Unclear and now leads the Support Van Hollen group.",
+    [["NBC News", "https://www.nbcnews.com/politics/congress/sen-chris-van-hollen-says-will-challenge-sen-chuck-schumer-majority-le-rcna609100"], ["Axios", "https://www.axios.com/2026/11/13/schumer-van-hollen-senate-majority-leader"]]],
+  ["Nov. 12", "11 PM", "movement", "First endorsements on both sides",
+    "Bernie Sanders and Sen.-elect Abdul El-Sayed back Van Hollen. Nevada's Catherine Cortez Masto and Jacky Rosen come out for Schumer, with Rosen saying she's \"proud to support him to be our Majority Leader.\"",
+    "Sanders and El-Sayed moved to Support Van Hollen. Cortez Masto and Rosen moved to Support Schumer.",
+    [["ABC News", "https://abcnews.com/Politics/schumer-van-hollen-facing-off-senate-majority-leader/story?id=138111386"]]],
+  ["Nov. 13", "", "significant", "Schumer: \"I have the votes\"",
+    "Schumer posts that he has the votes to stay on as leader and that he welcomes \"any discussion about the future of our caucus.\"",
+    "No change. A candidate's own count isn't the same as senators saying so on the record.",
+    [["Newsweek", "https://www.newsweek.com/chris-van-hollens-chances-of-beating-chuck-schumer-to-become-senate-leader-12709400"]]],
+  ["Nov. 13", "10:30 AM", "movement", "Peggy Flanagan backs Van Hollen",
+    "Minnesota Sen.-elect Peggy Flanagan posts that Van Hollen is \"the leader and fighter we need to bring about real change.\"",
+    "Moved from Opposing Schumer, no pick yet to Support Van Hollen.",
+    [["X", "https://x.com/peggyflanagan/status/2121245502545018920"]]],
+  ["Nov. 13", "", "no movement", "Axios maps out who could join Van Hollen",
+    "Axios looks at which senators might side with Van Hollen's challenge.",
+    "No change. It's an outlet's analysis, not senators speaking for themselves.",
+    [["Axios", "https://www.axios.com/2026/11/13/democrats-schumer-van-hollen-senate-leader"]]],
+  ["Nov. 13", "12:30 PM", "movement", "Coons calls for a team that \"shows we hear them\"",
+    "Sen. Chris Coons posts that the caucus is having a vigorous debate over experience and vision, without picking a side.",
+    "Moved from No public position to Unclear.",
+    [["X", "https://x.com/ChrisCoons/status/2121280335321399705"]]],
+  ["Nov. 13", "", "no movement", "Newsweek sizes up Van Hollen's chances",
+    "Newsweek walks through the count, citing The 29th Vote, and notes prediction markets gave Schumer roughly an 83% to 87% chance of keeping the job.",
+    "No change. Prediction markets and outlet tallies don't move anyone.",
+    [["Newsweek", "https://www.newsweek.com/chris-van-hollens-chances-of-beating-chuck-schumer-to-become-senate-leader-12709400"]]],
+  ["Nov. 13", "", "no movement", "Outlet lists put Alsobrooks and Kaine with Schumer",
+    "The New Republic and TIME both list Angela Alsobrooks and Tim Kaine among Schumer's backers, but neither article quotes them saying so.",
+    "No change. The tracker waits for the senator's own words, so Alsobrooks stays at No public position and Kaine stays Unclear.",
+    [["The New Republic", "https://newrepublic.com/post/217991/full-list-senators-back-chris-van-hollen-leader"], ["TIME", "https://time.com/article/2026/11/13/chris-van-hollen-senate-majority-leader-chuck-schumer-progressive-democrats/"]]],
+  ["Nov. 13", "3:30 PM", "movement", "Merkley: \"@ChrisVanHollen is that leader\"",
+    "Sen. Jeff Merkley posts that Americans want a government for the people, not the powerful, and that Van Hollen is the one to lead it.",
+    "Moved from No public position to Support Van Hollen.",
+    [["X", "https://x.com/SenJeffMerkley/status/2121328108854751475"]]],
+  ["Nov. 13", "", "no movement", "Van Hollen: \"I'm the underdog\"",
+    "Speaking in Denver, Van Hollen says he has the support of more than 10 senators and that he no longer plans to run for president in 2028.",
+    "No change. His count isn't backed by named senators yet.",
+    [["Politico", "https://www.politico.com/news/2026/11/13/van-hollen-schumer-senate-democrats-01166260"]]],
+  ["Nov. 13", "", "significant", "Talk of moving the vote up",
+    "Politico reports that Democrats are privately discussing holding the leadership vote before Thanksgiving instead of Dec. 1, and that several senators, speaking anonymously, plan to back Schumer.",
+    "No change. Anonymous senators aren't counted, and the vote is still set for Dec. 1.",
+    [["Politico", "https://www.politico.com/news/2026/11/13/van-hollen-schumer-senate-democrats-01166260"]]],
+  ["Nov. 13", "", "no movement", "PBS: \"The math favors Schumer\"",
+    "PBS NewsHour's Lisa Desjardins reports that Schumer has been lining up votes for some time.",
+    "No change. It's the reporter's read, without new senators on the record.",
+    [["PBS NewsHour", "https://www.pbs.org/newshour/show/does-van-hollen-have-enough-support-to-beat-schumer-in-senate-leadership-race"]]],
+  ["Nov. 14", "12 AM", "significant", "Mary Peltola wins in Alaska",
+    "VoteHub calls Alaska's Senate race for Peltola, bringing the caucus to 56 members.",
+    "Peltola joins the tracker as a senator-elect.",
+    []],
+  ["Nov. 14", "1 AM", "movement", "Andy Kim hopes to \"preserve our unity\"",
+    "Sen. Andy Kim tells Politico he hopes the caucus can settle the race in a way that keeps Democrats together, without backing either candidate.",
+    "Moved from No public position to Unclear.",
+    [["Politico", "https://www.politico.com/news/2026/11/13/van-hollen-schumer-senate-democrats-01166260"]]],
+  ["Nov. 14", "", "significant", "Schumer allies predict 40-plus votes",
+    "The Hill reports that people close to Schumer expect him to get more than 40 votes and that his side is weighing an earlier caucus vote.",
+    "No change. The prediction comes from unnamed allies, not senators on the record.",
+    [["The Hill", "https://thehill.com/homenews/senate/6220115-senate-democrats-leadership-election-update/"]]],
 ];
 /* ======================================================================== */
 
@@ -2544,12 +2702,14 @@ function setView(v) {
   document.getElementById("viewTracker").hidden = v !== "tracker";
   document.getElementById("viewPredict").hidden = v !== "predict";
   document.getElementById("viewHistory").hidden = v !== "history";
-  shotBtn.hidden = v === "history";
+  document.getElementById("viewNews").hidden = v !== "news";
+  shotBtn.hidden = v === "history" || v === "news";
   document.querySelectorAll(".tab").forEach(t => t.setAttribute("aria-selected", String(t.dataset.view === v)));
   pinned = null; hideTip();
-  try { history.replaceState(null, "", v === "predict" ? "#predict" : v === "history" ? "#history" : location.pathname + location.search); } catch (e) {}
+  try { history.replaceState(null, "", v === "predict" ? "#predict" : v === "history" ? "#history" : v === "news" ? "#news" : location.pathname + location.search); } catch (e) {}
   if (v === "predict") paintPred();
   if (v === "history") focusTimeline();
+  if (v === "news") focusTimeline();
 }
 document.querySelectorAll(".tab").forEach(t => t.addEventListener("click", e => { e.stopPropagation(); setView(t.dataset.view); }));
 
@@ -2609,11 +2769,13 @@ function renderHistory() {
 // The entry nearest the middle of the screen is bigger and darker; the rest shrink and fade to a lighter grey
 let tlRAF = 0;
 function focusTimeline() {
-  if (view !== "history") return;
+  if (view !== "history" && view !== "news") return;
+  const list = view === "news" ? newsEl : timelineEl;
+  if (!list) return;
   const vh = window.innerHeight, fy = vh * 0.42;
   const dark = document.documentElement.classList.contains("dark");
   const near = dark ? [233, 236, 239] : [34, 38, 43], far = dark ? [96, 104, 112] : [168, 174, 181];
-  timelineEl.querySelectorAll(".tl-item").forEach(el => {
+  list.querySelectorAll(".tl-item").forEach(el => {
     const r = el.getBoundingClientRect();
     const d = Math.min(1, Math.abs(r.top + Math.min(r.height, vh * 0.5) / 2 - fy) / (vh * 0.55));
     const f = reduceMotion ? 1 : 1 - d * d;
@@ -2621,8 +2783,56 @@ function focusTimeline() {
     el.style.color = `rgb(${near.map((n, k) => Math.round(far[k] + (n - far[k]) * f)).join(",")})`;
   });
 }
-window.addEventListener("scroll", () => { if (view === "history" && !tlRAF) tlRAF = requestAnimationFrame(() => { tlRAF = 0; focusTimeline(); }); }, { passive: true });
+window.addEventListener("scroll", () => { if ((view === "history" || view === "news") && !tlRAF) tlRAF = requestAnimationFrame(() => { tlRAF = 0; focusTimeline(); }); }, { passive: true });
 window.addEventListener("resize", () => focusTimeline());
+/* ---------- Next update countdown (checks run on the hour, 8 AM to 3 AM Eastern) ---------- */
+const nextUpEl = document.getElementById("nextUp");
+const CHECK_SKIP = [4, 5, 6, 7];        // Eastern hours with no check
+const CHECK_GRACE = 15;                 // minutes after the hour that a check is still running
+const etFmt = (() => { try { return new Intl.DateTimeFormat("en-US", { timeZone: "America/New_York", hour12: false, hour: "2-digit", minute: "2-digit", second: "2-digit" }); } catch (e) { return null; } })();
+const CLOCK_SVG = `<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>`;
+const ampm = h => (h % 12 || 12) + (h < 12 ? "am" : "pm");
+function tickNextUp() {
+  if (!nextUpEl || !etFmt) return;
+  const parts = {}; etFmt.formatToParts(new Date()).forEach(x => parts[x.type] = +x.value);
+  const H = parts.hour % 24, M = parts.minute, S = parts.second;
+  if (!CHECK_SKIP.includes(H) && M < CHECK_GRACE) {
+    nextUpEl.classList.add("now");
+    nextUpEl.innerHTML = `${CLOCK_SVG}<span>Checking for updates</span><span class="cd">now</span>`;
+    return;
+  }
+  let k = 1; while (CHECK_SKIP.includes((H + k) % 24)) k++;
+  const left = k * 3600 - (M * 60 + S), hh = Math.floor(left / 3600), mm = Math.floor(left / 60) % 60, ss = left % 60;
+  const pad = n => String(n).padStart(2, "0");
+  nextUpEl.classList.remove("now");
+  nextUpEl.innerHTML = `${CLOCK_SVG}<span>Next Update: ${ampm((H + k) % 24)} Eastern</span><span class="cd">${hh ? hh + ":" + pad(mm) : mm}:${pad(ss)}</span>`;
+}
+tickNextUp();
+setInterval(tickNextUp, 1000);
+
+/* ---------- News timeline ---------- */
+const newsEl = document.getElementById("newsline");
+const NEWS_TAG = { "movement": "Movement", "no movement": "No movement", "significant": "Significant event" };
+const NEWS_CLS = { "movement": "moved", "no movement": "report", "significant": "milestone" };
+const NEWS_DOT = { "movement": "#b8466f", "no movement": "#FFC8DD", "significant": "#9d8cf0" };
+function renderNews() {
+  if (typeof NEWS === "undefined" || !newsEl) return;
+  const esc = t => String(t).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+  let h = "", lastDay = null;
+  NEWS.slice().reverse().forEach(([day, time, kind, head, sum, effect, links]) => {
+    if (day !== lastDay) { h += `<li class="nw-day">${esc(day)}</li>`; lastDay = day; }
+    h += `<li class="tl-item" style="--dot:${NEWS_DOT[kind] || "#FFC8DD"}">
+      <div class="tl-when"><i class="nw-tag ${NEWS_CLS[kind] || "report"}">${NEWS_TAG[kind] || kind}</i>${time ? `<b style="font-size:14px">${esc(time)}</b>` : ""}</div>
+      <div class="nw-head">${esc(head)}</div>
+      <div class="nw-sum">${esc(sum)}</div>
+      ${effect ? `<div class="nw-effect"><b>On the tracker:</b> ${esc(effect)}</div>` : ""}
+      ${links && links.length ? `<div class="nw-links">${links.map(([o, u]) => `<a href="${esc(u)}" target="_blank" rel="noopener" onclick="event.stopPropagation()">${esc(o)}</a>`).join("")}</div>` : ""}
+    </li>`;
+  });
+  newsEl.innerHTML = h;
+  focusTimeline();
+}
+renderNews();
 const seePrev = document.getElementById("seePrev");
 if (seePrev) seePrev.addEventListener("click", e => { e.preventDefault(); e.stopPropagation(); setView("history"); window.scrollTo({ top: 0 }); });
 
@@ -2780,6 +2990,7 @@ barCandidates(document.getElementById("pBar"), [
 renderHistory();
 if (location.hash === "#predict") setView("predict");
 if (location.hash === "#history") setView("history");
+if (location.hash === "#news") setView("news");
 if (location.hash === "#map") setMap(true);
 </script>
 <!-- Cloudflare Web Analytics --><script type='module' src='https://static.cloudflareinsights.com/beacon.min.js' data-cf-beacon='{"token": "fd5bb1f3f1224382a6c68221e97e0c9b"}'></script><!-- End Cloudflare Web Analytics -->
