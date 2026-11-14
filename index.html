@@ -1640,10 +1640,10 @@ function callRow(name, isElect, hint = true) {
 }
 const PHOTO_DIR = "Senator Photos/";
 const MULTI_LAST = { "Chris Van Hollen": "Van Hollen", "Catherine Cortez Masto": "Cortez Masto", "Lisa Blunt Rochester": "Blunt Rochester", "Ben Ray Luján": "Luján" };
-// File name rule: last name, dash, state, .png (spaces become dashes, accents dropped), e.g. Van-Hollen-MD.png
+// File name rule: last name and .png (two-word last names use an underscore, accents dropped), e.g. Van_Hollen.png
 function photoFile(name, st) {
   const last = MULTI_LAST[name] || name.split(" ").slice(-1)[0];
-  return PHOTO_DIR + last.normalize("NFKD").replace(/[\u0300-\u036f]/g, "").replace(/ /g, "-") + `-${st}.png`;
+  return PHOTO_DIR + last.normalize("NFKD").replace(/[\u0300-\u036f]/g, "").replace(/ /g, "_") + ".png";
 }
 const NO_PHOTO = new Set();
 function avatar(name, st, color, size) {
