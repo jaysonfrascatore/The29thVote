@@ -457,6 +457,125 @@
   html.dark .timeline::before { background: #4a4b2a; }
   html.dark .tl-item::before { border-color: #111418; }
   html.dark .tl-after { border-top-color: #3a3c2a; }
+  /* ---------- Simulations tab ---------- */
+  @media (min-width: 861px) { .toolbar .tabs { flex-shrink: 0; } .toolbar .tool-right { min-width: 0; justify-content: flex-end; } }
+  .tab-sims { --tc: #c9b6ef; background: #efe8fb; border-color: #c9b6ef; color: #2f2150; }
+  .tab-sims::before { background: #8a6fd1; }
+  .tab-sims[aria-selected="true"] { background: #c9b6ef; border-color: #7d5fcf; color: #2f2150; }
+  .tab-sims[aria-selected="true"]::before { background: #4b3196; opacity: 1; }
+  .tab-sims:hover:not([aria-selected="true"]) { background: #e3d8f8; }
+  html.dark .tab-sims, html.dark .tab-sims[aria-selected="true"] { color: #2f2150; }
+  #viewSims { --sS: #2F6FD0; --sV: #12A6CC; --sT: #8a6fd1; --sBg: #f7f3fe; --sLine: #e4dbf7; }
+  html.dark #viewSims { --sBg: #1a1724; --sLine: #352d4d; --bgx: #111418; }
+  .sim-note { max-width: 640px; margin: 12px auto 0; font-size: 13.5px; line-height: 1.45; background: var(--sBg); border: 1px solid var(--sLine);
+    border-radius: 10px; padding: 10px 14px; color: var(--ink); }
+  .sim-head { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; max-width: 760px; margin: 0 auto; }
+  .sim-card { border: 1.5px solid var(--rule); border-radius: 12px; padding: 14px 14px 12px; text-align: center; position: relative; }
+  .sim-card .sc-av { display: flex; justify-content: center; margin-bottom: 6px; }
+  .sim-card .big { font-size: 40px; font-weight: 800; letter-spacing: -.02em; line-height: 1; display: block; }
+  .sim-card .lbl { font-size: 13px; font-weight: 700; margin-top: 6px; display: block; }
+  .sim-card .n { font-size: 12px; color: var(--muted); margin-top: 3px; display: block; font-variant-numeric: tabular-nums; }
+  .sim-card.s .big { color: var(--sS); } .sim-card.v .big { color: var(--sV); } .sim-card.t .big { color: var(--sT); }
+  .sim-card.lead { border-color: currentColor; }
+  .sim-card.s.lead { border-color: var(--sS); } .sim-card.v.lead { border-color: var(--sV); }
+  .sim-median { text-align: center; font-size: 14.5px; margin: 16px auto 0; max-width: 640px; line-height: 1.5; }
+  .sim-locks { max-width: 760px; margin: 14px auto 0; display: flex; flex-wrap: wrap; gap: 8px; align-items: center; justify-content: center; font-size: 13px; }
+  .sim-locks[hidden] { display: none; }
+  .lock-chip { display: inline-flex; align-items: center; gap: 6px; border-radius: 999px; padding: 4px 6px 4px 4px; font-weight: 700; font-size: 12.5px;
+    border: 1.5px solid var(--c); background: color-mix(in srgb, var(--c) 12%, transparent); color: var(--ink); cursor: pointer; }
+  .lock-chip .x { opacity: .6; font-weight: 800; padding: 0 3px; }
+  .lock-chip:hover .x { opacity: 1; }
+  .sim-clear { border: 1.5px solid var(--rule); background: transparent; color: var(--ink); border-radius: 999px; padding: 5px 12px; font: 600 12.5px/1 "Inter", system-ui, sans-serif; cursor: pointer; }
+  .sim-h2 { font-size: 19px; font-weight: 800; letter-spacing: -.01em; text-align: center; margin: 0 0 4px; }
+  .sim-sub { text-align: center; font-size: 13.5px; color: var(--muted); margin: 0 auto 14px; max-width: 600px; line-height: 1.45; }
+  /* histogram */
+  .hist { position: relative; max-width: 760px; margin: 0 auto; }
+  .hist svg { width: 100%; height: auto; display: block; overflow: visible; }
+  .hist .hb { cursor: pointer; transition: opacity .15s; }
+  .hist .hb:hover, .hist .hb.on { opacity: 1 !important; }
+  .hist.picked .hb:not(.on) { opacity: .35; }
+  .hist text { font: 600 11px "Inter", system-ui, sans-serif; fill: var(--muted); }
+  .hist .t29 { fill: var(--ink); font-weight: 800; }
+  .samples { max-width: 760px; margin: 14px auto 0; display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+  .samples:empty { display: none; }
+  .sample { border: 1px solid var(--rule); border-radius: 10px; padding: 10px 10px 8px; text-align: center; }
+  .sample b { font-size: 13px; }
+  .sample .res { font-size: 12.5px; font-weight: 700; margin: 2px 0 4px; }
+  .sample svg { width: 100%; height: auto; }
+  .sample .sur { font-size: 12px; line-height: 1.4; color: var(--muted); text-align: left; margin-top: 4px; }
+  .sample .sur b { color: var(--ink); font-size: 12px; }
+  /* trend */
+  .trend { position: relative; max-width: 760px; margin: 0 auto; }
+  .trend svg { width: 100%; height: auto; display: block; overflow: visible; touch-action: pan-y; }
+  .trend text { font: 600 11px "Inter", system-ui, sans-serif; fill: var(--muted); }
+  .trend-tip { position: absolute; pointer-events: none; opacity: 0; transition: opacity .1s; background: color-mix(in srgb, var(--bgc, #fff) 72%, transparent);
+    backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px); border: 1px solid var(--rule); border-radius: 10px; padding: 9px 12px;
+    font-size: 12.5px; line-height: 1.45; box-shadow: 0 8px 24px rgba(16,24,40,.12); width: 236px; }
+  html.dark .trend-tip { --bgc: #1b1f24; }
+  .trend-tip.show { opacity: 1; }
+  .trend-tip b { font-size: 13.5px; }
+  .trend-demo { display: block; margin: 10px auto 0; border: 1.5px dashed #b49be6; background: transparent; color: var(--ink); border-radius: 8px;
+    padding: 6px 12px; font: 600 12.5px/1.2 "Inter", system-ui, sans-serif; cursor: pointer; }
+  /* senator list */
+  .sim-tools { display: flex; justify-content: center; gap: 8px; flex-wrap: wrap; margin-bottom: 14px; }
+  .sim-tools button { border: 1.5px solid var(--rule); background: transparent; color: var(--ink); border-radius: 999px; padding: 6px 12px; font: 600 12.5px/1 "Inter", system-ui, sans-serif; cursor: pointer; }
+  .sim-tools button[aria-pressed="true"] { background: #efe8fb; border-color: #7d5fcf; color: #2f2150; }
+  .sgroup { max-width: 760px; margin: 0 auto 6px; }
+  .sgroup h3 { font-size: 12px; text-transform: uppercase; letter-spacing: .05em; font-weight: 800; margin: 18px 0 6px; display: flex; align-items: center; gap: 8px; }
+  .sgroup h3 i { width: 10px; height: 10px; border-radius: 50%; background: var(--c); }
+  .sgroup h3 span { color: var(--muted); font-weight: 700; }
+  .srow { display: grid; grid-template-columns: 46px minmax(150px, 210px) 1fr auto; gap: 2px 12px; align-items: center; padding: 10px 0 8px; border-top: 1px solid var(--rule); }
+  .srow > .avatar { grid-row: 1 / 4; align-self: start; }
+  .srow .who { grid-row: 1 / 4; align-self: start; }
+  .srow .sbar { align-self: start; margin-top: 3px; }
+  .srow .slock { align-self: start; }
+  .srow .scount { align-self: start; }
+  .srow .who b { font-size: 14.5px; display: block; line-height: 1.2; }
+  .srow .who span { font-size: 12px; color: var(--muted); }
+  .srow .who .lab { display: inline-block; margin-top: 3px; font-size: 11px; font-weight: 800; padding: 2px 6px; border-radius: 5px;
+    background: color-mix(in srgb, var(--c) 16%, transparent); color: var(--ink); }
+  .sbar { position: relative; height: 22px; border-radius: 6px; overflow: hidden; display: flex; background: var(--sV); }
+  .sbar .sS { background: var(--sS); height: 100%; transition: width .45s cubic-bezier(.2,.7,.3,1); }
+  .sbar .pl { position: absolute; top: 0; bottom: 0; display: flex; align-items: center; font-size: 11.5px; font-weight: 800; color: #fff; padding: 0 7px; text-shadow: 0 1px 2px rgba(0,0,0,.25); }
+  .sbar .pl.l { left: 0; } .sbar .pl.r { right: 0; }
+  .sbar .tick { position: absolute; top: -2px; bottom: -2px; width: 2px; background: #fff; opacity: .9; }
+  .scount { grid-column: 3 / 5; font-size: 12px; color: var(--muted); font-variant-numeric: tabular-nums; margin-top: -2px; }
+  .scount .shift { font-weight: 800; margin-left: 6px; }
+  .scount .shift.up { color: var(--sS); } .scount .shift.dn { color: var(--sV); }
+  .slock { display: flex; gap: 5px; }
+  .slock button { width: 34px; height: 30px; border-radius: 8px; border: 1.5px solid var(--rule); background: transparent; cursor: pointer; color: var(--muted);
+    font: 800 11px/1 "Inter", system-ui, sans-serif; }
+  .slock button.s:hover, .slock button.s[aria-pressed="true"] { border-color: var(--sS); color: #fff; background: var(--sS); }
+  .slock button.v:hover, .slock button.v[aria-pressed="true"] { border-color: var(--sV); color: #fff; background: var(--sV); }
+  .slock button:disabled { opacity: .35; cursor: default; background: transparent !important; color: var(--muted) !important; border-color: var(--rule) !important; }
+  .swhy { grid-column: 3 / 5; font-size: 12.5px; line-height: 1.45; margin-top: 2px; }
+  .swhy summary { cursor: pointer; color: var(--muted); font-weight: 600; width: fit-content; }
+  .swhy ul { margin: 6px 0 2px; padding-left: 0; list-style: none; }
+  .swhy li { display: grid; grid-template-columns: 48px 1fr; gap: 8px; padding: 3px 0; }
+  .swhy .pts { font-weight: 800; font-variant-numeric: tabular-nums; text-align: right; }
+  .swhy .pts.s { color: var(--sS); } .swhy .pts.v { color: var(--sV); }
+  .swhy a { color: var(--muted); }
+  .swhy .ty { color: var(--faint); font-size: 11.5px; }
+  .sim-method { max-width: 640px; margin: 0 auto; font-size: 13px; line-height: 1.55; color: var(--muted); }
+  .sim-method b { color: var(--ink); }
+  .sim-method table { border-collapse: collapse; margin: 8px 0; font-size: 12.5px; }
+  .sim-method td { padding: 3px 12px 3px 0; }
+  @media (max-width: 700px) {
+    .sim-head { gap: 6px; }
+    .sim-card { padding: 10px 4px 9px; }
+    .sim-card .avatar { width: 34px; height: 34px; }
+    .sim-card .big { font-size: 27px; }
+    .sim-card .lbl { font-size: 11.5px; }
+    .sim-card .n { font-size: 10.5px; }
+    .samples { grid-template-columns: 1fr; }
+    .srow { grid-template-columns: 42px 1fr auto; }
+    .srow .who { grid-row: 1; }
+    .srow > .avatar { grid-row: 1; }
+    .srow .slock { grid-row: 1; grid-column: 3; align-self: center; }
+    .srow .sbar { grid-column: 1 / 4; margin-top: 6px; }
+    .scount { grid-column: 1 / 4; }
+    .swhy { grid-column: 1 / 4; }
+  }
   /* ---------- News tab ---------- */
   .tab-news { --tc: #FFC8DD; background: #FFC8DD; border-color: #f4a6c4; color: #3a1424; }
   .tab-news::before { background: #d4648f; }
@@ -634,6 +753,7 @@
       <button class="tab tab-predict" role="tab" data-view="predict" aria-selected="false" type="button">Create Predictions</button>
       <button class="tab tab-history" role="tab" data-view="history" aria-selected="false" type="button">Previous Updates</button>
       <button class="tab tab-news" role="tab" data-view="news" aria-selected="false" type="button">News</button>
+      <button class="tab tab-sims" role="tab" data-view="sims" aria-selected="false" type="button">Simulations</button>
     </nav>
     <div class="tool-right">
     <button class="news-up" id="newsUp" type="button" data-noshot hidden></button>
@@ -709,6 +829,46 @@
     </header>
     <hr>
     <ol class="timeline newsline" id="newsline"></ol>
+  </div>
+
+  <div id="viewSims" hidden>
+    <header>
+      <p class="site-name">The 29th Vote</p>
+      <h1>11,111 simulations of the leader vote</h1>
+      <p class="subtitle">Each run plays out the secret ballot once: every senator votes Schumer or Van Hollen based on what they've said and done, with shared swings so allies tend to move together.</p>
+      <p class="sim-note"><b>These are simulations, not predictions.</b> The odds come from sourced factors and the weights listed at the bottom of this tab. Lock any senator to a side and everything recalculates from only the runs where that happened.</p>
+    </header>
+    <hr>
+    <section class="sim-head" id="simHead"></section>
+    <p class="sim-median" id="simMedian"></p>
+    <div class="sim-locks" id="simLocks" hidden></div>
+    <hr>
+    <section>
+      <h2 class="sim-h2">How many votes Schumer got</h2>
+      <p class="sim-sub">Each bar is how many of the runs ended with that many votes for Schumer. Tap a bar to see a few of those runs.</p>
+      <div class="hist" id="simHist"></div>
+      <div class="samples" id="simSamples"></div>
+    </section>
+    <hr>
+    <section>
+      <h2 class="sim-h2">Trend</h2>
+      <p class="sim-sub">Schumer's middle result across the runs, with the shaded band covering the middle 80%. One point gets added each hourly check, and old points are never changed.</p>
+      <div class="trend" id="simTrend"></div>
+      <button class="trend-demo" id="trendDemo" type="button" data-noshot>Preview with sample points (test only)</button>
+    </section>
+    <hr>
+    <section>
+      <h2 class="sim-h2">Every senator</h2>
+      <p class="sim-sub">How often each senator voted for each candidate across the runs. Open "Why" for the factors and sources behind it, and use S or VH to lock someone to a side.</p>
+      <div class="sim-tools" id="simTools">
+        <button type="button" data-sort="lean" aria-pressed="true">By lean</button>
+        <button type="button" data-sort="shift" aria-pressed="false">Biggest shifts</button>
+        <button type="button" data-sort="name" aria-pressed="false">A to Z</button>
+      </div>
+      <div id="simList"></div>
+    </section>
+    <hr>
+    <section class="sim-method" id="simMethod"></section>
   </div>
 
   <div id="viewPredict" hidden>
@@ -2712,6 +2872,367 @@ function predShareSpec() {
   };
 }
 
+/* ================= SIMULATIONS (from the Simulation Scoring Sheet) ================= */
+// Factor types and weights. Points = side (+1 Schumer, -1 Van Hollen) x weight x strength.
+const SIM_WEIGHTS = { S: ["Public stance", 2.0], P: ["Policy position", 0.5], R: ["Party rank", 0.5], G: ["Smaller signal", 0.25] };
+const SIM_SETTINGS = { runs: 11111, seed: 29, baseline: 0, k: 1.75, ceiling: 0.97, floor: 0.03, safe: 0.9, likely: 0.75, lean: 0.6,
+  // shared swings in each simulation (log-odds), so senators who share a camp move together
+  swing: { caucus: 0.35, progressive: 0.3, establishment: 0.25, state: 0.2 } };
+const SRC = {
+  M4A: ["LegiScan, S. 1506 (119th Congress)", "https://legiscan.com/US/bill/SB1506/"],
+  LEAD: ["Senate.gov leadership page", "https://www.senate.gov/senators/leadership.htm"],
+  JB: ["Jenner & Block, Nov. 4", "https://www.jenner.com/print/v2/content/103758/democrats-flip-the-senate-incoming-committee-chairs-and-oversight-priorities.pdf"],
+  RANK: ["Senate Democrats, ranking members list", "https://www.democrats.senate.gov/newsroom/press-releases/majority-leader-schumer-announces-new-ranking-member-assignments-for-senate-democrats"],
+  WT: ["Washington Times, Nov. 10", "https://www.washingtontimes.com/news/2026/nov/10/senate-democrats-call-new-leadership-grows-uprising-lacks-champion/"],
+  NW: ["Newsweek, Nov. 11", "https://newsweek.com/chuck-schumer-senate-majority-leadership-democrats-12700175"],
+  ABC: ["ABC News, Nov. 12", "https://abcnews.com/Politics/schumer-van-hollen-facing-off-senate-majority-leader/story?id=138111386"],
+  FC: ["WSHU (NYT report), Nov. 25, 2025", "https://www.wshu.org/connecticut-news/2025-11-25/ct-chris-murphy-fight-club-democrats"],
+  FC2: ["Portside / Common Dreams, Nov. 26, 2025", "https://portside.org/2025-11-26/sanders-warren-help-form-senate-democratic-fight-club-challenging-schumers-leadership"],
+  AJ: ["Al Jazeera, Nov. 5", "https://www.aljazeera.com/amp/news/2026/11/5/division-among-us-democrats-over-schumers-leadership-role"],
+  HILLREC: ["The Hill, 2026", "https://thehill.com/homenews/senate/6030959-schumer-senate-leader-future/amp/"],
+  AX: ["Axios, Nov. 13", "https://www.axios.com/2026/11/13/democrats-schumer-van-hollen-senate-leader"],
+  NBC: ["NBC News, Nov. 12", "https://www.nbcnews.com/politics/congress/sen-chris-van-hollen-says-will-challenge-sen-chuck-schumer-majority-le-rcna609100"],
+  DROP: ["Drop Site whip count", "https://whipcount.dropsitenews.com/"],
+  CD: ["Common Dreams, 2026", "https://www.commondreams.org/news/van-hollen-medicare-for-all-2678145919"],
+  HILL14: ["The Hill, Nov. 14", "https://thehill.com/homenews/senate/6220115-senate-democrats-leadership-election-update/"],
+  SEM: ["Semafor, May 7", "https://semafor.com/article/05/07/2026/grahams-democratic-opponent-hits-him-on-ballroom-funding"],
+};
+const M4A_TXT = "Cosponsor of the Medicare for All Act (S. 1506), which Van Hollen also cosponsors";
+// [senator, side (+1 Schumer / -1 Van Hollen), type, strength, what, source key or [label, url]]
+const SIM_FACTORS = [
+  ["Chuck Schumer", 1, "S", 1, "Candidate for majority leader (votes for himself)", "NBC"],
+  ["Chuck Schumer", 1, "R", 1, "Democratic leader", "LEAD"],
+  ["Kirsten Gillibrand", 1, "S", 1, "Tracker: Support Schumer. Defended his leadership on Nov. 10", ["Finger Lakes 1, Nov. 11", "https://www.fingerlakes1.com/2026/11/11/schumer-gillibrand-outline-affordability-agenda-as-democrats-prepare-to-take-senate-control/"]],
+  ["Kirsten Gillibrand", -1, "P", .5, M4A_TXT, "M4A"],
+  ["Kirsten Gillibrand", 1, "R", 1, "DSCC chair, picked by Schumer", ["Roll Call, Jan. 6, 2025", "https://rollcall.com/2025/01/06/kirsten-gillibrand-dscc-chair-2026-election/"]],
+  ["Ruben Gallego", 1, "S", 1, "Tracker: Support Schumer. \"When the manager takes you to the World Series, you give him another contract\"", ["KJZZ, Nov. 11", "https://www.kjzz.org/politics/2026-11-11/arizonas-sen-gallego-backs-chuck-schumer-for-democrats-senate-leader"]],
+  ["Sheldon Whitehouse", 1, "S", 1, "Tracker: Support Schumer. Said the win \"certainly justifies another term\"", "NW"],
+  ["Sheldon Whitehouse", -1, "P", .5, M4A_TXT, "M4A"],
+  ["Sheldon Whitehouse", 1, "R", .5, "Expected Judiciary chair in the new majority", "JB"],
+  ["Mark Kelly", 1, "S", 1, "Tracker: Support Schumer, while urging Democrats to do things differently", "WT"],
+  ["Mark Kelly", -1, "P", .25, "Backs Schumer but is urging Democrats to do things differently", "WT"],
+  ["Mark Kelly", 1, "R", .5, "DSCC vice chair", "SEM"],
+  ["Richard Blumenthal", 1, "S", 1, "Tracker: Support Schumer. Said he plans to vote for him", "WT"],
+  ["Richard Blumenthal", -1, "P", .5, M4A_TXT, "M4A"],
+  ["Richard Blumenthal", -1, "P", .5, "\"We need a conversation about leadership... new energy and ideas\"", ["Fox News, Nov. 9", "https://foxnews.com/politics/schumers-grip-power-slips-dems-begin-revolt-against-him-eye-new-leadership"]],
+  ["Richard Blumenthal", 1, "R", .5, "Expected Permanent Subcommittee on Investigations chair in the new majority", "JB"],
+  ["John Fetterman", 1, "S", 1, "Tracker: Support Schumer. Said he'd back Schumer staying on as leader", ["Northeast Times (CBS), Sept. 28", "https://northeasttimes.com/?p=164051"]],
+  ["Tammy Baldwin", 1, "S", 1, "Tracker: Support Schumer. Nov. 12 statement announcing she'll support him", "DROP"],
+  ["Tammy Baldwin", -1, "P", .5, M4A_TXT, "M4A"],
+  ["Tammy Baldwin", 1, "R", .5, "Conference secretary", "LEAD"],
+  ["Brian Schatz", 1, "S", 1, "Tracker: Support Schumer. Publicly backed him Nov. 9", "WT"],
+  ["Brian Schatz", -1, "P", .5, M4A_TXT, "M4A"],
+  ["Brian Schatz", 1, "R", 1, "Incoming Democratic whip (No. 2)", "HILL14"],
+  ["Jack Reed", 1, "S", 1, "Tracker: Support Schumer. Nov. 12 statement saying he'll support him", "DROP"],
+  ["Jack Reed", 1, "R", .5, "Top Democrat on Armed Services (in line to chair it)", "RANK"],
+  ["Angus King", 1, "S", 1, "Tracker: Support Schumer. \"Why would you fire the manager when you just won the World Series?\"", "AX"],
+  ["Catherine Cortez Masto", 1, "S", 1, "Tracker: Support Schumer. \"I will be supporting him as our Democratic leader\"", "ABC"],
+  ["Catherine Cortez Masto", 1, "R", .5, "Vice chair of Outreach", "LEAD"],
+  ["Jacky Rosen", 1, "S", 1, "Tracker: Support Schumer. Endorsed him Nov. 12", "ABC"],
+  ["Sherrod Brown", 1, "S", 1, "Tracker: Support Schumer. Publicly backed him Nov. 9", "NW"],
+  ["Sherrod Brown", 1, "R", .5, "Expected Agriculture chair in the new majority", "JB"],
+  ["Sherrod Brown", 1, "G", 1, "Recruited to run by Schumer", "HILLREC"],
+  ["Cory Booker", -1, "P", .5, M4A_TXT, "M4A"],
+  ["Cory Booker", -1, "P", .5, "Said the party \"needs a new generation of leaders\" after the 2025 shutdown deal", ["Fox News, Nov. 14, 2025", "https://www.foxnews.com/politics/eading-senate-democrat-tells-fox-news-its-time-for-new-leadership-schumer-faces-growing-pressure.amp"]],
+  ["Cory Booker", 1, "R", 1, "Strategic Communications chair (No. 4)", "LEAD"],
+  ["Cory Booker", 1, "G", .5, "Praised Schumer's handling of the midterms", ["The 29th Vote tracker", "https://jaysonfrascatore.github.io/The29thVote/"]],
+  ["Elizabeth Warren", -1, "P", .5, M4A_TXT, "M4A"],
+  ["Elizabeth Warren", -1, "P", 1, "Core member of the anti-Schumer \"Fight Club\" (NYT report)", "FC"],
+  ["Elizabeth Warren", 1, "R", .5, "Vice chair of the conference", "LEAD"],
+  ["Elizabeth Warren", 1, "R", .5, "Expected Banking chair in the new majority", "JB"],
+  ["Chris Murphy", -1, "P", 1, "Core member of the anti-Schumer \"Fight Club\" (NYT report)", "FC"],
+  ["Chris Murphy", 1, "R", .5, "Deputy conference secretary", "LEAD"],
+  ["Ben Ray Luján", -1, "P", .5, M4A_TXT, "M4A"],
+  ["Alex Padilla", -1, "P", .5, M4A_TXT, "M4A"],
+  ["Alex Padilla", 1, "R", .5, "Top Democrat on Rules (in line to chair it)", "RANK"],
+  ["Mark Warner", 1, "R", .5, "Vice chair of the conference", "LEAD"],
+  ["Mark Warner", 1, "R", .5, "Top Democrat on Intelligence (in line to chair it)", "RANK"],
+  ["Mark Warner", 1, "G", .5, "Praised Schumer's fundraising while declining to commit", "NW"],
+  ["Martin Heinrich", -1, "P", .5, M4A_TXT, "M4A"],
+  ["Martin Heinrich", -1, "P", .25, "Named among \"Fight Club\" senators in one opinion piece (not in the NYT core list)", ["The Hill opinion (via AOL), Nov. 2025", "https://www.aol.com/articles/opinion-senate-dems-revolt-against-184950270.html"]],
+  ["Martin Heinrich", 1, "R", .5, "Expected Energy chair in the new majority", "JB"],
+  ["Ed Markey", -1, "P", .5, M4A_TXT, "M4A"],
+  ["Ed Markey", -1, "P", .5, "Took part in \"Fight Club\" actions (NYT report)", "FC2"],
+  ["Ed Markey", 1, "R", .5, "Top Democrat on Small Business (in line to chair it)", "RANK"],
+  ["Mazie Hirono", -1, "P", .5, M4A_TXT, "M4A"],
+  ["Chris Coons", -1, "P", .25, "Wants \"a leadership team that shows we hear them\"", ["Coons on X, Nov. 13", "https://x.com/ChrisCoons/status/2121280335321399705"]],
+  ["Chris Coons", 1, "R", .5, "Top Democrat on Ethics (in line to chair it)", "RANK"],
+  ["Maria Cantwell", 1, "R", .5, "Expected Commerce chair in the new majority", "JB"],
+  ["Maria Cantwell", 1, "G", .5, "Said Schumer deserves \"points for this big victory\"", ["Spokesman-Review, Nov. 4", "https://www.spokesman.com/stories/2026/nov/04/impeach-trump-work-with-him-washington-democrats-c/"]],
+  ["Patty Murray", 1, "R", .5, "Top Democrat on Appropriations (in line to chair it)", "RANK"],
+  ["Peter Welch", -1, "P", .5, M4A_TXT, "M4A"],
+  ["Peter Welch", -1, "P", .5, "\"Whether it's Schumer or not, we absolutely are committed to change\"", ["NBC5, Nov. 11", "https://www.mynbc5.com/article/welch-democratic-senate-majority-leader/74404630"]],
+  ["Ron Wyden", -1, "P", 1, "Said whoever backs Medicare for All gets his vote for leader; Van Hollen cosponsors it, Schumer doesn't", ["Wyden on X, Nov. 13", "https://jaysonfrascatore.github.io/The29thVote/"]],
+  ["Ron Wyden", 1, "R", .5, "Expected Finance chair in the new majority", "JB"],
+  ["Tim Kaine", 1, "S", .25, "Backed Schumer before the race (June 28); hasn't repeated it since Van Hollen entered", "AX"],
+  ["James Talarico", -1, "P", .5, "Called for \"new blood\"; wants to hear Schumer's vision before committing", "AJ"],
+  ["James Talarico", -1, "G", .5, "DSCC tried to steer him into the governor's race instead", ["NOTUS, 2026", "https://www.notus.org/democrats/chuck-schumer-dscc-senate-primaries"]],
+  ["Chris Pappas", -1, "P", .5, "Said voters are \"hungry for... a new generation of leadership in the Senate\"", "AJ"],
+  ["Josh Turek", 1, "G", 1, "Recruited to run by Schumer", "HILLREC"],
+  ["Roy Cooper", 1, "G", 1, "Recruited to run by Schumer", "HILLREC"],
+  ["Scott Colom", -1, "G", .5, "Won't commit; pushed back on Schumer taking credit for his win", ["The New Republic, Nov. 13", "https://newrepublic.com/post/217991/full-list-senators-back-chris-van-hollen-leader"]],
+  ["Mary Peltola", 1, "G", 1, "Recruited to run by Schumer", "HILLREC"],
+  ["Chris Van Hollen", -1, "S", 1, "Candidate for majority leader (votes for himself)", "NBC"],
+  ["Bernie Sanders", -1, "S", 1, "Tracker: Support Van Hollen. \"I will not be supporting Chuck to be reelected\"", "ABC"],
+  ["Bernie Sanders", -1, "P", .5, "Lead sponsor of the Medicare for All Act (S. 1506)", "M4A"],
+  ["Bernie Sanders", -1, "P", 1, "Core member of the anti-Schumer \"Fight Club\" (NYT report)", "FC"],
+  ["Bernie Sanders", 1, "R", .5, "Chair of Outreach", "LEAD"],
+  ["Bernie Sanders", 1, "R", .5, "Expected HELP chair in the new majority", "JB"],
+  ["Abdul El-Sayed", -1, "S", 1, "Tracker: Support Van Hollen (backed him since April)", "ABC"],
+  ["Abdul El-Sayed", -1, "P", .5, "Ran as a Medicare for All supporter", "CD"],
+  ["Abdul El-Sayed", -1, "G", 1, "Schumer backed his primary opponent (Haley Stevens)", "AJ"],
+  ["Jeff Merkley", -1, "S", 1, "Tracker: Support Van Hollen. \"@ChrisVanHollen is that leader\"", ["Merkley on X, Nov. 13", "https://x.com/SenJeffMerkley/status/2121328108854751475"]],
+  ["Jeff Merkley", -1, "P", .5, M4A_TXT, "M4A"],
+  ["Jeff Merkley", -1, "P", .5, "Took part in \"Fight Club\" actions (NYT report)", "FC2"],
+  ["Jeff Merkley", 1, "R", .5, "Top Democrat on Budget (in line to chair it)", "RANK"],
+  ["Peggy Flanagan", -1, "S", 1, "Tracker: Support Van Hollen", ["Flanagan on X, Nov. 13", "https://x.com/peggyflanagan/status/2121245502545018920"]],
+  ["Peggy Flanagan", -1, "G", 1, "Beat the establishment pick (Angie Craig) after campaigning against Schumer's leadership", ["Newsweek, 2026", "https://www.newsweek.com/full-list-democrats-rallying-against-chuck-schumer-senate-12315442"]],
+  ["Elissa Slotkin", -1, "S", .75, "Tracker: Opposing Schumer, no pick yet. Wants \"a concrete plan that's definitively different\"", "NW"],
+  ["Troy Jackson", -1, "S", .75, "Tracker: Opposing Schumer, no pick yet. Told Schumer he'll \"support somebody else\"", "AJ"],
+  ["Troy Jackson", -1, "P", .5, "Ran as a Medicare for All supporter", "CD"],
+  ["Juliana Stratton", -1, "S", .75, "Tracker: Opposing Schumer, no pick yet. Said through a spokesperson she won't support him", "AJ"],
+  ["Juliana Stratton", -1, "G", 1, "Ran in the primary on not backing Schumer", ["Fox News, March 2026", "https://www.foxnews.com/politics/blue-state-democrat-fast-track-senate-defies-schumer"]],
+  ["Adam Hamilton", -1, "S", .75, "Tracker: Opposing Schumer, no pick yet. \"I'm not supporting Schumer\"", "AJ"],
+  ["Adam Hamilton", 1, "G", .5, "Moderate; Van Hollen backs Medicare for All and ending the filibuster, which may not fit him", "HILL14"],
+  ["Annie Andrews", -1, "S", .75, "Tracker: Opposing Schumer, no pick yet. Wants generational change", ["National News Desk, Nov. 5", "https://local12.com/news/nation-world/gallery/generational-change-sen-elect-annie-andrews-wont-back-chuck-schumer-for-majority-leader-south-carolina-politics"]],
+  ["Annie Andrews", -1, "P", .5, "\"I think we need a generational shift in leadership\"", "SEM"],
+  ["Adam Schiff", -1, "P", .5, M4A_TXT, "M4A"],
+  ["Angela Alsobrooks", 1, "S", .25, "Backed Schumer before Van Hollen entered; hasn't repeated it", "AX"],
+  ["Amy Klobuchar", 1, "R", 1, "Steering & Policy chair (No. 3); leaving to be governor", "LEAD"],
+  ["Maggie Hassan", 1, "R", .5, "Expected Homeland Security chair in the new majority", "JB"],
+];
+// Append-only trend log: one point per hourly check. Never edit past points.
+// [time label, median Schumer votes, low (10th pct), high (90th pct), P(Schumer gets 29), P(Van Hollen gets 29), P(28-28 tie)]
+const SIM_HISTORY = [];
+
+/* ---------- Simulations tab ---------- */
+let SIM = null;
+const simBuild = () => {
+  const S = SIM_SETTINGS, N_RUNS = S.runs;
+  const roster = [];
+  CATS.forEach(c => { if (c === "No public position") return; (SENATORS[c] || []).forEach(r => roster.push({ name: r[0], st: r[1], cat: c })); });
+  NO_POSITION.forEach(r => roster.push({ name: r[0], st: r[1], cat: "No public position" }));
+  const src = k => Array.isArray(k) ? k : (SRC[k] || ["", ""]);
+  roster.forEach(p => {
+    p.factors = SIM_FACTORS.filter(f => f[0] === p.name).map(f => {
+      const [lbl, w] = SIM_WEIGHTS[f[2]];
+      return { side: f[1], type: lbl, strength: f[3], what: f[4], src: src(f[5]), pts: f[1] * w * f[3] };
+    });
+    p.score = S.baseline + p.factors.reduce((a, f) => a + f.pts, 0);
+    p.fixed = p.name === "Chuck Schumer" ? 1 : p.name === "Chris Van Hollen" ? 0 : null;
+    const raw = 1 / (1 + Math.exp(-S.k * p.score));
+    p.p = p.fixed != null ? p.fixed : Math.min(S.ceiling, Math.max(S.floor, raw));
+    p.prog = p.factors.some(f => f.side < 0 && /Medicare for All|Fight Club/.test(f.what));
+    p.est = p.factors.some(f => f.type === "Party rank" || /Recruited to run by Schumer/.test(f.what));
+  });
+  const N = roster.length;
+  // Seeded random numbers so every visitor sees the same 11,111 runs
+  let seed = S.seed >>> 0;
+  const rnd = () => { seed |= 0; seed = seed + 0x6D2B79F5 | 0; let t = Math.imul(seed ^ seed >>> 15, 1 | seed); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; };
+  const gauss = () => { let u = 0; while (!u) u = rnd(); return Math.sqrt(-2 * Math.log(u)) * Math.cos(2 * Math.PI * rnd()); };
+  const states = [...new Set(roster.map(p => p.st))];
+  const logit = p => Math.log(p / (1 - p));
+  const votes = new Uint8Array(N_RUNS * N);   // 1 = Schumer
+  const sCount = new Uint8Array(N_RUNS);
+  for (let r = 0; r < N_RUNS; r++) {
+    const zc = gauss() * S.swing.caucus, zp = gauss() * S.swing.progressive, ze = gauss() * S.swing.establishment;
+    const zs = {}; states.forEach(st => zs[st] = gauss() * S.swing.state);
+    let n = 0;
+    for (let i = 0; i < N; i++) {
+      const p = roster[i]; let v;
+      if (p.fixed != null) v = p.fixed;
+      else {
+        const x = logit(p.p) + zc + (p.prog ? zp : 0) + (p.est ? ze : 0) + zs[p.st];
+        const q = Math.min(S.ceiling, Math.max(S.floor, 1 / (1 + Math.exp(-x))));
+        v = rnd() < q ? 1 : 0;
+      }
+      votes[r * N + i] = v; n += v;
+    }
+    sCount[r] = n;
+  }
+  function stats(locks) {
+    const keys = Object.keys(locks), idx = keys.map(k => roster.findIndex(p => p.name === k)), want = keys.map(k => locks[k]);
+    const per = new Uint32Array(N), hist = new Uint32Array(N + 1), runs = [];
+    for (let r = 0; r < N_RUNS; r++) {
+      let ok = true;
+      for (let j = 0; j < idx.length; j++) if (votes[r * N + idx[j]] !== want[j]) { ok = false; break; }
+      if (!ok) continue;
+      runs.push(r); hist[sCount[r]]++;
+      for (let i = 0; i < N; i++) per[i] += votes[r * N + i];
+    }
+    const kept = runs.length, need = Math.ceil((N + 1) / 2);   // 29 of 56
+    let s = 0, v = 0, t = 0; for (let k = 0; k <= N; k++) { if (k >= need) s += hist[k]; else if (N - k >= need) v += hist[k]; else t += hist[k]; }
+    const q = f => { let c = 0; for (let k = 0; k <= N; k++) { c += hist[k]; if (c >= f * kept) return k; } return N; };
+    return { kept, per, hist, runs, sWin: s, vWin: v, tie: t, med: kept ? q(.5) : null, lo: kept ? q(.1) : null, hi: kept ? q(.9) : null };
+  }
+  return { roster, N, N_RUNS, votes, sCount, stats };
+};
+
+const simEl = id => document.getElementById(id);
+const simFmt = n => n.toLocaleString("en-US");
+const simPct = (a, b) => b ? Math.round(100 * a / b) : 0;
+let simLocks = {}, simBase = null, simCur = null, simSort = "lean", simPick = null, simDemo = false;
+function simLabel(p) {
+  const S = SIM_SETTINGS, m = Math.max(p, 1 - p), side = p > .5 ? "Schumer" : "Van Hollen";
+  if (m >= S.safe) return "Safe " + side; if (m >= S.likely) return "Likely " + side; if (m >= S.lean) return "Lean " + side; return "Toss-up";
+}
+const SIM_GROUPS = ["Safe Schumer", "Likely Schumer", "Lean Schumer", "Toss-up", "Lean Van Hollen", "Likely Van Hollen", "Safe Van Hollen"];
+const SIM_GC = { "Safe Schumer": "#2F6FD0", "Likely Schumer": "#5d8fdc", "Lean Schumer": "#93b4ea", "Toss-up": "#a58ae0", "Lean Van Hollen": "#86d0e3", "Likely Van Hollen": "#45bad6", "Safe Van Hollen": "#12A6CC" };
+function simPaint() {
+  if (!SIM) SIM = simBuild();
+  if (!simBase) simBase = SIM.stats({});
+  simCur = Object.keys(simLocks).length ? SIM.stats(simLocks) : simBase;
+  const st = simCur, R = SIM.N_RUNS, locked = Object.keys(simLocks).length > 0;
+  // Headline
+  const lead = st.sWin >= st.vWin ? "s" : "v";
+  const card = (cls, big, lbl, n, av) => `<div class="sim-card ${cls}${cls === lead ? " lead" : ""}"><div class="sc-av">${av}</div><span class="big">${big}</span><span class="lbl">${lbl}</span><span class="n">${n}</span></div>`;
+  simEl("simHead").innerHTML = st.kept ? [
+    card("s", simPct(st.sWin, st.kept) + "%", "Schumer reaches 29", `${simFmt(st.sWin)} of ${simFmt(st.kept)} runs`, avatar("Chuck Schumer", "NY", "#03045E", 46)),
+    card("t", simPct(st.tie, st.kept) + "%", "28–28 tie", `${simFmt(st.tie)} of ${simFmt(st.kept)} runs`, `<span class="avatar" style="--av:#8a6fd1;--sz:46px"><span class="av-ini" style="visibility:visible">28</span></span>`),
+    card("v", simPct(st.vWin, st.kept) + "%", "Van Hollen reaches 29", `${simFmt(st.vWin)} of ${simFmt(st.kept)} runs`, avatar("Chris Van Hollen", "MD", "#06566B", 46)),
+  ].join("") : `<p class="sim-sub" style="grid-column:1/-1">None of the ${simFmt(R)} runs match every lock you set. Remove one to see results.</p>`;
+  simEl("simMedian").innerHTML = st.kept ? `In the middle run, Schumer gets <b>${st.med} votes</b> to Van Hollen's <b>${56 - st.med}</b>. Most runs (the middle 80%) land between <b>${st.lo} and ${st.hi}</b> for Schumer.` +
+    (locked ? `<br><span style="color:var(--muted)">Counting only the ${simFmt(st.kept)} of ${simFmt(R)} runs that match your locks.</span>` : "") : "";
+  // Lock chips
+  const lk = simEl("simLocks"); lk.hidden = !locked;
+  lk.innerHTML = Object.entries(simLocks).map(([n, v]) => { const p = SIM.roster.find(x => x.name === n);
+    return `<button class="lock-chip" type="button" data-unlock="${n}" style="--c:${v ? "#2F6FD0" : "#12A6CC"}">${avatar(n, p.st, v ? "#2F6FD0" : "#12A6CC", 24)}${n.split(" ").slice(-1)[0]} → ${v ? "Schumer" : "Van Hollen"}<span class="x">×</span></button>`; }).join("") +
+    (locked ? `<button class="sim-clear" type="button" data-unlock="*">Clear all locks</button>` : "");
+  simHist(); simSamples(); simTrend(); simList(); simMethod();
+}
+function simHist() {
+  const st = simCur, h = st.hist; let lo = 56, hi = 0;
+  for (let k = 0; k <= 56; k++) if (h[k] || simBase.hist[k]) { lo = Math.min(lo, k); hi = Math.max(hi, k); }
+  lo = Math.min(lo, 27); hi = Math.max(hi, 30);
+  const W = 760, H = 230, pad = 26, n = hi - lo + 1, bw = (W - 20) / n, max = Math.max(...h.slice(lo, hi + 1), 1);
+  let s = `<svg viewBox="0 0 ${W} ${H + pad}" role="img" aria-label="Histogram of Schumer vote totals">`;
+  const x29 = 10 + (29 - lo) * bw;
+  s += `<rect x="${x29 - 2}" y="0" width="2" height="${H}" fill="var(--ink)" opacity=".5"/><text class="t29" x="${x29 + 4}" y="12">29 to win</text>`;
+  for (let k = lo; k <= hi; k++) {
+    const c = h[k], bh = c ? Math.max(2, (H - 26) * c / max) : 0, x = 10 + (k - lo) * bw;
+    const col = k >= 29 ? "#2F6FD0" : k <= 27 ? "#12A6CC" : "#8a6fd1";
+    s += `<g class="hb${simPick === k ? " on" : ""}" data-k="${k}"><rect x="${x}" y="0" width="${bw}" height="${H}" fill="transparent"/>` +
+      `<rect x="${x + 2}" y="${H - bh}" width="${bw - 4}" height="${bh}" rx="3" fill="${col}"/>` +
+      (c ? `<text x="${x + bw / 2}" y="${H - bh - 5}" text-anchor="middle" style="font-size:${bw < 22 ? 8.5 : 10}px">${c > 999 ? (c / 1000).toFixed(1) + "k" : c}</text>` : "") +
+      `<text x="${x + bw / 2}" y="${H + 17}" text-anchor="middle">${k}</text><title>${k} Schumer, ${56 - k} Van Hollen: ${simFmt(c)} runs</title></g>`;
+  }
+  s += `</svg>`;
+  const el = simEl("simHist"); el.innerHTML = s; el.classList.toggle("picked", simPick != null);
+}
+function simMini(r) {
+  // Small half-circle: Schumer votes from the left, Van Hollen from the right
+  const N = SIM.N; const tot = [12, 13, 15, 16];
+  const pts = []; tot.forEach((cnt, ri) => { const rad = 40 + ri * 14; for (let j = 0; j < cnt; j++) { const a = Math.PI * (1 - j / (cnt - 1)); pts.push([100 + rad * Math.cos(a), 98 - rad * Math.sin(a), a]); } });
+  pts.sort((a, b) => b[2] - a[2]);
+  const order = SIM.roster.map((p, i) => ({ p, i, v: SIM.votes[r * N + i] })).sort((a, b) => (b.v - a.v) || (b.p.p - a.p.p));
+  return `<svg viewBox="0 0 200 104">` + order.map((o, j) => { const [x, y] = pts[j];
+    const surprise = (o.v && o.p.p < .5) || (!o.v && o.p.p > .5);
+    return `<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="5" fill="${o.v ? "#2F6FD0" : "#12A6CC"}" ${surprise ? 'stroke="#f2b134" stroke-width="2"' : 'stroke="var(--bgx,#fff)" stroke-width="1"'}><title>${o.p.name} (${o.p.st}): ${o.v ? "Schumer" : "Van Hollen"}</title></circle>`; }).join("") + `</svg>`;
+}
+function simSamples() {
+  const el = simEl("simSamples");
+  if (simPick == null) { el.innerHTML = ""; return; }
+  const pool = simCur.runs.filter(r => SIM.sCount[r] === simPick);
+  if (!pool.length) { el.innerHTML = ""; return; }
+  const pick = [0, 1, 2].map(j => pool[Math.floor((j + .5) * pool.length / 3)]).filter((r, j, a) => r != null && a.indexOf(r) === j);
+  el.innerHTML = pick.map(r => {
+    const s = SIM.sCount[r], N = SIM.N;
+    const sur = SIM.roster.map((p, i) => ({ p, v: SIM.votes[r * N + i] })).filter(o => o.p.fixed == null && ((o.v && o.p.p < .5) || (!o.v && o.p.p > .5)));
+    const surS = sur.filter(o => o.v).map(o => o.p.name.split(" ").slice(-1)[0]), surV = sur.filter(o => !o.v).map(o => o.p.name.split(" ").slice(-1)[0]);
+    return `<div class="sample"><b>Run #${simFmt(r + 1)}</b><div class="res" style="color:${s >= 29 ? "#2F6FD0" : s <= 27 ? "#12A6CC" : "#8a6fd1"}">${s >= 29 ? "Schumer wins" : s <= 27 ? "Van Hollen wins" : "Tie"}, ${s}–${56 - s}</div>${simMini(r)}` +
+      `<div class="sur">${surV.length ? `<b>Leaned Schumer, voted Van Hollen:</b> ${surV.join(", ")}<br>` : ""}${surS.length ? `<b>Leaned Van Hollen, voted Schumer:</b> ${surS.join(", ")}` : ""}${!sur.length ? "Everyone voted the way they lean." : ""}</div></div>`;
+  }).join("");
+}
+function simPoint(st, when) { return [when, st.med, st.lo, st.hi, Math.round(1000 * st.sWin / st.kept) / 10, Math.round(1000 * st.vWin / st.kept) / 10, Math.round(1000 * st.tie / st.kept) / 10]; }
+function simTrend() {
+  const now = simPoint(simBase, "Now");
+  let pts = SIM_HISTORY.slice();
+  if (simDemo) { // made-up points so the chart can be previewed; never shipped
+    let m = 27, a = 7; pts = [];
+    ["Nov. 11, 6 PM", "Nov. 12, 9 AM", "Nov. 12, 3 PM", "Nov. 12, 9 PM", "Nov. 13, 10 AM", "Nov. 13, 4 PM", "Nov. 13, 11 PM", "Nov. 14, 9 AM", "Nov. 14, 6 PM", "Nov. 15, 10 AM"].forEach((w, i) => {
+      m += [1, 1, 0, 1, -1, 1, 0, 1, 0, 0][i]; a = Math.max(3, a - (i % 3 === 0 ? 1 : 0));
+      pts.push([w, m, m - a, m + a - 1, Math.min(90, 20 + i * 6), Math.max(5, 45 - i * 4), 10]); });
+  }
+  const last = pts[pts.length - 1];
+  if (!last || last[1] !== now[1] || last[2] !== now[2] || last[3] !== now[3]) pts.push(now);
+  const W = 760, H = 240, L = 34, Rr = 16, T = 12, B = 30;
+  const ys = pts.flatMap(p => [p[2], p[3]]), ymin = Math.min(22, ...ys) - 1, ymax = Math.max(34, ...ys) + 1;
+  const X = i => pts.length === 1 ? (L + W - Rr) / 2 : L + i * (W - L - Rr) / (pts.length - 1), Y = v => T + (ymax - v) * (H - T - B) / (ymax - ymin);
+  let s = `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Trend of Schumer's middle vote count">`;
+  for (let v = Math.ceil(ymin / 2) * 2; v <= ymax; v += 2) s += `<line x1="${L}" x2="${W - Rr}" y1="${Y(v)}" y2="${Y(v)}" stroke="var(--rule)"/><text x="${L - 6}" y="${Y(v) + 4}" text-anchor="end">${v}</text>`;
+  s += `<line x1="${L}" x2="${W - Rr}" y1="${Y(28.5)}" y2="${Y(28.5)}" stroke="var(--ink)" stroke-dasharray="4 4" opacity=".55"/><text x="${W - Rr}" y="${Y(28.5) - 5}" text-anchor="end" style="fill:var(--ink)">29 to win</text>`;
+  if (pts.length > 1) {
+    s += `<path d="${pts.map((p, i) => (i ? "L" : "M") + X(i) + " " + Y(p[3])).join("")}${pts.slice().reverse().map((p, j) => "L" + X(pts.length - 1 - j) + " " + Y(p[2])).join("")}Z" fill="#8a6fd1" opacity=".18"/>`;
+    s += `<path d="${pts.map((p, i) => (i ? "L" : "M") + X(i) + " " + Y(p[1])).join("")}" fill="none" stroke="#6b4fc4" stroke-width="2.5" stroke-linejoin="round"/>`;
+  } else s += `<line x1="${X(0)}" x2="${X(0)}" y1="${Y(pts[0][3])}" y2="${Y(pts[0][2])}" stroke="#8a6fd1" stroke-width="10" stroke-linecap="round" opacity=".25"/>`;
+  pts.forEach((p, i) => s += `<circle cx="${X(i)}" cy="${Y(p[1])}" r="${i === pts.length - 1 ? 5 : 3}" fill="#6b4fc4" stroke="var(--bgx,#fff)" stroke-width="1.5"/>`);
+  [0, pts.length - 1].filter((v, i, a) => a.indexOf(v) === i).forEach(i => s += `<text x="${X(i)}" y="${H - 8}" text-anchor="${pts.length === 1 ? "middle" : i ? "end" : "start"}">${pts[i][0]}</text>`);
+  s += `<line id="trCur" x1="0" x2="0" y1="${T}" y2="${H - B}" stroke="var(--ink)" opacity="0"/><rect id="trHit" x="${L}" y="0" width="${W - L - Rr}" height="${H}" fill="transparent"/></svg>`;
+  const el = simEl("simTrend"); el.innerHTML = s + `<div class="trend-tip" id="trTip"></div>` + (pts.length === 1 ? `<p class="sim-sub" style="margin-top:8px">The line starts with this first point. Each hourly check adds one more.</p>` : "");
+  const svg = el.querySelector("svg"), tipE = el.querySelector("#trTip"), cur = el.querySelector("#trCur");
+  const move = e => {
+    const b = svg.getBoundingClientRect(), x = (e.clientX - b.left) * W / b.width;
+    const i = pts.length === 1 ? 0 : Math.max(0, Math.min(pts.length - 1, Math.round((x - L) / ((W - L - Rr) / (pts.length - 1))))), p = pts[i];
+    cur.setAttribute("x1", X(i)); cur.setAttribute("x2", X(i)); cur.setAttribute("opacity", ".35");
+    tipE.innerHTML = `<b>${p[0]}</b><br>Schumer middle result: <b>${p[1]}</b> votes<br>Middle 80%: ${p[2]} to ${p[3]}<br><span style="color:#2F6FD0">Schumer reaches 29: <b>${p[4]}%</b></span><br><span style="color:#0e8cab">Van Hollen reaches 29: <b>${p[5]}%</b></span><br>Tie: ${p[6]}%`;
+    const px = X(i) * b.width / W; tipE.style.left = Math.min(b.width - 240, Math.max(0, px + 12 > b.width - 240 ? px - 248 : px + 12)) + "px"; tipE.style.top = "8px"; tipE.classList.add("show");
+  };
+  svg.addEventListener("pointermove", move); svg.addEventListener("pointerdown", move);
+  svg.addEventListener("pointerleave", () => { tipE.classList.remove("show"); cur.setAttribute("opacity", "0"); });
+  simEl("trendDemo").textContent = simDemo ? "Hide sample points" : "Preview with sample points (test only)";
+}
+function simList() {
+  const st = simCur, N = SIM.N, base = simBase;
+  const rows = SIM.roster.map((p, i) => ({ p, i, share: st.kept ? st.per[i] / st.kept : p.p, b: base.per[i] / base.kept }));
+  rows.forEach(r => { r.shift = r.share - r.b; r.lab = r.p.fixed != null ? (r.p.fixed ? "Safe Schumer" : "Safe Van Hollen") : simLabel(r.share); });
+  const row = r => {
+    const p = r.p, lk = simLocks[p.name], pctS = Math.round(100 * r.share), cnt = st.kept ? st.per[r.i] : 0, c = SIM_GC[r.lab];
+    const color = p.fixed === 1 ? "#03045E" : p.fixed === 0 ? "#06566B" : COLORS[p.cat] || "#B8BDC4";
+    const sh = Object.keys(simLocks).length && p.fixed == null && lk == null && Math.abs(r.shift) >= .005 ? `<span class="shift ${r.shift > 0 ? "up" : "dn"}">${r.shift > 0 ? "▲" : "▼"} ${Math.abs(Math.round(100 * r.shift))} pts ${r.shift > 0 ? "toward Schumer" : "toward Van Hollen"}</span>` : "";
+    const why = p.factors.length ? `<ul>${p.factors.map(f => `<li><span class="pts ${f.pts > 0 ? "s" : "v"}">${f.pts > 0 ? "+" : "−"}${Math.abs(f.pts).toFixed(2)}</span><span>${f.what} <span class="ty">· ${f.type}${f.src[1] ? ` · <a href="${f.src[1]}" target="_blank" rel="noopener">${f.src[0]}</a>` : ""}</span></span></li>`).join("")}</ul>` +
+      `<div class="ty">Score ${p.score >= 0 ? "+" : "−"}${Math.abs(p.score).toFixed(2)} → ${p.fixed != null ? (p.fixed ? "always votes Schumer" : "always votes Van Hollen") : `${Math.round(100 * p.p)}% Schumer before shared swings`}</div>`
+      : `<ul><li><span class="pts">0.00</span><span>No sourced factors yet, so this senator starts at a coin flip.</span></li></ul>`;
+    return `<div class="srow" data-name="${p.name}">${avatar(p.name, p.st, color, 42)}
+      <div class="who"><b>${p.name}</b><span>${STATE_NAMES[p.st] || p.st} · ${L(p.cat)}</span><br><span class="lab" style="--c:${c}">${r.lab}</span></div>
+      <div class="sbar" title="${pctS}% Schumer, ${100 - pctS}% Van Hollen"><div class="sS" style="width:${100 * r.share}%"></div>${pctS >= 12 ? `<span class="pl l">${pctS}%</span>` : ""}${pctS <= 88 ? `<span class="pl r">${100 - pctS}%</span>` : ""}</div>
+      <div class="slock">${p.fixed != null ? `<button type="button" class="s" disabled title="Candidates always vote for themselves">S</button><button type="button" class="v" disabled>VH</button>` :
+        `<button type="button" class="s" data-lock="1" aria-pressed="${lk === 1}" title="Lock to Schumer">S</button><button type="button" class="v" data-lock="0" aria-pressed="${lk === 0}" title="Lock to Van Hollen">VH</button>`}</div>
+      <div class="scount">Schumer in ${simFmt(cnt)} of ${simFmt(st.kept)} runs${sh}</div>
+      <details class="swhy"><summary>Why</summary>${why}</details></div>`;
+  };
+  let html = "";
+  if (simSort === "lean") {
+    rows.sort((a, b) => b.share - a.share || a.p.name.localeCompare(b.p.name));
+    SIM_GROUPS.forEach(g => { const rs = rows.filter(r => r.lab === g); if (rs.length) html += `<div class="sgroup"><h3 style="--c:${SIM_GC[g]}"><i></i>${g} <span>${rs.length}</span></h3>${rs.map(row).join("")}</div>`; });
+  } else {
+    if (simSort === "shift") rows.sort((a, b) => Math.abs(b.shift) - Math.abs(a.shift) || b.share - a.share);
+    else rows.sort((a, b) => a.p.name.split(" ").slice(-1)[0].localeCompare(b.p.name.split(" ").slice(-1)[0]));
+    html = `<div class="sgroup">${rows.map(row).join("")}</div>`;
+    if (simSort === "shift" && !Object.keys(simLocks).length) html = `<p class="sim-sub">Lock a senator to a side first, then this shows who moves most with them.</p>` + html;
+  }
+  const open = new Set([...document.querySelectorAll("#simList details[open]")].map(d => d.closest(".srow").dataset.name));
+  simEl("simList").innerHTML = html;
+  open.forEach(n => { const d = document.querySelector(`#simList .srow[data-name="${CSS.escape(n)}"] details`); if (d) d.open = true; });
+}
+function simMethod() {
+  const S = SIM_SETTINGS;
+  simEl("simMethod").innerHTML = `<h2 class="sim-h2" style="color:var(--ink)">How this works</h2>
+    <p>Every senator gets a score from sourced factors. Each factor's points are <b>side × weight × strength</b> (plus for Schumer, minus for Van Hollen).</p>
+    <table>${Object.values(SIM_WEIGHTS).map(([n, w]) => `<tr><td><b>${n}</b></td><td>±${w.toFixed(2)}</td></tr>`).join("")}</table>
+    <p>Strength runs from 0.25 (one outlet's read) to 1 (said it themselves, holds the post, or is on the bill). A score turns into odds with a logistic curve (steepness ${S.k}), capped at ${Math.round(S.ceiling * 100)}% and ${Math.round(S.floor * 100)}% because the ballot is secret. Schumer and Van Hollen always vote for themselves.</p>
+    <p>Each run also draws shared swings: one for the whole caucus, one for senators tied to the progressive wing (Medicare for All, "Fight Club"), one for senators tied to leadership (party posts, committee gavels, Schumer recruits), and one for each state's pair. That's why locking one senator moves others. The runs use a fixed seed, so everyone sees the same ${simFmt(SIM.N_RUNS)}.</p>`;
+}
+document.addEventListener("click", e => {
+  if (view !== "sims") return;
+  const t = e.target.closest("[data-lock],[data-unlock],.hb,[data-sort],#trendDemo");
+  if (!t) return;
+  if (t.dataset.lock != null) { const n = t.closest(".srow").dataset.name, v = +t.dataset.lock; if (simLocks[n] === v) delete simLocks[n]; else simLocks[n] = v; simPick = null; simPaint(); }
+  else if (t.dataset.unlock != null) { if (t.dataset.unlock === "*") simLocks = {}; else delete simLocks[t.dataset.unlock]; simPick = null; simPaint(); }
+  else if (t.classList.contains("hb")) { const k = +t.dataset.k; simPick = simPick === k ? null : k; simHist(); simSamples(); }
+  else if (t.dataset.sort) { simSort = t.dataset.sort; document.querySelectorAll("#simTools button").forEach(b => b.setAttribute("aria-pressed", String(b === t))); simList(); }
+  else if (t.id === "trendDemo") { simDemo = !simDemo; simTrend(); }
+});
+
 /* ----- Tabs ----- */
 let view = "tracker";
 function setView(v) {
@@ -2720,13 +3241,15 @@ function setView(v) {
   document.getElementById("viewPredict").hidden = v !== "predict";
   document.getElementById("viewHistory").hidden = v !== "history";
   document.getElementById("viewNews").hidden = v !== "news";
-  shotBtn.hidden = v === "history" || v === "news";
+  document.getElementById("viewSims").hidden = v !== "sims";
+  shotBtn.hidden = v === "history" || v === "news" || v === "sims";
   document.querySelectorAll(".tab").forEach(t => t.setAttribute("aria-selected", String(t.dataset.view === v)));
   pinned = null; hideTip();
-  try { history.replaceState(null, "", v === "predict" ? "#predict" : v === "history" ? "#history" : v === "news" ? "#news" : location.pathname + location.search); } catch (e) {}
+  try { history.replaceState(null, "", v === "predict" ? "#predict" : v === "history" ? "#history" : v === "news" ? "#news" : v === "sims" ? "#sims" : location.pathname + location.search); } catch (e) {}
   if (v === "predict") paintPred();
   if (v === "history") focusTimeline();
   if (v === "news") focusTimeline();
+  if (v === "sims") simPaint();
 }
 document.querySelectorAll(".tab").forEach(t => t.addEventListener("click", e => { e.stopPropagation(); setView(t.dataset.view); }));
 
@@ -3020,6 +3543,7 @@ renderHistory();
 if (location.hash === "#predict") setView("predict");
 if (location.hash === "#history") setView("history");
 if (location.hash === "#news") setView("news");
+if (location.hash === "#sims") setView("sims");
 if (location.hash === "#map") setMap(true);
 </script>
 <!-- Cloudflare Web Analytics --><script type='module' src='https://static.cloudflareinsights.com/beacon.min.js' data-cf-beacon='{"token": "fd5bb1f3f1224382a6c68221e97e0c9b"}'></script><!-- End Cloudflare Web Analytics -->
