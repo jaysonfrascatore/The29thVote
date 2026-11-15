@@ -3209,9 +3209,10 @@ function simList() {
 function simMethod() {
   const S = SIM_SETTINGS;
   simEl("simMethod").innerHTML = `<h2 class="sim-h2" style="color:var(--ink)">How this works</h2>
-    <p>Every senator gets a score from sourced factors. Each factor's points are <b>side × weight × strength</b> (plus for Schumer, minus for Van Hollen).</p>
-    <table>${Object.values(SIM_WEIGHTS).map(([n, w]) => `<tr><td><b>${n}</b></td><td>±${w.toFixed(2)}</td></tr>`).join("")}</table>
-    <p>Strength runs from 0.25 (one outlet's read) to 1 (said it themselves, holds the post, or is on the bill). A score turns into odds with a logistic curve (steepness ${S.k}), capped at ${Math.round(S.ceiling * 100)}% and ${Math.round(S.floor * 100)}% because the ballot is secret. Schumer and Van Hollen always vote for themselves.</p>
+    <p>Every senator gets a score built from sourced factors. Each factor has two numbers. The <b>weight</b> is how much that kind of factor can count, and it is the same for everyone:</p>
+    <table><tr><td><b>Type</b></td><td><b>Weight</b></td></tr>${Object.values(SIM_WEIGHTS).map(([n, w]) => `<tr><td>${n}</td><td>${w.toFixed(2)}</td></tr>`).join("")}</table>
+    <p>The <b>strength</b> is how solid that one piece of evidence is, from 0.25 (one outlet's read, or an old statement) to 1 (said it themselves, holds the post, or is on the bill). A factor's points are <b>weight × strength</b>, counted as plus for Schumer and minus for Van Hollen. For example, a senator who said on the record they'll back Schumer gets 2.00 × 1 = <b>+2.00</b>. One who said they won't back Schumer but hasn't picked Van Hollen gets 2.00 × 0.75 = <b>−1.50</b>. A Medicare for All cosponsor gets 0.50 × 0.5 = <b>−0.25</b>. The points in each senator's "Why" list are already multiplied out.</p>
+    <p>A senator's score is all their points added up. A score turns into odds with a logistic curve (steepness ${S.k}), capped at ${Math.round(S.ceiling * 100)}% and ${Math.round(S.floor * 100)}% because the ballot is secret. Schumer and Van Hollen always vote for themselves.</p>
     <p>Each run also draws shared swings: one for the whole caucus, one for senators tied to the progressive wing (Medicare for All, "Fight Club"), one for senators tied to leadership (party posts, committee gavels, Schumer recruits), and one for each state's pair. That's why locking one senator moves others. The runs use a fixed seed, so everyone sees the same ${simFmt(SIM.N_RUNS)}.</p>`;
 }
 document.addEventListener("click", e => {
