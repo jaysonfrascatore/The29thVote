@@ -235,6 +235,7 @@
     background: color-mix(in srgb, var(--av) 22%, #fff); box-shadow: inset 0 0 0 2px var(--av); display: inline-grid; place-items: center; }
   .avatar .av-ini { font-weight: 700; font-size: calc(var(--sz) * .36); color: color-mix(in srgb, var(--av) 70%, #16191d); letter-spacing: .02em; }
   .avatar img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: 50% 12%; }
+  .avatar:has(img) .av-ini { visibility: hidden; }   /* initials only show if there is no photo */
   .avatar::after { content: ""; position: absolute; inset: 0; border-radius: 50%; box-shadow: inset 0 0 0 2px var(--av); pointer-events: none; }
   html.dark .avatar { background: color-mix(in srgb, var(--av) 30%, #1b1f24); }
   html.dark .avatar .av-ini { color: color-mix(in srgb, var(--av) 55%, #fff); }
