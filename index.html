@@ -84,6 +84,13 @@
   .next-up.now .cd { color: #1a8f4c; }
   html.dark .next-up { background: #1b1f24; }
   html.dark .next-up.now .cd { color: #5fd08f; }
+  .news-up { display: inline-flex; align-items: center; gap: 6px; font: 600 10.5px/1 "Inter", system-ui, sans-serif; color: var(--ink);
+    background: #fff; border: 1.5px solid var(--rule); border-radius: 6px; padding: 5px 8px; white-space: nowrap; cursor: pointer; }
+  .news-up:hover { background: #f6f7f9; }
+  .news-up .lt { width: 8px; height: 8px; border-radius: 50%; flex: none; background: #f08c00; box-shadow: 0 0 0 2px rgba(240,140,0,.18); }
+  .news-up.fresh .lt { background: #1fa45a; box-shadow: 0 0 0 2px rgba(31,164,90,.2), 0 0 6px rgba(31,164,90,.7); }
+  html.dark .news-up { background: #1b1f24; }
+  html.dark .news-up:hover { background: #23282e; }
   .shot-btn[disabled] { opacity: .6; cursor: progress; }
   .modal { position: fixed; inset: 0; z-index: 20; background: rgba(16,24,40,.55); display: none;
     align-items: center; justify-content: center; padding: 20px; }
@@ -629,6 +636,7 @@
       <button class="tab tab-news" role="tab" data-view="news" aria-selected="false" type="button">News</button>
     </nav>
     <div class="tool-right">
+    <button class="news-up" id="newsUp" type="button" data-noshot hidden></button>
     <div class="next-up" id="nextUp" title="The tracker is checked every hour from 8 AM to 3 AM Eastern"></div>
     <button class="shot-btn" id="shotBtn" type="button" data-noshot>
       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
@@ -756,7 +764,7 @@
     </a>
     </div>
     <p class="note">Senate Democrats elect their leader by secret ballot, expected in December. Senators with no public position are not committed either way. <span style="white-space:nowrap">* Senator-elect</span></p>
-    <p class="src">Sources: CBS News, CBC, Boston Globe, Roll Call, CNN, The Hill, PolitiFact, Washington Times, Epoch Times, Punchbowl News, New Republic, NBC News, Spokesman-Review, NBC5 (WPTZ), States Newsroom, Politico, VoteHub, X &nbsp;·&nbsp; <span style="white-space:nowrap">Created by Jayson Frascatore</span></p>
+    <p class="src">Sources: CBS News, CBC, Boston Globe, Roll Call, CNN, The Hill, PolitiFact, Washington Times, Washington Examiner, Epoch Times, Punchbowl News, New Republic, NBC News, Spokesman-Review, NBC5 (WPTZ), States Newsroom, Politico, VoteHub, X &nbsp;·&nbsp; <span style="white-space:nowrap">Created by Jayson Frascatore</span></p>
   </footer>
 </div>
 
@@ -940,6 +948,9 @@ const CANDIDATES = [
 // [day (e.g. "Nov. 13"), time or "" , kind, headline, what happened, what it meant for the tracker, [[outlet, url], ...]]
 // kind: "movement" (moved someone on the tracker), "no movement" (reported, but nobody moved), "significant" (a big moment:
 // a race called, someone announcing, a wave of support, big reported support or rumors, someone reaching 29, a vote date change)
+// NEWS_UPDATED = the check (short form, like LAST_MOVE) that last added a NEWS entry. When it matches the latest check
+// (LAST_UPDATED), the News light at the top of the page is green; otherwise it's orange.
+const NEWS_UPDATED = "Nov. 15, 11 AM";
 const NEWS = [
   ["Nov. 3", "", "significant", "Democrats win back the Senate majority",
     "Democrats flip enough seats on election night to take control of the Senate. Schumer calls it a \"generational remake\" of the chamber, and the question of whether he stays on as leader takes off right away.",
@@ -1033,6 +1044,11 @@ const NEWS = [
     "The Hill reports that people close to Schumer expect him to get more than 40 votes and that his side is weighing an earlier caucus vote.",
     "No change. The prediction comes from unnamed allies, not senators on the record.",
     [["The Hill", "https://thehill.com/homenews/senate/6220115-senate-democrats-leadership-election-update/"]]],
+
+  ["Nov. 15", "11 AM", "no movement", "Van Hollen: Schumer's team trying to \"instill fear\"",
+    "On ABC's This Week, Van Hollen says the race is wide open, that several senators have switched from Schumer to him, and that Schumer's team is spreading \"misinformation\" to \"instill fear\" in senators who might back him.",
+    "No change. He didn't name the senators who switched, so nobody moves until they say so themselves.",
+    [["ABC News", "https://abcnews.com/Politics/van-hollen-schumer-instill-fear-retain-senate-leadership/story?id=138155548"], ["Washington Examiner", "https://www.washingtonexaminer.com/news/senate/4804139/van-hollen-schumer-misinformation-senate-majority-leader-votes/"]]],
 ];
 /* ======================================================================== */
 
@@ -2834,6 +2850,18 @@ function renderNews() {
   focusTimeline();
 }
 renderNews();
+/* ---------- News light (green when the latest check added news, orange when it didn't) ---------- */
+(function () {
+  const el = document.getElementById("newsUp");
+  if (!el || typeof NEWS_UPDATED !== "string") return;
+  const fresh = NEWS_UPDATED === CHECKED;
+  const at = CHECKED.replace(/^.*?,\s*/, "");
+  el.classList.toggle("fresh", fresh);
+  el.innerHTML = `<i class="lt" aria-hidden="true"></i><span>${fresh ? `News update at ${at}` : `No new news at ${at}`}</span>`;
+  el.title = fresh ? "The latest check added news. Open the News tab." : `No new news in the latest check. Last news update: ${NEWS_UPDATED}. Open the News tab.`;
+  el.hidden = false;
+  el.addEventListener("click", e => { e.stopPropagation(); setView("news"); window.scrollTo({ top: 0 }); });
+})();
 const seePrev = document.getElementById("seePrev");
 if (seePrev) seePrev.addEventListener("click", e => { e.preventDefault(); e.stopPropagation(); setView("history"); window.scrollTo({ top: 0 }); });
 
