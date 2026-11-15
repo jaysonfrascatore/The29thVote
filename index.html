@@ -514,8 +514,6 @@
   html.dark .trend-tip { --bgc: #1b1f24; }
   .trend-tip.show { opacity: 1; }
   .trend-tip b { font-size: 13.5px; }
-  .trend-demo { display: block; margin: 10px auto 0; border: 1.5px dashed #b49be6; background: transparent; color: var(--ink); border-radius: 8px;
-    padding: 6px 12px; font: 600 12.5px/1.2 "Inter", system-ui, sans-serif; cursor: pointer; }
   /* senator list */
   .sim-tools { display: flex; justify-content: center; gap: 8px; flex-wrap: wrap; margin-bottom: 14px; }
   .sim-tools button { border: 1.5px solid var(--rule); background: transparent; color: var(--ink); border-radius: 999px; padding: 6px 12px; font: 600 12.5px/1 "Inter", system-ui, sans-serif; cursor: pointer; }
@@ -854,7 +852,6 @@
       <h2 class="sim-h2">Trend</h2>
       <p class="sim-sub">Schumer's middle result across the runs, with the shaded band covering the middle 80%. One point gets added each hourly check, and old points are never changed.</p>
       <div class="trend" id="simTrend"></div>
-      <button class="trend-demo" id="trendDemo" type="button" data-noshot>Preview with sample points (test only)</button>
     </section>
     <hr>
     <section>
@@ -3003,7 +3000,9 @@ const SIM_FACTORS = [
 ];
 // Append-only trend log: one point per hourly check. Never edit past points.
 // [time label, median Schumer votes, low (10th pct), high (90th pct), P(Schumer gets 29), P(Van Hollen gets 29), P(28-28 tie)]
-const SIM_HISTORY = [];
+const SIM_HISTORY = [
+  ["Nov. 15, 1 PM", 30, 25, 36, 66.5, 25.4, 8.1],
+];
 
 /* ---------- Simulations tab ---------- */
 let SIM = null;
@@ -3071,7 +3070,7 @@ const simBuild = () => {
 const simEl = id => document.getElementById(id);
 const simFmt = n => n.toLocaleString("en-US");
 const simPct = (a, b) => b ? Math.round(100 * a / b) : 0;
-let simLocks = {}, simBase = null, simCur = null, simSort = "lean", simPick = null, simDemo = false;
+let simLocks = {}, simBase = null, simCur = null, simSort = "lean", simPick = null;
 function simLabel(p) {
   const S = SIM_SETTINGS, m = Math.max(p, 1 - p), side = p > .5 ? "Schumer" : "Van Hollen";
   if (m >= S.safe) return "Safe " + side; if (m >= S.likely) return "Likely " + side; if (m >= S.lean) return "Lean " + side; return "Toss-up";
@@ -3147,12 +3146,6 @@ function simPoint(st, when) { return [when, st.med, st.lo, st.hi, Math.round(100
 function simTrend() {
   const now = simPoint(simBase, "Now");
   let pts = SIM_HISTORY.slice();
-  if (simDemo) { // made-up points so the chart can be previewed; never shipped
-    let m = 27, a = 7; pts = [];
-    ["Nov. 11, 6 PM", "Nov. 12, 9 AM", "Nov. 12, 3 PM", "Nov. 12, 9 PM", "Nov. 13, 10 AM", "Nov. 13, 4 PM", "Nov. 13, 11 PM", "Nov. 14, 9 AM", "Nov. 14, 6 PM", "Nov. 15, 10 AM"].forEach((w, i) => {
-      m += [1, 1, 0, 1, -1, 1, 0, 1, 0, 0][i]; a = Math.max(3, a - (i % 3 === 0 ? 1 : 0));
-      pts.push([w, m, m - a, m + a - 1, Math.min(90, 20 + i * 6), Math.max(5, 45 - i * 4), 10]); });
-  }
   const last = pts[pts.length - 1];
   if (!last || last[1] !== now[1] || last[2] !== now[2] || last[3] !== now[3]) pts.push(now);
   const W = 760, H = 240, L = 34, Rr = 16, T = 12, B = 30;
@@ -3179,7 +3172,6 @@ function simTrend() {
   };
   svg.addEventListener("pointermove", move); svg.addEventListener("pointerdown", move);
   svg.addEventListener("pointerleave", () => { tipE.classList.remove("show"); cur.setAttribute("opacity", "0"); });
-  simEl("trendDemo").textContent = simDemo ? "Hide sample points" : "Preview with sample points (test only)";
 }
 function simList() {
   const st = simCur, N = SIM.N, base = simBase;
@@ -3224,13 +3216,12 @@ function simMethod() {
 }
 document.addEventListener("click", e => {
   if (view !== "sims") return;
-  const t = e.target.closest("[data-lock],[data-unlock],.hb,[data-sort],#trendDemo");
+  const t = e.target.closest("[data-lock],[data-unlock],.hb,[data-sort]");
   if (!t) return;
   if (t.dataset.lock != null) { const n = t.closest(".srow").dataset.name, v = +t.dataset.lock; if (simLocks[n] === v) delete simLocks[n]; else simLocks[n] = v; simPick = null; simPaint(); }
   else if (t.dataset.unlock != null) { if (t.dataset.unlock === "*") simLocks = {}; else delete simLocks[t.dataset.unlock]; simPick = null; simPaint(); }
   else if (t.classList.contains("hb")) { const k = +t.dataset.k; simPick = simPick === k ? null : k; simHist(); simSamples(); }
   else if (t.dataset.sort) { simSort = t.dataset.sort; document.querySelectorAll("#simTools button").forEach(b => b.setAttribute("aria-pressed", String(b === t))); simList(); }
-  else if (t.id === "trendDemo") { simDemo = !simDemo; simTrend(); }
 });
 
 /* ----- Tabs ----- */
