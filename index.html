@@ -2786,9 +2786,9 @@ function focusTimeline() {
 }
 window.addEventListener("scroll", () => { if ((view === "history" || view === "news") && !tlRAF) tlRAF = requestAnimationFrame(() => { tlRAF = 0; focusTimeline(); }); }, { passive: true });
 window.addEventListener("resize", () => focusTimeline());
-/* ---------- Next update countdown (checks run on the hour, 8 AM to 3 AM Eastern) ---------- */
+/* ---------- Next update countdown (checks run on the hour, 9 AM to midnight Eastern) ---------- */
 const nextUpEl = document.getElementById("nextUp");
-const CHECK_SKIP = [4, 5, 6, 7];        // Eastern hours with no check
+const CHECK_SKIP = [1, 2, 3, 4, 5, 6, 7, 8];   // Eastern hours with no check (last check is midnight, first is 9 AM)
 const CHECK_GRACE = 15;                 // minutes after the hour that a check is still running
 const etFmt = (() => { try { return new Intl.DateTimeFormat("en-US", { timeZone: "America/New_York", hour12: false, hour: "2-digit", minute: "2-digit", second: "2-digit" }); } catch (e) { return null; } })();
 const CLOCK_SVG = `<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>`;
