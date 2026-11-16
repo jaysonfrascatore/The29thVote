@@ -536,6 +536,35 @@
   .sim-tools button { border: 1.5px solid var(--rule); background: transparent; color: var(--ink); border-radius: 999px; padding: 6px 12px; font: 600 12.5px/1 "Inter", system-ui, sans-serif; cursor: pointer; }
   .sim-tools button[aria-pressed="true"] { background: #efe8fb; border-color: #7d5fcf; color: #2f2150; }
   .sgroup { max-width: 760px; margin: 0 auto 6px; }
+  /* Standings bar (Every senator section) */
+  .sstand { max-width: 760px; margin: 4px auto 10px; }
+  .sstand .st-sides { display: flex; justify-content: space-between; align-items: flex-end; gap: 8px; margin-bottom: 6px; }
+  .sstand .st-side { border: 0; background: transparent; padding: 2px 0; cursor: pointer; color: var(--ink); text-align: left;
+    font: 800 13px/1.2 "Inter", system-ui, sans-serif; border-bottom: 2px solid transparent; }
+  .sstand .st-side.v { text-align: right; }
+  .sstand .st-side b { font-size: 22px; display: block; letter-spacing: -.01em; }
+  .sstand .st-side.s b { color: var(--sS); } .sstand .st-side.v b { color: var(--sV); }
+  .sstand .st-side.t { text-align: center; } .sstand .st-side.t b { color: #8a6fd1; }
+  .sstand .st-side[aria-pressed="true"] { border-bottom-color: currentColor; }
+  .sstand .st-bar { position: relative; display: flex; height: 38px; border-radius: 8px; overflow: visible; }
+  .sstand .st-seg { position: relative; border: 0; padding: 0; margin: 0; height: 100%; background: var(--c); cursor: pointer; color: #fff; min-width: 0;
+    font: 800 13px/1 "Inter", system-ui, sans-serif; text-shadow: 0 1px 2px rgba(0,0,0,.3); transition: opacity .15s, transform .15s; }
+  .sstand .st-seg:first-child { border-radius: 8px 0 0 8px; } .sstand .st-seg:last-child { border-radius: 0 8px 8px 0; }
+  .sstand .st-seg + .st-seg { box-shadow: inset 1px 0 0 rgba(255,255,255,.55); }
+  .sstand .st-seg:hover { transform: translateY(-2px); }
+  .sstand.has-pick .st-seg:not(.on) { opacity: .35; }
+  .sstand .st-seg.on { outline: 2.5px solid var(--ink); outline-offset: 2px; z-index: 1; }
+  .sstand .st-mark { position: absolute; top: -6px; bottom: -6px; width: 2px; background: var(--ink); pointer-events: none; z-index: 2; }
+  .sstand .st-mark span { position: absolute; top: 100%; transform: translateX(-50%); margin-top: 2px; font-size: 10.5px; font-weight: 800; color: var(--ink); white-space: nowrap; }
+  .sstand .st-key { display: flex; flex-wrap: wrap; justify-content: center; gap: 4px 12px; margin-top: 22px; font-size: 11.5px; color: var(--muted); }
+  .sstand .st-key button { border: 0; background: transparent; color: inherit; font: 600 11.5px/1.4 "Inter", system-ui, sans-serif; cursor: pointer; padding: 0;
+    display: inline-flex; align-items: center; gap: 5px; }
+  .sstand .st-key button[aria-pressed="true"] { color: var(--ink); text-decoration: underline; }
+  .sstand .st-key i { width: 10px; height: 10px; border-radius: 3px; background: var(--c); }
+  .sstand .st-need { text-align: center; font-size: 14.5px; line-height: 1.5; margin: 12px auto 0; max-width: 640px; }
+  .sstand .st-need .asof { color: var(--muted); }
+  .sstand .st-pick { text-align: center; font-size: 12.5px; color: var(--muted); margin-top: 8px; }
+  .sstand .st-pick button { border: 0; background: transparent; color: var(--ink); font: 700 12.5px/1 "Inter", system-ui, sans-serif; text-decoration: underline; cursor: pointer; padding: 0; }
   .sgroup h3 { font-size: 12px; text-transform: uppercase; letter-spacing: .05em; font-weight: 800; margin: 18px 0 6px; display: flex; align-items: center; gap: 8px; }
   .sgroup h3 i { width: 10px; height: 10px; border-radius: 50%; background: var(--c); }
   .sgroup h3 span { color: var(--muted); font-weight: 700; }
@@ -582,6 +611,10 @@
     .sim-card .big { font-size: 27px; }
     .sim-card .lbl { font-size: 11.5px; }
     .sim-card .n { font-size: 10.5px; }
+    .sstand .st-bar { height: 32px; }
+    .sstand .st-seg { font-size: 11.5px; }
+    .sstand .st-side b { font-size: 19px; }
+    .sstand .st-side { font-size: 11.5px; }
     .samples { grid-template-columns: 1fr; }
     .srow { grid-template-columns: 42px 1fr auto; }
     .srow .who { grid-row: 1; }
@@ -885,6 +918,7 @@
         <button type="button" data-sort="shift" aria-pressed="false">Biggest shifts</button>
         <button type="button" data-sort="name" aria-pressed="false">A to Z</button>
       </div>
+      <div class="sstand" id="simStand"></div>
       <div id="simList"></div>
     </section>
     <hr>
@@ -3196,7 +3230,7 @@ const simBuild = () => {
 const simEl = id => document.getElementById(id);
 const simFmt = n => n.toLocaleString("en-US");
 const simPct = (a, b) => b ? Math.round(100 * a / b) : 0;
-let simLocks = {}, simBase = null, simCur = null, simSort = "lean", simPick = null;
+let simLocks = {}, simBase = null, simCur = null, simSort = "lean", simPick = null, simFilter = null;
 function simLabel(p) {
   const S = SIM_SETTINGS, m = Math.max(p, 1 - p), side = p > .5 ? "Schumer" : "Van Hollen";
   if (m >= S.safe) return "Safe " + side; if (m >= S.likely) return "Likely " + side; if (m >= S.lean) return "Lean " + side; return "Toss-up";
@@ -3376,11 +3410,15 @@ function simList() {
       <div class="scount">Schumer in ${simFmt(cnt)} of ${simFmt(st.kept)} runs${sh}</div>
       <details class="swhy"><summary>Why</summary>${why}</details></div>`;
   };
+  simStand(rows);
+  const keep = simFilterGroups();
+  const shown = keep ? rows.filter(r => keep.includes(r.lab)) : rows;
   let html = "";
   if (simSort === "lean") {
-    rows.sort((a, b) => b.share - a.share || a.p.name.localeCompare(b.p.name));
-    SIM_GROUPS.forEach(g => { const rs = rows.filter(r => r.lab === g); if (rs.length) html += `<div class="sgroup"><h3 style="--c:${SIM_GC[g]}"><i></i>${g} <span>${rs.length}</span></h3>${rs.map(row).join("")}</div>`; });
+    shown.sort((a, b) => b.share - a.share || a.p.name.localeCompare(b.p.name));
+    SIM_GROUPS.forEach(g => { const rs = shown.filter(r => r.lab === g); if (rs.length) html += `<div class="sgroup"><h3 style="--c:${SIM_GC[g]}"><i></i>${g} <span>${rs.length}</span></h3>${rs.map(row).join("")}</div>`; });
   } else {
+    const rows = shown;
     if (simSort === "shift") rows.sort((a, b) => Math.abs(b.shift) - Math.abs(a.shift) || b.share - a.share);
     else rows.sort((a, b) => a.p.name.split(" ").slice(-1)[0].localeCompare(b.p.name.split(" ").slice(-1)[0]));
     html = `<div class="sgroup">${rows.map(row).join("")}</div>`;
@@ -3389,6 +3427,44 @@ function simList() {
   const open = new Set([...document.querySelectorAll("#simList details[open]")].map(d => d.closest(".srow").dataset.name));
   simEl("simList").innerHTML = html;
   open.forEach(n => { const d = document.querySelector(`#simList .srow[data-name="${CSS.escape(n)}"] details`); if (d) d.open = true; });
+}
+// Standings bar: how many senators sit in each Safe / Likely / Lean / Toss-up group right now (follows any locks).
+// Click a piece (or a side's name) to show just those senators in the list below.
+function simFilterGroups() {
+  if (!simFilter) return null;
+  if (simFilter === "S") return SIM_GROUPS.filter(g => / Schumer$/.test(g));
+  if (simFilter === "V") return SIM_GROUPS.filter(g => / Van Hollen$/.test(g));
+  return [simFilter];
+}
+function simStand(rows) {
+  const el = simEl("simStand"); if (!el) return;
+  const N = rows.length, need = Math.ceil((N + 1) / 2), cnt = {};
+  SIM_GROUPS.forEach(g => cnt[g] = rows.filter(r => r.lab === g).length);
+  const sideS = SIM_GROUPS.filter(g => / Schumer$/.test(g)).reduce((a, g) => a + cnt[g], 0);
+  const sideV = SIM_GROUPS.filter(g => / Van Hollen$/.test(g)).reduce((a, g) => a + cnt[g], 0);
+  const toss = cnt["Toss-up"];
+  if (simFilter && simFilterGroups().every(g => !cnt[g])) simFilter = null;
+  const pick = simFilterGroups(), on = g => pick && pick.includes(g);
+  const short = g => g.replace(/ (Schumer|Van Hollen)$/, "");
+  const segs = SIM_GROUPS.filter(g => cnt[g]).map(g =>
+    `<button type="button" class="st-seg${on(g) ? " on" : ""}" data-sfilter="${g}" style="--c:${SIM_GC[g]};width:${100 * cnt[g] / N}%" ` +
+    `title="${g}: ${cnt[g]} senator${cnt[g] === 1 ? "" : "s"}" aria-pressed="${!!on(g)}" aria-label="${g}, ${cnt[g]} senators">${cnt[g] >= 2 || N < 40 ? cnt[g] : ""}</button>`).join("");
+  const mark = (k, lbl) => `<div class="st-mark" style="left:calc(${100 * k / N}% - 1px)"><span>${lbl}</span></div>`;
+  const key = SIM_GROUPS.filter(g => cnt[g]).map(g => `<button type="button" data-sfilter="${g}" aria-pressed="${!!on(g)}" style="--c:${SIM_GC[g]}"><i></i>${g} ${cnt[g]}</button>`).join("");
+  const more = (who, have) => have >= need ? `<b>${who}</b> already has <b>${have}</b>, enough to become Majority Leader` :
+    `<b>${who}</b> needs <b>${need - have}</b> more senator${need - have === 1 ? "" : "s"} to become Majority Leader`;
+  const locked = Object.keys(simLocks).length > 0;
+  el.className = "sstand" + (pick ? " has-pick" : "");
+  el.innerHTML = `<div class="st-sides">
+      <button type="button" class="st-side s" data-sfilter="S" aria-pressed="${simFilter === "S"}"><b>${sideS}</b>Schumer</button>
+      <button type="button" class="st-side t" data-sfilter="Toss-up" aria-pressed="${simFilter === "Toss-up"}"><b>${toss}</b>Toss-up</button>
+      <button type="button" class="st-side v" data-sfilter="V" aria-pressed="${simFilter === "V"}"><b>${sideV}</b>Van Hollen</button>
+    </div>
+    <div class="st-bar">${segs}${mark(N / 2, "29 to win")}</div>
+    <div class="st-key">${key}</div>
+    <p class="st-need">${more("Schumer", sideS)}, while ${more("Van Hollen", sideV).replace(" to become Majority Leader", "")}. <span class="asof">This is based on current endorsements and leanings as of ${CHECKED}${locked ? ", plus the locks you set" : ""}.</span></p>
+    ${pick ? `<p class="st-pick">Showing only ${simFilter === "S" ? "senators on Schumer's side" : simFilter === "V" ? "senators on Van Hollen's side" : simFilter} below. <button type="button" data-sfilter="*">Show everyone</button></p>` :
+      `<p class="st-pick">Tap a color to see who's in it.</p>`}`;
 }
 function simMethod() {
   const S = SIM_SETTINGS;
@@ -3403,11 +3479,12 @@ function simMethod() {
 }
 document.addEventListener("click", e => {
   if (view !== "sims") return;
-  const t = e.target.closest("[data-lock],[data-unlock],.hb,[data-sort]");
+  const t = e.target.closest("[data-lock],[data-unlock],.hb,[data-sort],[data-sfilter]");
   if (!t) return;
   if (t.dataset.lock != null) { const n = t.closest(".srow").dataset.name, v = +t.dataset.lock; if (simLocks[n] === v) delete simLocks[n]; else simLocks[n] = v; simPick = null; simPaint(); }
   else if (t.dataset.unlock != null) { if (t.dataset.unlock === "*") simLocks = {}; else delete simLocks[t.dataset.unlock]; simPick = null; simPaint(); }
   else if (t.classList.contains("hb")) { const k = +t.dataset.k; simPick = simPick === k ? null : k; simHist(); simSamples(); }
+  else if (t.dataset.sfilter) { const f = t.dataset.sfilter; simFilter = f === "*" || simFilter === f ? null : f; simList(); }
   else if (t.dataset.sort) { simSort = t.dataset.sort; document.querySelectorAll("#simTools button").forEach(b => b.setAttribute("aria-pressed", String(b === t))); simList(); }
 });
 
