@@ -974,7 +974,7 @@ const TOTAL = 56;
 const NEEDED = 29;
 const SUBTITLE = "Public positions of the 56-member Senate Democratic caucus";
 const KOFI_URL = "https://ko-fi.com/jaysonfras";
-const LAST_UPDATED = "Last updated on November 16th, 2026 at 1:00pm";
+const LAST_UPDATED = "Last updated on November 16th, 2026 at 1:45pm";
 
 const SENATORS = {
   "Support": [
@@ -991,6 +991,7 @@ const SENATORS = {
     ["Angus King", "ME", "Independent who caucuses with Democrats. Backs Schumer."],
     ["Catherine Cortez Masto", "NV", "Posted on Nov. 12 that Schumer was \"instrumental\" in winning the majority: \"I will be supporting him as our Democratic leader\" (CBC)."],
     ["Jacky Rosen", "NV", "Endorsed Schumer on Nov. 12, saying he has \"the experience and the fight to continue leading our diverse caucus\" (CBS News)."],
+    ["Angela Alsobrooks", "MD", "Told Politico on Nov. 2 that she's supporting Schumer, and Politico again listed her among his public backers on Nov. 15."],
     ["Sherrod Brown", "OH", "Senator-elect recruited by Schumer. Publicly supports him.", true],
   ],
   "Unclear": [
@@ -1042,23 +1043,23 @@ const SENATORS = {
 const NO_POSITION = [
   ["Adam Schiff", "CA"], ["Michael Bennet", "CO", "", "Lost his primary for Colorado governor, so he stays in the Senate. Hasn't said publicly where he stands on Schumer."],
   ["John Hickenlooper", "CO"], ["Lisa Blunt Rochester", "DE"],
-  ["Angela Alsobrooks", "MD"], ["Amy Klobuchar", "MN", "\u2020", "Elected Minnesota governor, so her seat will go to an appointee. Hasn't said publicly where she stands on Schumer."],
+  ["Amy Klobuchar", "MN", "\u2020", "Elected Minnesota governor, so her seat will go to an appointee. Hasn't said publicly where she stands on Schumer."],
   ["Maggie Hassan", "NH"],
 ];
 const NO_POSITION_DEFAULT = "Hasn't said publicly whether they'll back Schumer for majority leader.";
 const NO_POSITION_NOTE = "\u2020 Elected Minnesota governor. Her seat will go to an appointee.";
 
 /* Previous snapshot for the "On the Record" box, plus who moved since then */
-const PREV = { "Support": 14, "Unclear": 24, "No public position": 8, "Will not support": 5, "Support Van Hollen": 5 };
-const PREV_LABEL = "Change since Nov. 13, 11 PM";
+const PREV = { "Support": 14, "Unclear": 25, "No public position": 7, "Will not support": 5, "Support Van Hollen": 5 };
+const PREV_LABEL = "Change since Nov. 14, 1 AM";
 // When the senators in MOVERS moved (short form, e.g. "Nov. 12, 9 AM"). LAST_UPDATED at the top is the time of the
 // latest check, even when that check found no change; if the two differ, the page says there was no change.
-const LAST_MOVE = "Nov. 14, 1 AM";
+const LAST_MOVE = "Nov. 16, 1:45 PM";
 // Date of the closed-door leader vote. Set movedUp to true only if reputable outlets report the vote was moved earlier (and update date).
 const LEADER_VOTE = { date: "Dec. 1", movedUp: false };
 // Each move: [name, moved FROM, moved TO]. Listed in the order they happened; the page animates them one at a time.
 const MOVERS = [
-  ["Andy Kim (NJ)", "No public position", "Unclear"],
+  ["Angela Alsobrooks (MD)", "No public position", "Support"],
 ];
 
 // Previous Updates timeline. One entry per update that moved anyone, oldest first; add new entries at the END.
@@ -1112,6 +1113,9 @@ const HISTORY = [
   ["Nov. 14, 12 AM", "", [], "Mary Peltola becomes a senator-elect after VoteHub called Alaska's Senate race for her, confirming the 56-member caucus.", "AK"],
   ["Nov. 14, 1 AM", "", [
     ["Andy Kim", "NJ", "No public position", "Unclear", "Told Politico he hopes the caucus can settle the race in a way that \"tries our best to preserve our unity,\" without backing Schumer or Van Hollen."],
+  ]],
+  ["Nov. 16, 1:45 PM", "", [
+    ["Angela Alsobrooks", "MD", "No public position", "Support", "Told Politico she's supporting Schumer, and Politico again listed her among his public backers on Nov. 15."],
   ]],
 ];
 
@@ -3021,7 +3025,7 @@ const SIM_FACTORS = [
   ["Annie Andrews", -1, "S", .75, "Tracker: Opposing Schumer, no pick yet. Wants generational change", ["National News Desk, Nov. 5", "https://local12.com/news/nation-world/gallery/generational-change-sen-elect-annie-andrews-wont-back-chuck-schumer-for-majority-leader-south-carolina-politics"]],
   ["Annie Andrews", -1, "P", .5, "\"I think we need a generational shift in leadership\"", "SEM"],
   ["Adam Schiff", -1, "P", .5, M4A_TXT, "M4A"],
-  ["Angela Alsobrooks", 1, "S", .25, "Backed Schumer before Van Hollen entered; hasn't repeated it", "AX"],
+  ["Angela Alsobrooks", 1, "S", 1, "Tracker: Support Schumer. Told Politico she's supporting him", ["Politico, Nov. 2", "https://www.politico.com/news/2026/11/02/chuck-schumer-democratic-leader-midterms-01144492"]],
   ["Amy Klobuchar", 1, "R", 1, "Steering & Policy chair (No. 3); leaving to be governor", "LEAD"],
   ["Maggie Hassan", 1, "R", .5, "Expected Homeland Security chair in the new majority", "JB"],
 ];
@@ -3113,6 +3117,7 @@ const SIM_HISTORY = [
   ["Nov. 16, 11 AM", 30.28, 25, 36, 66.5, 25.4, 8.1, "No change in public positions."],
   ["Nov. 16, 12 PM", 30.28, 25, 36, 66.5, 25.4, 8.1, "No change in public positions."],
   ["Nov. 16, 1 PM", 30.28, 25, 36, 66.5, 25.4, 8.1, "No change in public positions."],
+  ["Nov. 16, 1:45 PM", 30.56, 25, 36, 69, 22.9, 8.1, "Angela Alsobrooks → Support Schumer: Told Politico she's supporting Schumer, and Politico again listed her among his public backers on Nov. 15."],
 ];
 
 /* ---------- Simulations tab ---------- */
