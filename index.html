@@ -467,6 +467,7 @@
   html.dark .tab-sims, html.dark .tab-sims[aria-selected="true"] { color: #2f2150; }
   #viewSims { --sS: #2F6FD0; --sV: #12A6CC; --sT: #8a6fd1; --sBg: #f7f3fe; --sLine: #e4dbf7; }
   html.dark #viewSims { --sBg: #1a1724; --sLine: #352d4d; --bgx: #111418; }
+  #viewSims { --bgx: #fff; }
   .sim-note { max-width: 640px; margin: 12px auto 0; font-size: 13.5px; line-height: 1.45; background: var(--sBg); border: 1px solid var(--sLine);
     border-radius: 10px; padding: 10px 14px; color: var(--ink); }
   .sim-head { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; max-width: 760px; margin: 0 auto; }
@@ -506,11 +507,27 @@
   .sample .sur b { color: var(--ink); font-size: 12px; }
   /* trend */
   .trend { position: relative; max-width: 760px; margin: 0 auto; }
-  .trend svg { width: 100%; height: auto; display: block; overflow: visible; touch-action: pan-y; }
+  .tr-plot { position: relative; }
+  .tr-pic { position: absolute; transform: translate(10px, -50%); display: flex; align-items: center; gap: 5px; pointer-events: none; }
+  .tr-pic .tr-val { font-size: 12px; font-weight: 800; background: var(--bgx, #fff); border-radius: 4px; padding: 0 2px; }
+  .sim-pulse { transform-box: fill-box; transform-origin: center; animation: simPulse 1.6s ease-out infinite; }
+  @keyframes simPulse { 0% { transform: scale(1); opacity: .55; } 100% { transform: scale(3.2); opacity: 0; } }
+  @media (prefers-reduced-motion: reduce) { .sim-pulse { animation: none; opacity: 0; } }
+  .trend-tip .tt-row, .tr-read .tt-row { display: grid; grid-template-columns: 10px 1fr auto auto; gap: 7px; align-items: center; margin-top: 3px; }
+  .tt-row i { width: 10px; height: 10px; border-radius: 50%; }
+  .tt-row span { font-weight: 800; font-variant-numeric: tabular-nums; text-align: right; }
+  .tt-row span + span { font-weight: 600; color: var(--muted); min-width: 64px; }
+  .tt-sub { color: var(--muted); font-size: 12px; margin-top: 4px; }
+  .tt-note { margin-top: 6px; padding-top: 6px; border-top: 1px solid var(--rule); font-size: 12px; line-height: 1.4; }
+  .tt-latest { font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: .05em; color: var(--muted); }
+  .tr-read { display: none; margin-top: 8px; border: 1px solid var(--rule); border-radius: 10px; padding: 9px 12px; font-size: 13px; line-height: 1.45; }
+  .tr-read.show { display: block; }
+  @media (min-width: 560px) { .tr-read { display: none !important; } }
+  .trend svg { width: 100%; height: auto; display: block; overflow: visible; touch-action: pan-y; -webkit-user-select: none; user-select: none; cursor: crosshair; }
   .trend text { font: 600 11px "Inter", system-ui, sans-serif; fill: var(--muted); }
   .trend-tip { position: absolute; pointer-events: none; opacity: 0; transition: opacity .1s; background: color-mix(in srgb, var(--bgc, #fff) 72%, transparent);
     backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px); border: 1px solid var(--rule); border-radius: 10px; padding: 9px 12px;
-    font-size: 12.5px; line-height: 1.45; box-shadow: 0 8px 24px rgba(16,24,40,.12); width: 236px; }
+    font-size: 12.5px; line-height: 1.45; box-shadow: 0 8px 24px rgba(16,24,40,.12); width: 270px; z-index: 3; }
   html.dark .trend-tip { --bgc: #1b1f24; }
   .trend-tip.show { opacity: 1; }
   .trend-tip b { font-size: 13.5px; }
@@ -842,16 +859,22 @@
     <div class="sim-locks" id="simLocks" hidden></div>
     <hr>
     <section>
+      <h2 class="sim-h2">Projected votes since Nov. 11</h2>
+      <p class="sim-sub">Each point is one hourly check: the average number of votes each candidate got across all 11,111 runs, with the shaded bands covering the middle 80% of runs. The dashed line is 29, the majority of 56 needed to win. The chart runs to the vote.</p>
+      <div class="trend" id="simTrendSeats"></div>
+    </section>
+    <hr>
+    <section>
+      <h2 class="sim-h2">Chance of winning since Nov. 11</h2>
+      <p class="sim-sub">How often each candidate won the runs at each check. A 28–28 tie would go to another ballot, so it counts as half a win for each. Hover, or tap and drag, to see what changed at each point.</p>
+      <div class="trend" id="simTrendWin"></div>
+    </section>
+    <hr>
+    <section>
       <h2 class="sim-h2">How many votes Schumer got</h2>
       <p class="sim-sub">Each bar is how many of the runs ended with that many votes for Schumer. Tap a bar to see a few of those runs.</p>
       <div class="hist" id="simHist"></div>
       <div class="samples" id="simSamples"></div>
-    </section>
-    <hr>
-    <section>
-      <h2 class="sim-h2">Trend</h2>
-      <p class="sim-sub">Schumer's middle result across the runs, with the shaded band covering the middle 80%. One point gets added each hourly check, and old points are never changed.</p>
-      <div class="trend" id="simTrend"></div>
     </section>
     <hr>
     <section>
@@ -1031,6 +1054,8 @@ const PREV_LABEL = "Change since Nov. 13, 11 PM";
 // When the senators in MOVERS moved (short form, e.g. "Nov. 12, 9 AM"). LAST_UPDATED at the top is the time of the
 // latest check, even when that check found no change; if the two differ, the page says there was no change.
 const LAST_MOVE = "Nov. 14, 1 AM";
+// Date of the closed-door leader vote. Set movedUp to true only if reputable outlets report the vote was moved earlier (and update date).
+const LEADER_VOTE = { date: "Dec. 1", movedUp: false };
 // Each move: [name, moved FROM, moved TO]. Listed in the order they happened; the page animates them one at a time.
 const MOVERS = [
   ["Andy Kim (NJ)", "No public position", "Unclear"],
@@ -2872,7 +2897,9 @@ function predShareSpec() {
 /* ================= SIMULATIONS (from the Simulation Scoring Sheet) ================= */
 // Factor types and weights. Points = side (+1 Schumer, -1 Van Hollen) x weight x strength.
 const SIM_WEIGHTS = { S: ["Public stance", 2.0], P: ["Policy position", 0.5], R: ["Party rank", 0.5], G: ["Smaller signal", 0.25] };
-const SIM_SETTINGS = { runs: 11111, seed: 29, baseline: 0, k: 1.75, ceiling: 0.97, floor: 0.03, safe: 0.9, likely: 0.75, lean: 0.6,
+const SIM_SETTINGS = { runs: 11111, seed: 29, baseline: 0, k: 1.75,
+  // If the vote is moved up, every senator but the two candidates gets this many extra points toward Schumer (about +1.25 expected votes)
+  movedUpBoost: 0.095, ceiling: 0.97, floor: 0.03, safe: 0.9, likely: 0.75, lean: 0.6,
   // shared swings in each simulation (log-odds), so senators who share a camp move together
   swing: { caucus: 0.35, progressive: 0.3, establishment: 0.25, state: 0.2 } };
 const SRC = {
@@ -2999,19 +3026,87 @@ const SIM_FACTORS = [
   ["Maggie Hassan", 1, "R", .5, "Expected Homeland Security chair in the new majority", "JB"],
 ];
 // Append-only trend log: one point per hourly check. Never edit past points.
-// [time label, median Schumer votes, low (10th pct), high (90th pct), P(Schumer gets 29), P(Van Hollen gets 29), P(28-28 tie)]
+// [time, average Schumer votes, low (10th pct), high (90th pct), % Schumer 29+, % Van Hollen 29+, % 28-28 tie, what changed]
 const SIM_HISTORY = [
-  ["Nov. 15, 1 PM", 30, 25, 36, 66.5, 25.4, 8.1],
-  ["Nov. 15, 2 PM", 30, 25, 36, 66.5, 25.4, 8.1],
-  ["Nov. 15, 3 PM", 30, 25, 36, 66.5, 25.4, 8.1],
-  ["Nov. 15, 4 PM", 30, 25, 36, 66.5, 25.4, 8.1],
-  ["Nov. 15, 5 PM", 30, 25, 36, 66.5, 25.4, 8.1],
-  ["Nov. 15, 6 PM", 30, 25, 36, 66.5, 25.4, 8.1],
-  ["Nov. 15, 7 PM", 30, 25, 36, 66.5, 25.4, 8.1],
-  ["Nov. 15, 8 PM", 30, 25, 36, 66.5, 25.4, 8.1],
-  ["Nov. 15, 9 PM", 30, 25, 36, 66.5, 25.4, 8.1],
-  ["Nov. 15, 10 PM", 30, 25, 36, 66.5, 25.4, 8.1],
-  ["Nov. 15, 11 PM", 30, 25, 36, 66.5, 25.4, 8.1],
+  ["Nov. 11, 3 PM", 29.62, 24, 35, 59.6, 32.2, 8.2, "Starting point: public positions when the tracker launched. Mark Warner → Unclear: Won't commit, though he praised Schumer's fundraising. Martin Heinrich → Unclear: Won't publicly commit to backing Schumer yet."],
+  ["Nov. 11, 4 PM", 29.62, 24, 35, 59.6, 32.2, 8.2, "No change in public positions."],
+  ["Nov. 11, 5 PM", 29.62, 24, 35, 59.6, 32.2, 8.2, "Scott Colom becomes a senator-elect after winning Mississippi's Senate race, joining the caucus as a new member."],
+  ["Nov. 11, 6 PM", 29.62, 24, 35, 59.6, 32.2, 8.2, "No change in public positions."],
+  ["Nov. 11, 7 PM", 29.62, 24, 35, 59.6, 32.2, 8.2, "No change in public positions."],
+  ["Nov. 11, 8 PM", 29.62, 24, 35, 59.6, 32.2, 8.2, "No change in public positions."],
+  ["Nov. 11, 9 PM", 29.62, 24, 35, 59.6, 32.2, 8.2, "No change in public positions."],
+  ["Nov. 11, 10 PM", 29.62, 24, 35, 59.6, 32.2, 8.2, "No change in public positions."],
+  ["Nov. 11, 11 PM", 29.62, 24, 35, 59.6, 32.2, 8.2, "No change in public positions."],
+  ["Nov. 12, 12 AM", 29.62, 24, 35, 59.6, 32.2, 8.2, "No change in public positions."],
+  ["Nov. 12, 1 AM", 29.62, 24, 35, 59.6, 32.2, 8.2, "No change in public positions."],
+  ["Nov. 12, 8 AM", 29.62, 24, 35, 59.6, 32.2, 8.2, "No change in public positions."],
+  ["Nov. 12, 9 AM", 29.61, 24, 35, 59.9, 31.9, 8.3, "Ed Markey → Unclear: Asked after his reelection whether he'd back Schumer, he sidestepped it and said Schumer had called to congratulate him (Boston Globe)."],
+  ["Nov. 12, 10 AM", 29.61, 24, 35, 59.9, 31.9, 8.3, "No change in public positions."],
+  ["Nov. 12, 11 AM", 29.61, 24, 35, 59.9, 31.9, 8.3, "No change in public positions."],
+  ["Nov. 12, 12 PM", 29.61, 24, 35, 59.9, 31.9, 8.3, "No change in public positions."],
+  ["Nov. 12, 1 PM", 29.61, 24, 35, 59.9, 31.9, 8.3, "No change in public positions."],
+  ["Nov. 12, 2 PM", 29.61, 24, 35, 59.9, 31.9, 8.3, "No change in public positions."],
+  ["Nov. 12, 3 PM", 29.61, 24, 35, 59.9, 31.9, 8.3, "No change in public positions."],
+  ["Nov. 12, 4 PM", 29.61, 24, 35, 59.9, 31.9, 8.3, "No change in public positions."],
+  ["Nov. 12, 5 PM", 29.61, 24, 35, 59.9, 31.9, 8.3, "No change in public positions."],
+  ["Nov. 12, 6 PM", 29.64, 24, 35, 59.7, 31.8, 8.6, "Mazie Hirono → Unclear: Asked whether she'd back Schumer, she told The Epoch Times: \"Stay tuned.\" Tammy Duckworth → Unclear: Told The Epoch Times Schumer is \"the only one who's declared\" so far, and that she'll \"consider all options\" if someone else gets in."],
+  ["Nov. 12, 7 PM", 29.64, 24, 35, 59.7, 31.8, 8.6, "No change in public positions."],
+  ["Nov. 12, 8 PM", 29.64, 24, 35, 59.7, 31.8, 8.6, "No change in public positions."],
+  ["Nov. 12, 9 PM", 29.64, 24, 35, 59.7, 31.8, 8.6, "Chris Van Hollen → Opposing Schumer, no pick yet: Announced he's running against Schumer for majority leader, saying \"we need new leadership\" (AP, The Washington Sun)."],
+  ["Nov. 12, 10 PM", 29.64, 24, 35, 59.7, 31.8, 8.6, "No change in public positions."],
+  ["Nov. 12, 11 PM", 30.48, 25, 36, 67.6, 24.4, 7.9, "Catherine Cortez Masto → Support Schumer: Posted that Schumer was \"instrumental\" in winning the majority: \"I will be supporting him as our Democratic leader\" (CBC). Jacky Rosen → Support Schumer: Endorsed Schumer, saying he has \"the experience and the fight to continue leading our diverse caucus\" (CBS News)."],
+  ["Nov. 13, 12 AM", 30.48, 25, 36, 67.6, 24.4, 7.9, "No change in public positions."],
+  ["Nov. 13, 1 AM", 30.46, 25, 36, 67.4, 24.4, 8.2, "Chris Van Hollen → Support Van Hollen: Leads the new Support Van Hollen group after announcing his run. Bernie Sanders → Support Van Hollen: Posted on Nov. 12 that he is \"supporting Senator Chris Van Hollen to lead Senate Democrats\" (CNN). Abdul El-Sayed → Support Van Hollen: Reiterated his support for Van Hollen after Van Hollen announced on Nov. 12 (CNN)."],
+  ["Nov. 13, 8 AM", 30.46, 25, 36, 67.4, 24.4, 8.2, "No change in public positions."],
+  ["Nov. 13, 9 AM", 30.46, 25, 36, 67.4, 24.4, 8.2, "No change in public positions."],
+  ["Nov. 13, 10 AM", 30.46, 25, 36, 67.4, 24.4, 8.2, "No change in public positions."],
+  ["Nov. 13, 11 AM", 30.45, 25, 36, 67.4, 24.6, 8, "Peggy Flanagan → Support Van Hollen: Announced on X that she's backing Van Hollen for leader. Had already called for new leadership."],
+  ["Nov. 13, 12 PM", 30.45, 25, 36, 67.4, 24.6, 8, "No change in public positions."],
+  ["Nov. 13, 1 PM", 30.43, 25, 36, 67.1, 24.9, 8, "Chris Coons → Unclear: Posted on X that the caucus needs \"a leadership team that shows we hear them,\" calling it a vigorous debate, without backing either candidate."],
+  ["Nov. 13, 2 PM", 30.43, 25, 36, 67.1, 24.9, 8, "No change in public positions."],
+  ["Nov. 13, 3 PM", 30.43, 25, 36, 67.1, 24.9, 8, "No change in public positions."],
+  ["Nov. 13, 4 PM", 30.07, 25, 35, 64.5, 27, 8.5, "Jeff Merkley → Support Van Hollen: Posted on X that Americans want government for the people and \"@ChrisVanHollen is that leader.\""],
+  ["Nov. 13, 5 PM", 30.07, 25, 35, 64.5, 27, 8.5, "No change in public positions."],
+  ["Nov. 13, 6 PM", 30.07, 25, 35, 64.5, 27, 8.5, "No change in public positions."],
+  ["Nov. 13, 7 PM", 30.05, 25, 35, 64.5, 26.9, 8.6, "Maria Cantwell → Unclear: Told the Spokesman-Review she'll \"listen to the debate\" but that Schumer deserves \"points for this big victory,\" without saying she'd vote for him. Patty Murray → Unclear: Told the Spokesman-Review the caucus will \"make a decision as a whole\" and that she's \"not going to litigate that in the press.\" Peter Welch → Unclear: Told NBC5 that \"whether it's Schumer or not, we absolutely are committed to change,\" noting no one else was running yet. Ron Wyden → Unclear: Posted on X that whoever backs Medicare for All will have his vote for leader, without naming Schumer or Van Hollen."],
+  ["Nov. 13, 8 PM", 30.05, 25, 35, 64.5, 26.9, 8.6, "No change in public positions."],
+  ["Nov. 13, 9 PM", 30.05, 25, 35, 64.5, 26.9, 8.6, "No change in public positions."],
+  ["Nov. 13, 10 PM", 30.05, 25, 35, 64.5, 26.9, 8.6, "No change in public positions."],
+  ["Nov. 13, 11 PM", 30.26, 25, 36, 66, 25.3, 8.6, "Tim Kaine → Unclear: Told States Newsroom he's keeping his discussions about caucus leadership with his colleagues, and didn't say whether he'd back Schumer."],
+  ["Nov. 14, 12 AM", 30.26, 25, 36, 66, 25.3, 8.6, "Mary Peltola becomes a senator-elect after VoteHub called Alaska's Senate race for her, confirming the 56-member caucus."],
+  ["Nov. 14, 1 AM", 30.28, 25, 36, 66.5, 25.4, 8.1, "Andy Kim → Unclear: Told Politico he hopes the caucus can settle the race in a way that \"tries our best to preserve our unity,\" without backing Schumer or Van Hollen."],
+  ["Nov. 14, 8 AM", 30.28, 25, 36, 66.5, 25.4, 8.1, "No change in public positions."],
+  ["Nov. 14, 9 AM", 30.28, 25, 36, 66.5, 25.4, 8.1, "No change in public positions."],
+  ["Nov. 14, 10 AM", 30.28, 25, 36, 66.5, 25.4, 8.1, "No change in public positions."],
+  ["Nov. 14, 11 AM", 30.28, 25, 36, 66.5, 25.4, 8.1, "No change in public positions."],
+  ["Nov. 14, 12 PM", 30.28, 25, 36, 66.5, 25.4, 8.1, "No change in public positions."],
+  ["Nov. 14, 1 PM", 30.28, 25, 36, 66.5, 25.4, 8.1, "No change in public positions."],
+  ["Nov. 14, 2 PM", 30.28, 25, 36, 66.5, 25.4, 8.1, "No change in public positions."],
+  ["Nov. 14, 3 PM", 30.28, 25, 36, 66.5, 25.4, 8.1, "No change in public positions."],
+  ["Nov. 14, 4 PM", 30.28, 25, 36, 66.5, 25.4, 8.1, "No change in public positions."],
+  ["Nov. 14, 5 PM", 30.28, 25, 36, 66.5, 25.4, 8.1, "No change in public positions."],
+  ["Nov. 14, 6 PM", 30.28, 25, 36, 66.5, 25.4, 8.1, "No change in public positions."],
+  ["Nov. 14, 7 PM", 30.28, 25, 36, 66.5, 25.4, 8.1, "No change in public positions."],
+  ["Nov. 14, 8 PM", 30.28, 25, 36, 66.5, 25.4, 8.1, "No change in public positions."],
+  ["Nov. 14, 9 PM", 30.28, 25, 36, 66.5, 25.4, 8.1, "No change in public positions."],
+  ["Nov. 14, 10 PM", 30.28, 25, 36, 66.5, 25.4, 8.1, "No change in public positions."],
+  ["Nov. 14, 11 PM", 30.28, 25, 36, 66.5, 25.4, 8.1, "No change in public positions."],
+  ["Nov. 15, 12 AM", 30.28, 25, 36, 66.5, 25.4, 8.1, "No change in public positions."],
+  ["Nov. 15, 9 AM", 30.28, 25, 36, 66.5, 25.4, 8.1, "No change in public positions."],
+  ["Nov. 15, 10 AM", 30.28, 25, 36, 66.5, 25.4, 8.1, "No change in public positions."],
+  ["Nov. 15, 11 AM", 30.28, 25, 36, 66.5, 25.4, 8.1, "No change in public positions."],
+  ["Nov. 15, 12 PM", 30.28, 25, 36, 66.5, 25.4, 8.1, "No change in public positions."],
+  ["Nov. 15, 1 PM", 30.28, 25, 36, 66.5, 25.4, 8.1, "No change in public positions."],
+  ["Nov. 15, 2 PM", 30.28, 25, 36, 66.5, 25.4, 8.1, "No change in public positions."],
+  ["Nov. 15, 3 PM", 30.28, 25, 36, 66.5, 25.4, 8.1, "No change in public positions."],
+  ["Nov. 15, 4 PM", 30.28, 25, 36, 66.5, 25.4, 8.1, "No change in public positions."],
+  ["Nov. 15, 5 PM", 30.28, 25, 36, 66.5, 25.4, 8.1, "No change in public positions."],
+  ["Nov. 15, 6 PM", 30.28, 25, 36, 66.5, 25.4, 8.1, "No change in public positions."],
+  ["Nov. 15, 7 PM", 30.28, 25, 36, 66.5, 25.4, 8.1, "No change in public positions."],
+  ["Nov. 15, 8 PM", 30.28, 25, 36, 66.5, 25.4, 8.1, "No change in public positions."],
+  ["Nov. 15, 9 PM", 30.28, 25, 36, 66.5, 25.4, 8.1, "No change in public positions."],
+  ["Nov. 15, 10 PM", 30.28, 25, 36, 66.5, 25.4, 8.1, "No change in public positions."],
+  ["Nov. 15, 11 PM", 30.28, 25, 36, 66.5, 25.4, 8.1, "No change in public positions."],
 ];
 
 /* ---------- Simulations tab ---------- */
@@ -3027,7 +3122,7 @@ const simBuild = () => {
       const [lbl, w] = SIM_WEIGHTS[f[2]];
       return { side: f[1], type: lbl, strength: f[3], what: f[4], src: src(f[5]), pts: f[1] * w * f[3] };
     });
-    p.score = S.baseline + p.factors.reduce((a, f) => a + f.pts, 0);
+    p.score = S.baseline + (typeof LEADER_VOTE !== "undefined" && LEADER_VOTE.movedUp ? S.movedUpBoost : 0) + p.factors.reduce((a, f) => a + f.pts, 0);
     p.fixed = p.name === "Chuck Schumer" ? 1 : p.name === "Chris Van Hollen" ? 0 : null;
     const raw = 1 / (1 + Math.exp(-S.k * p.score));
     p.p = p.fixed != null ? p.fixed : Math.min(S.ceiling, Math.max(S.floor, raw));
@@ -3072,7 +3167,8 @@ const simBuild = () => {
     const kept = runs.length, need = Math.ceil((N + 1) / 2);   // 29 of 56
     let s = 0, v = 0, t = 0; for (let k = 0; k <= N; k++) { if (k >= need) s += hist[k]; else if (N - k >= need) v += hist[k]; else t += hist[k]; }
     const q = f => { let c = 0; for (let k = 0; k <= N; k++) { c += hist[k]; if (c >= f * kept) return k; } return N; };
-    return { kept, per, hist, runs, sWin: s, vWin: v, tie: t, med: kept ? q(.5) : null, lo: kept ? q(.1) : null, hi: kept ? q(.9) : null };
+    let sum = 0; for (let k = 0; k <= N; k++) sum += k * hist[k];
+    return { kept, per, hist, runs, mean: kept ? sum / kept : null, sWin: s, vWin: v, tie: t, med: kept ? q(.5) : null, lo: kept ? q(.1) : null, hi: kept ? q(.9) : null };
   }
   return { roster, N, N_RUNS, votes, sCount, stats };
 };
@@ -3100,7 +3196,7 @@ function simPaint() {
     card("t", simPct(st.tie, st.kept) + "%", "28–28 tie", `${simFmt(st.tie)} of ${simFmt(st.kept)} runs`, `<span class="avatar" style="--av:#8a6fd1;--sz:46px"><span class="av-ini" style="visibility:visible">28</span></span>`),
     card("v", simPct(st.vWin, st.kept) + "%", "Van Hollen reaches 29", `${simFmt(st.vWin)} of ${simFmt(st.kept)} runs`, avatar("Chris Van Hollen", "MD", "#06566B", 46)),
   ].join("") : `<p class="sim-sub" style="grid-column:1/-1">None of the ${simFmt(R)} runs match every lock you set. Remove one to see results.</p>`;
-  simEl("simMedian").innerHTML = st.kept ? `In the middle run, Schumer gets <b>${st.med} votes</b> to Van Hollen's <b>${56 - st.med}</b>. Most runs (the middle 80%) land between <b>${st.lo} and ${st.hi}</b> for Schumer.` +
+  simEl("simMedian").innerHTML = st.kept ? `In the middle run, Schumer gets <b>${st.med} votes</b> to Van Hollen's <b>${56 - st.med}</b>. Most runs (the middle 80%) land between <b>${st.lo} and ${st.hi}</b> for Schumer. Counting a tie as a coin flip, that's a <b style="color:#2F6FD0">${(100 * (st.sWin + st.tie / 2) / st.kept).toFixed(1)}%</b> chance for Schumer and <b style="color:#0e8cab">${(100 * (st.vWin + st.tie / 2) / st.kept).toFixed(1)}%</b> for Van Hollen.` +
     (locked ? `<br><span style="color:var(--muted)">Counting only the ${simFmt(st.kept)} of ${simFmt(R)} runs that match your locks.</span>` : "") : "";
   // Lock chips
   const lk = simEl("simLocks"); lk.hidden = !locked;
@@ -3152,37 +3248,95 @@ function simSamples() {
       `<div class="sur">${surV.length ? `<b>Leaned Schumer, voted Van Hollen:</b> ${surV.join(", ")}<br>` : ""}${surS.length ? `<b>Leaned Van Hollen, voted Schumer:</b> ${surS.join(", ")}` : ""}${!sur.length ? "Everyone voted the way they lean." : ""}</div></div>`;
   }).join("");
 }
-function simPoint(st, when) { return [when, st.med, st.lo, st.hi, Math.round(1000 * st.sWin / st.kept) / 10, Math.round(1000 * st.vWin / st.kept) / 10, Math.round(1000 * st.tie / st.kept) / 10]; }
-function simTrend() {
-  const now = simPoint(simBase, "Now");
-  let pts = SIM_HISTORY.slice();
-  const last = pts[pts.length - 1];
-  if (!last || last[1] !== now[1] || last[2] !== now[2] || last[3] !== now[3]) pts.push(now);
-  const W = 760, H = 240, L = 34, Rr = 16, T = 12, B = 30;
-  const ys = pts.flatMap(p => [p[2], p[3]]), ymin = Math.min(22, ...ys) - 1, ymax = Math.max(34, ...ys) + 1;
-  const X = i => pts.length === 1 ? (L + W - Rr) / 2 : L + i * (W - L - Rr) / (pts.length - 1), Y = v => T + (ymax - v) * (H - T - B) / (ymax - ymin);
-  let s = `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Trend of Schumer's middle vote count">`;
-  for (let v = Math.ceil(ymin / 2) * 2; v <= ymax; v += 2) s += `<line x1="${L}" x2="${W - Rr}" y1="${Y(v)}" y2="${Y(v)}" stroke="var(--rule)"/><text x="${L - 6}" y="${Y(v) + 4}" text-anchor="end">${v}</text>`;
-  s += `<line x1="${L}" x2="${W - Rr}" y1="${Y(28.5)}" y2="${Y(28.5)}" stroke="var(--ink)" stroke-dasharray="4 4" opacity=".55"/><text x="${W - Rr}" y="${Y(28.5) - 5}" text-anchor="end" style="fill:var(--ink)">29 to win</text>`;
-  if (pts.length > 1) {
-    s += `<path d="${pts.map((p, i) => (i ? "L" : "M") + X(i) + " " + Y(p[3])).join("")}${pts.slice().reverse().map((p, j) => "L" + X(pts.length - 1 - j) + " " + Y(p[2])).join("")}Z" fill="#8a6fd1" opacity=".18"/>`;
-    s += `<path d="${pts.map((p, i) => (i ? "L" : "M") + X(i) + " " + Y(p[1])).join("")}" fill="none" stroke="#6b4fc4" stroke-width="2.5" stroke-linejoin="round"/>`;
-  } else s += `<line x1="${X(0)}" x2="${X(0)}" y1="${Y(pts[0][3])}" y2="${Y(pts[0][2])}" stroke="#8a6fd1" stroke-width="10" stroke-linecap="round" opacity=".25"/>`;
-  pts.forEach((p, i) => s += `<circle cx="${X(i)}" cy="${Y(p[1])}" r="${i === pts.length - 1 ? 5 : 3}" fill="#6b4fc4" stroke="var(--bgx,#fff)" stroke-width="1.5"/>`);
-  [0, pts.length - 1].filter((v, i, a) => a.indexOf(v) === i).forEach(i => s += `<text x="${X(i)}" y="${H - 8}" text-anchor="${pts.length === 1 ? "middle" : i ? "end" : "start"}">${pts[i][0]}</text>`);
-  s += `<line id="trCur" x1="0" x2="0" y1="${T}" y2="${H - B}" stroke="var(--ink)" opacity="0"/><rect id="trHit" x="${L}" y="0" width="${W - L - Rr}" height="${H}" fill="transparent"/></svg>`;
-  const el = simEl("simTrend"); el.innerHTML = s + `<div class="trend-tip" id="trTip"></div>` + (pts.length === 1 ? `<p class="sim-sub" style="margin-top:8px">The line starts with this first point. Each hourly check adds one more.</p>` : "");
-  const svg = el.querySelector("svg"), tipE = el.querySelector("#trTip"), cur = el.querySelector("#trCur");
-  const move = e => {
-    const b = svg.getBoundingClientRect(), x = (e.clientX - b.left) * W / b.width;
-    const i = pts.length === 1 ? 0 : Math.max(0, Math.min(pts.length - 1, Math.round((x - L) / ((W - L - Rr) / (pts.length - 1))))), p = pts[i];
-    cur.setAttribute("x1", X(i)); cur.setAttribute("x2", X(i)); cur.setAttribute("opacity", ".35");
-    tipE.innerHTML = `<b>${p[0]}</b><br>Schumer middle result: <b>${p[1]}</b> votes<br>Middle 80%: ${p[2]} to ${p[3]}<br><span style="color:#2F6FD0">Schumer reaches 29: <b>${p[4]}%</b></span><br><span style="color:#0e8cab">Van Hollen reaches 29: <b>${p[5]}%</b></span><br>Tie: ${p[6]}%`;
-    const px = X(i) * b.width / W; tipE.style.left = Math.min(b.width - 240, Math.max(0, px + 12 > b.width - 240 ? px - 248 : px + 12)) + "px"; tipE.style.top = "8px"; tipE.classList.add("show");
-  };
-  svg.addEventListener("pointermove", move); svg.addEventListener("pointerdown", move);
-  svg.addEventListener("pointerleave", () => { tipE.classList.remove("show"); cur.setAttribute("opacity", "0"); });
+function simPoint(st, when) { return [when, Math.round(st.mean * 100) / 100, st.lo, st.hi, Math.round(1000 * st.sWin / st.kept) / 10, Math.round(1000 * st.vWin / st.kept) / 10, Math.round(1000 * st.tie / st.kept) / 10, ""]; }
+const SIM_MONTHS = { "Jan.": 0, "Feb.": 1, "March": 2, "April": 3, "May": 4, "June": 5, "July": 6, "Aug.": 7, "Sept.": 8, "Oct.": 9, "Nov.": 10, "Dec.": 11 };
+function simStamp(label) {   // "Nov. 13, 4 PM" or "Dec. 1" -> hours since Jan 1 (Eastern wall clock)
+  const m = String(label).match(/^(\w+\.?) (\d+)(?:, (\d+)(?::(\d+))? (AM|PM))?$/);
+  if (!m) return null;
+  const h = m[3] ? (+m[3] % 12) + (m[5] === "PM" ? 12 : 0) : 12;
+  return Date.UTC(2026, SIM_MONTHS[m[1]], +m[2], h, +(m[4] || 0)) / 3600000;
 }
+const simWin = p => Math.round(10 * (p[4] + p[6] / 2)) / 10;   // a 28-28 tie counts as a coin flip
+let simTrendClose = null;
+function simTrend() {
+  const pts = SIM_HISTORY.filter(p => simStamp(p[0]) != null);
+  if (!pts.length) pts.push(simPoint(simBase, "Now"));
+  const t0 = simStamp(pts[0][0]) ?? 0, tEnd = simStamp(LEADER_VOTE.date) ?? simStamp("Dec. 1");
+  const pts2 = pts.map(p => ({ p, t: simStamp(p[0]) ?? t0 }));
+  simDrawTrend("simTrendSeats", pts2, t0, tEnd, {
+    yMin: 16, yMax: 40, step: 4, fmt: v => v, ref: 28.5, refLabel: "29 to win",
+    lines: [{ v: p => p[1], lo: p => p[2], hi: p => p[3], c: "#2F6FD0", who: ["Chuck Schumer", "NY", "#03045E"], tag: p => p[1].toFixed(1) },
+            { v: p => 56 - p[1], lo: p => 56 - p[3], hi: p => 56 - p[2], c: "#12A6CC", who: ["Chris Van Hollen", "MD", "#06566B"], tag: p => (56 - p[1]).toFixed(1) }] });
+  simDrawTrend("simTrendWin", pts2, t0, tEnd, {
+    yMin: 0, yMax: 100, step: 25, fmt: v => v + "%", ref: 50, refLabel: "50%",
+    lines: [{ v: p => simWin(p), c: "#2F6FD0", who: ["Chuck Schumer", "NY", "#03045E"], tag: p => simWin(p).toFixed(1) + "%" },
+            { v: p => Math.round(10 * (100 - simWin(p))) / 10, c: "#12A6CC", who: ["Chris Van Hollen", "MD", "#06566B"], tag: p => (100 - simWin(p)).toFixed(1) + "%" }] });
+}
+function simTip(p) {
+  const w = simWin(p), note = p[7] || "";
+  return `<b>${p[0]}</b>
+    <div class="tt-row"><i style="background:#2F6FD0"></i>Schumer<span>${w.toFixed(1)}%</span><span>${p[1].toFixed(1)} votes</span></div>
+    <div class="tt-row"><i style="background:#12A6CC"></i>Van Hollen<span>${(100 - w).toFixed(1)}%</span><span>${(56 - p[1]).toFixed(1)} votes</span></div>
+    <div class="tt-sub">Middle 80% of runs: Schumer ${p[2]}–${p[3]} votes</div>
+    ${note ? `<div class="tt-note">${note.length > 280 ? note.slice(0, 277).replace(/\s+\S*$/, "") + "…" : note}</div>` : ""}`;
+}
+function simDrawTrend(id, pts, t0, tEnd, o) {
+  const el = simEl(id), narrowW = el.clientWidth > 0 && el.clientWidth < 560;
+  const W = Math.max(300, Math.round(el.clientWidth) || 760), H = narrowW ? 230 : 270, L = narrowW ? 34 : 40, R = narrowW ? 62 : 70, T = 14, B = 30;
+  const X = t => L + (t - t0) * (W - L - R) / Math.max(1, tEnd - t0), Y = v => T + (o.yMax - v) * (H - T - B) / (o.yMax - o.yMin);
+  let s = `<svg viewBox="0 0 ${W} ${H}" role="img">`;
+  for (let v = o.yMin; v <= o.yMax; v += o.step) s += `<line x1="${L}" x2="${W - R}" y1="${Y(v)}" y2="${Y(v)}" stroke="var(--rule)"/><text x="${L - 7}" y="${Y(v) + 4}" text-anchor="end">${o.fmt(v)}</text>`;
+  // day ticks
+  const every = narrowW ? 7 : 3;
+  for (let d = Math.floor(t0 / 24) * 24; d <= tEnd; d += 24) {
+    const day = new Date(d * 3600000), lab = (day.getUTCMonth() === 11 ? "Dec. " : "Nov. ") + day.getUTCDate(), dd = day.getUTCDate();
+    const xd = Math.max(L, X(d)), dec = day.getUTCMonth() === 11;
+    s += `<line x1="${xd}" x2="${xd}" y1="${H - B}" y2="${H - B + 4}" stroke="var(--muted)" opacity=".5"/>`;
+    if (dec ? dd === 1 : ((dd - 11) % every === 0 && 30 - dd >= 2)) s += `<text x="${xd}" y="${H - 10}" text-anchor="${xd <= L ? "start" : "middle"}">${lab}</text>`;
+  }
+  s += `<line x1="${X(tEnd)}" x2="${X(tEnd)}" y1="${T}" y2="${H - B}" stroke="var(--ink)" stroke-dasharray="3 4" opacity=".5"/><text x="${X(tEnd) + 4}" y="${T + 8}" style="fill:var(--ink)">Vote</text>`;
+  s += `<line x1="${L}" x2="${W - R}" y1="${Y(o.ref)}" y2="${Y(o.ref)}" stroke="var(--ink)" stroke-dasharray="5 4" opacity=".55"/><text x="${X(tEnd) - 6}" y="${Y(o.ref) - 6}" text-anchor="end" style="fill:var(--ink)">${o.refLabel}</text>`;
+  o.lines.forEach(l => {
+    if (l.lo && pts.length > 1) s += `<path d="${pts.map((q, i) => (i ? "L" : "M") + X(q.t).toFixed(1) + " " + Y(l.hi(q.p)).toFixed(1)).join("")}${pts.slice().reverse().map(q => "L" + X(q.t).toFixed(1) + " " + Y(l.lo(q.p)).toFixed(1)).join("")}Z" fill="${l.c}" opacity=".12"/>`;
+  });
+  o.lines.forEach(l => { s += `<path d="${pts.map((q, i) => (i ? "L" : "M") + X(q.t).toFixed(1) + " " + Y(l.v(q.p)).toFixed(1)).join("")}" fill="none" stroke="${l.c}" stroke-width="2.6" stroke-linejoin="round" stroke-linecap="round"/>`; });
+  const last = pts[pts.length - 1];
+  o.lines.forEach(l => { const x = X(last.t), y = Y(l.v(last.p));
+    s += `<circle class="sim-pulse" cx="${x}" cy="${y}" r="6" fill="${l.c}"/><circle cx="${x}" cy="${y}" r="5" fill="${l.c}" stroke="var(--bgx,#fff)" stroke-width="1.5"/>`; });
+  s += `<line class="tr-cur" x1="0" x2="0" y1="${T}" y2="${H - B}" stroke="var(--ink)" opacity="0"/>` + o.lines.map((l, i) => `<circle class="tr-dot" data-i="${i}" r="5" fill="${l.c}" stroke="var(--bgx,#fff)" stroke-width="2" opacity="0"/>`).join("");
+  s += `<rect class="tr-hit" x="${L - 10}" y="0" width="${W - L - R + 20}" height="${H}" fill="transparent"/></svg>`;
+  // photos riding at the end of each line
+  let pics = o.lines.map(l => { const x = X(last.t), y = Y(l.v(last.p));
+    return `<div class="tr-pic" style="left:${100 * x / W}%;top:${100 * y / H}%">${avatar(l.who[0], l.who[1], l.who[2], narrowW ? 26 : 30)}<b class="tr-val" style="color:${l.c}">${l.tag(last.p)}</b></div>`; }).join("");
+  el.innerHTML = `<div class="tr-plot">${s}${pics}<div class="trend-tip"></div></div><div class="tr-read"></div>`;
+  const svg = el.querySelector("svg"), plot = el.querySelector(".tr-plot"), tipE = plot.querySelector(".trend-tip"), read = el.querySelector(".tr-read"), cur = svg.querySelector(".tr-cur"), dots = [...svg.querySelectorAll(".tr-dot")];
+  const narrow = () => el.clientWidth < 560;
+  const show = i => {
+    const q = pts[i], x = X(q.t);
+    cur.setAttribute("x1", x); cur.setAttribute("x2", x); cur.setAttribute("opacity", ".35");
+    dots.forEach((d, k) => { d.setAttribute("cx", x); d.setAttribute("cy", Y(o.lines[k].v(q.p))); d.setAttribute("opacity", "1"); });
+    if (narrow()) { read.innerHTML = simTip(q.p); read.classList.add("show"); tipE.classList.remove("show"); return; }
+    tipE.innerHTML = simTip(q.p);
+    const bw = plot.clientWidth, px = x * bw / W, tw = tipE.offsetWidth || 260;
+    tipE.style.left = (px + 16 + tw > bw ? Math.max(0, px - 16 - tw) : px + 16) + "px"; tipE.style.top = "4px"; tipE.classList.add("show");
+  };
+  const hide = () => { cur.setAttribute("opacity", "0"); dots.forEach(d => d.setAttribute("opacity", "0")); tipE.classList.remove("show"); if (narrow()) showLatest(); else read.classList.remove("show"); };
+  const showLatest = () => { read.innerHTML = `<div class="tt-latest">Latest check</div>` + simTip(last.p); read.classList.add("show"); };
+  const near = e => { const b = svg.getBoundingClientRect();
+    if (e.pointerType === "touch" && pts.length > 1) { const f = ((e.clientX - b.left) * W / b.width - L) / (W - L - R); return Math.max(0, Math.min(pts.length - 1, Math.round(f * (pts.length - 1)))); }
+    const t = t0 + ((e.clientX - b.left) * W / b.width - L) * (tEnd - t0) / (W - L - R);
+    let bi = 0, bd = Infinity; pts.forEach((q, i) => { const d = Math.abs(q.t - t); if (d < bd) { bd = d; bi = i; } }); return bi; };
+  let active = false;
+  svg.addEventListener("pointerdown", e => { active = true; show(near(e)); });
+  svg.addEventListener("pointermove", e => { if (e.pointerType === "mouse" || active) show(near(e)); });
+  ["pointerup", "pointercancel"].forEach(ev => svg.addEventListener(ev, e => { if (e.pointerType !== "mouse") active = true; }));   // touch: stays put after lifting
+  svg.addEventListener("pointerleave", e => { if (e.pointerType === "mouse") { active = false; hide(); } });
+  el._hide = () => { active = false; hide(); };
+  if (narrow()) showLatest();
+}
+let simRsz = null, simLastW = 0;
+window.addEventListener("resize", () => { clearTimeout(simRsz); simRsz = setTimeout(() => { const w = (simEl("simTrendWin") || {}).clientWidth; if (view === "sims" && SIM && w && w !== simLastW) { simLastW = w; simTrend(); } }, 150); });
+document.addEventListener("pointerdown", e => { if (!e.target.closest(".trend")) document.querySelectorAll(".trend").forEach(t => t._hide && t._hide()); });
 function simList() {
   const st = simCur, N = SIM.N, base = simBase;
   const rows = SIM.roster.map((p, i) => ({ p, i, share: st.kept ? st.per[i] / st.kept : p.p, b: base.per[i] / base.kept }));
@@ -3223,7 +3377,9 @@ function simMethod() {
     <table><tr><td><b>Type</b></td><td><b>Weight</b></td></tr>${Object.values(SIM_WEIGHTS).map(([n, w]) => `<tr><td>${n}</td><td>${w.toFixed(2)}</td></tr>`).join("")}</table>
     <p>The <b>strength</b> is how solid that one piece of evidence is, from 0.25 (one outlet's read, or an old statement) to 1 (said it themselves, holds the post, or is on the bill). A factor's points are <b>weight × strength</b>, counted as plus for Schumer and minus for Van Hollen. For example, a senator who said on the record they'll back Schumer gets 2.00 × 1 = <b>+2.00</b>. One who said they won't back Schumer but hasn't picked Van Hollen gets 2.00 × 0.75 = <b>−1.50</b>. A Medicare for All cosponsor gets 0.50 × 0.5 = <b>−0.25</b>. The points in each senator's "Why" list are already multiplied out.</p>
     <p>A senator's score is all their points added up. A score turns into odds with a logistic curve (steepness ${S.k}), capped at ${Math.round(S.ceiling * 100)}% and ${Math.round(S.floor * 100)}% because the ballot is secret. Schumer and Van Hollen always vote for themselves.</p>
-    <p>Each run also draws shared swings: one for the whole caucus, one for senators tied to the progressive wing (Medicare for All, "Fight Club"), one for senators tied to leadership (party posts, committee gavels, Schumer recruits), and one for each state's pair. That's why locking one senator moves others. The runs use a fixed seed, so everyone sees the same ${simFmt(SIM.N_RUNS)}.</p>`;
+    <p>Each run also draws shared swings: one for the whole caucus, one for senators tied to the progressive wing (Medicare for All, "Fight Club"), one for senators tied to leadership (party posts, committee gavels, Schumer recruits), and one for each state's pair. That's why locking one senator moves others. The runs use a fixed seed, so everyone sees the same ${simFmt(SIM.N_RUNS)}.</p>
+    <p>The vote is set for <b>${LEADER_VOTE.date}</b>. If it gets moved up, every senator except the two candidates gets a small nudge toward Schumer, worth about <b>1.25 votes</b> in total, since an earlier vote leaves less time for defections and reads as a show of confidence.${LEADER_VOTE.movedUp ? " <b>That nudge is on now.</b>" : ""}</p>
+    <p>The two charts at the top go back to the tracker's launch on Nov. 11. Earlier points were rebuilt from each senator's tracker position at that hour, using the same factors and weights, and only at times inside the hourly check window (8 AM to 1 AM through Nov. 14, 9 AM to midnight since). A 28–28 tie counts as half a win for each candidate.</p>`;
 }
 document.addEventListener("click", e => {
   if (view !== "sims") return;
