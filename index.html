@@ -646,6 +646,18 @@
   .sp-side .sp-bio p { margin: 0 0 8px; }
   .sp-side .sp-note { font-size: 12.5px; color: var(--muted); border-top: 1px solid var(--rule); padding-top: 10px; margin-top: 6px; line-height: 1.5; }
   .sp-ownmark { fill: none; stroke: var(--ink); stroke-width: 2.5; }
+  .sp-modes { justify-content: flex-start; margin: 0 0 8px; }
+  .sp-dot { position: absolute; transform: translate(-50%, -50%); border: 0; padding: 0; margin: 0; background: none; cursor: pointer; z-index: 2; border-radius: 50%; line-height: 0; }
+  .sp-dot .avatar { filter: grayscale(1); opacity: .5; transition: filter .15s, opacity .15s; }
+  .sp-dot:hover, .sp-dot:focus-visible { z-index: 6; }
+  .sp-dot:hover .avatar, .sp-dot:focus-visible .avatar { filter: none; opacity: 1; }
+  .sp-dot.me { z-index: 5; }
+  .sp-dot.me .avatar { filter: none; opacity: 1; box-shadow: 0 0 0 2.5px var(--ink); border-radius: 50%; }
+  .sp-dot::after { content: attr(data-label); position: absolute; left: 50%; bottom: calc(100% + 5px); transform: translateX(-50%); white-space: nowrap; pointer-events: none;
+    font: 700 11px/1.2 "Inter", system-ui, sans-serif; background: var(--ink); color: var(--bgx, #fff); padding: 4px 7px; border-radius: 6px; opacity: 0; transition: opacity .1s; }
+  html.dark .sp-dot::after { color: #111418; }
+  .sp-dot:hover::after, .sp-dot:focus-visible::after, .sp-dot.me::after { opacity: 1; }
+  .tr-plot:has(.sp-dot:not(.me):hover) .sp-dot.me::after { opacity: 0; }
   @media (max-width: 860px) {
     .sp-grid { grid-template-columns: 1fr; }
     .sp-side { position: static; }
@@ -3425,7 +3437,7 @@ function simDrawTrend(id, pts, t0, tEnd, o) {
   s += `<line class="tr-cur" x1="0" x2="0" y1="${T}" y2="${H - B}" stroke="var(--ink)" opacity="0"/>` + o.lines.map((l, i) => `<circle class="tr-dot" data-i="${i}" r="5" fill="${l.c}" stroke="var(--bgx,#fff)" stroke-width="2" opacity="0"/>`).join("");
   s += `<rect class="tr-hit" x="${L - 10}" y="0" width="${W - L - R + 20}" height="${H}" fill="transparent"/></svg>`;
   // photos riding at the end of each line
-  let pics = o.lines.map(l => { const x = X(last.t), y = Y(l.v(last.p));
+  let pics = (o.html ? o.html(X, Y, W, H) : "") + (o.noPics ? [] : o.lines).map(l => { const x = X(last.t), y = Y(l.v(last.p));
     return `<div class="tr-pic" style="left:${100 * x / W}%;top:${100 * y / H}%">${avatar(l.who[0], l.who[1], l.who[2], narrowW ? 26 : 30)}<b class="tr-val" style="color:${lc(l, l.v(last.p))}">${l.tag(last.p)}</b></div>`; }).join("");
   el.innerHTML = `<div class="tr-plot">${s}${pics}<div class="trend-tip"></div></div><div class="tr-read"></div>`;
   const svg = el.querySelector("svg"), plot = el.querySelector(".tr-plot"), tipE = plot.querySelector(".trend-tip"), read = el.querySelector(".tr-read"), cur = svg.querySelector(".tr-cur"), dots = [...svg.querySelectorAll(".tr-dot")];
@@ -3685,8 +3697,9 @@ function spOpen(name) {
       <div class="sp-main">
         <h1>${name}'s trend over time</h1>
         <p class="sp-sub">${name}'s chance of voting Schumer or Van Hollen in the 11,111 runs at each hourly check since Nov. 11. The line is blue while it's above the tie line and turns teal when it crosses below. ${p.fixed != null ? `As a candidate, ${first} always votes for ${p.fixed ? "himself" : "himself"}.` : `Only ${first}'s own statements move this line. When other senators move, they show up as dots along the bottom, and what that did to the race is in the tooltip and the list below.`}</p>
+        <div class="sim-tools sp-modes" role="group" aria-label="Graph view"><button type="button" data-spmode="trend" aria-pressed="${spMode === "trend"}">Trend</button><button type="button" data-spmode="compare" aria-pressed="${spMode === "compare"}">Comparison</button></div>
         <div class="trend" id="spTrend"></div>
-        <div class="sp-legend"><span><i style="--c:#2F6FD0"></i>Above the tie: leans Schumer</span><span><i style="--c:#12A6CC"></i>Below the tie: leans Van Hollen</span><span><i class="ring"></i>${first} moved on the tracker</span><span><i style="--c:#8a8f96"></i>Another senator moved (colored by where they went)</span></div>
+        <div class="sp-legend" id="spLegend"><span><i style="--c:#2F6FD0"></i>Above the tie: leans Schumer</span><span><i style="--c:#12A6CC"></i>Below the tie: leans Van Hollen</span><span><i class="ring"></i>${first} moved on the tracker</span><span><i style="--c:#8a8f96"></i>Another senator moved (colored by where they went)</span></div>
         <h2 class="sp-h2">What moved ${ownEv.length ? `${first} and ` : ""}the race</h2>
         ${moves.slice().reverse().map(evRow).join("")}
       </div>
@@ -3704,26 +3717,56 @@ function spOpen(name) {
       </aside>
     </div></div>`;
   wrap.hidden = false; document.documentElement.style.overflow = "hidden"; wrap.scrollTop = 0;
-  const t0 = pts[0].t, tEnd = simStamp(LEADER_VOTE.date) ?? simStamp("Dec. 1");
+  spState = { name, p, pts, events, color, legend: document.getElementById("spLegend").innerHTML };
+  spDraw();
+}
+let spMode = "trend", spState = null, spAll = null;
+// Every caucus member's line, for the Comparison view (built once per page load)
+function spAllSeries() {
+  if (!spAll) spAll = SIM.roster.map((r, i) => ({ r, i, pts: spSeries(r.name).pts, now: r.fixed != null ? r.fixed : simBase.per[i] / simBase.kept }));
+  return spAll;
+}
+function spDraw() {
+  const { name, p, pts, events, color, legend } = spState, first = name.split(" ").slice(-1)[0], cmp = spMode === "compare";
+  const t0 = pts[0].t, tEnd = simStamp(LEADER_VOTE.date) ?? simStamp("Dec. 1"), all = cmp ? spAllSeries() : null;
+  document.querySelectorAll("#simPerson [data-spmode]").forEach(b => b.setAttribute("aria-pressed", String(b.dataset.spmode === spMode)));
+  const lg = document.getElementById("spLegend");
+  if (lg) lg.innerHTML = cmp ? `<span><i style="--c:#2F6FD0"></i>${first} in color</span><span><i style="--c:#8a8f96"></i>The other ${all.length - 1} caucus members in gray, at their latest odds</span><span>Hover a face to see who it is. Tap it to open their page.</span>` : legend;
   simDrawTrend("spTrend", pts, t0, tEnd, {
-    yMin: 0, yMax: 100, step: 25, fmt: v => (v === 50 ? 50 : v > 50 ? v : 100 - v) + "%", ref: 50, refLabel: "Tie", tip: spTip,
+    yMin: 0, yMax: 100, step: 25, fmt: v => (v === 50 ? 50 : v > 50 ? v : 100 - v) + "%", ref: 50, refLabel: "Tie", tip: spTip, noPics: cmp,
     bands: (X, Y, x1, x2) => `<rect x="${x1}" y="${Y(100)}" width="${x2 - x1}" height="${Y(50) - Y(100)}" fill="#2F6FD0" opacity=".06"/>` +
       `<rect x="${x1}" y="${Y(50)}" width="${x2 - x1}" height="${Y(0) - Y(50)}" fill="#12A6CC" opacity=".06"/>` +
       `<text x="${x1 + 8}" y="${Y(100) + 15}" style="fill:#2F6FD0;font-weight:800">↑ Schumer</text>` +
-      `<text x="${x1 + 8}" y="${Y(0) - 18}" style="fill:#0e8cab;font-weight:800">↓ Van Hollen</text>`,
+      `<text x="${x1 + 8}" y="${Y(0) - 18}" style="fill:#0e8cab;font-weight:800">↓ Van Hollen</text>` +
+      (cmp ? all.filter(a => a.r.name !== name).map(a => `<path d="${a.pts.map((q, k) => (k ? "L" : "M") + X(q.t).toFixed(1) + " " + Y(100 * q.p.s).toFixed(1)).join("")}" fill="none" stroke="var(--muted)" stroke-width="1.4" opacity=".22"/>`).join("") : ""),
     lines: [{ v: q => Math.round(1000 * q.s) / 10, split: [50, "#2F6FD0", "#12A6CC"], c: "#2F6FD0", who: [name, p.st, color],
               tag: q => q.s >= .5 ? `${Math.round(100 * q.s)}% Schumer` : `${Math.round(100 * (1 - q.s))}% Van Hollen` }],
     marks: (X, Y, base) => events.filter(v => v.e[2].length).map(v => {
       if (v.own) { const k = pts.findIndex(q => q.t >= v.t); if (k < 0) return ""; const q = pts[k];
         return `<circle class="sp-ownmark" cx="${X(q.t)}" cy="${Y(100 * q.p.s)}" r="9"/>`; }
+      if (cmp) return "";
       const to = v.e[2][0][3] === "Opposing Schumer" ? "Will not support" : v.e[2][0][3];
       return `<circle cx="${X(v.t)}" cy="${base - 5}" r="4" fill="${SP_TO_C[to] || "#8a8f96"}" stroke="var(--bgx,#fff)" stroke-width="1.2"/>`;
-    }).join("") });
+    }).join(""),
+    // Comparison: every member's face at their latest odds, packed so none overlap, starting at the end of the line
+    html: !cmp ? null : (X, Y, W, H) => {
+      const narrow = W < 560, sz = narrow ? 18 : 24, d = sz + 2, x0 = X(pts[pts.length - 1].t), xMax = X(tEnd) - sz / 2 - 2;
+      const offs = []; for (let o = 0; x0 + o <= xMax; o += 2) offs.push(o); for (let o = -2; x0 + o >= 40; o -= 2) offs.push(o);
+      const me = all.find(a => a.r.name === name), rest = all.filter(a => a !== me).sort((a, b) => b.now - a.now);
+      const placed = [];
+      [me, ...rest].forEach(a => { a.y = Y(100 * a.now); const dd = a === me ? d + 6 : d;
+        a.x = x0 + (offs.find(o => placed.every(b => (b.x - x0 - o) ** 2 + (b.y - a.y) ** 2 >= dd * dd)) ?? 0); placed.push(a); });
+      const lab = a => `${a.r.name} (${a.r.st}): ${a.now >= .5 ? Math.round(100 * a.now) + "% Schumer" : Math.round(100 * (1 - a.now)) + "% Van Hollen"}`;
+      return placed.slice().reverse().map(a => { const mine = a === me, c = a.r.fixed === 1 ? "#03045E" : a.r.fixed === 0 ? "#06566B" : COLORS[a.r.cat] || "#B8BDC4";
+        return `<button type="button" class="sp-dot${mine ? " me" : ""}" data-spgo="${a.r.name}" data-label="${mine ? lab(a).replace(/^.*?\): /, first + ": ") : lab(a)}" aria-label="${lab(a)}" style="left:${100 * a.x / W}%;top:${100 * a.y / H}%">${avatar(a.r.name, a.r.st, c, mine ? sz + 8 : sz)}</button>`; }).join("");
+    } });
 }
 function spClose() { const w = document.getElementById("simPerson"); if (w) w.hidden = true; document.documentElement.style.overflow = ""; spOpenName = null; }
 document.addEventListener("click", e => {
-  const t = e.target.closest("[data-trend],[data-spclose]"); if (!t) return;
-  if (t.dataset.trend) spOpen(t.dataset.trend); else spClose();
+  const t = e.target.closest("[data-trend],[data-spclose],[data-spmode],[data-spgo]"); if (!t) return;
+  if (t.dataset.spmode) { spMode = t.dataset.spmode; spDraw(); }
+  else if (t.dataset.spgo) { if (t.dataset.spgo !== spOpenName) spOpen(t.dataset.spgo); }
+  else if (t.dataset.trend) { spMode = "trend"; spOpen(t.dataset.trend); } else spClose();
 });
 document.addEventListener("keydown", e => { if (e.key === "Escape" && spOpenName) spClose(); });
 window.addEventListener("resize", () => { if (spOpenName) { clearTimeout(spOpen._r); spOpen._r = setTimeout(() => { const y = document.getElementById("simPerson").scrollTop; spOpen(spOpenName); document.getElementById("simPerson").scrollTop = y; }, 150); } });
