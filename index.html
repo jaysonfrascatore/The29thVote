@@ -604,6 +604,53 @@
   .sim-method b { color: var(--ink); }
   .sim-method table { border-collapse: collapse; margin: 8px 0; font-size: 12.5px; }
   .sim-method td { padding: 3px 12px 3px 0; }
+  /* ---------- Senator trend page (mockup) ---------- */
+  .sfoot { grid-column: 3 / 5; display: flex; align-items: flex-start; justify-content: space-between; gap: 10px; flex-wrap: wrap; }
+  .sfoot .swhy { flex: 1 1 auto; min-width: 0; }
+  .strend { border: 1.5px solid var(--rule); background: transparent; color: var(--ink); border-radius: 999px; padding: 4px 10px; cursor: pointer;
+    font: 700 11.5px/1.2 "Inter", system-ui, sans-serif; white-space: nowrap; }
+  .strend:hover { border-color: #7d5fcf; background: #efe8fb; color: #2f2150; }
+  .sp-wrap { position: fixed; inset: 0; z-index: 60; overflow-y: auto; background: #fff; -webkit-overflow-scrolling: touch; }
+  html.dark .sp-wrap { background: #111418; }
+  .sp-in { max-width: 1120px; margin: 0 auto; padding: 18px 20px 48px; }
+  .sp-top { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 14px; }
+  .sp-back { border: 1.5px solid var(--rule); background: transparent; color: var(--ink); border-radius: 999px; padding: 7px 14px; cursor: pointer; font: 700 13px/1 "Inter", system-ui, sans-serif; }
+  .sp-mock { font-size: 11px; font-weight: 800; letter-spacing: .06em; text-transform: uppercase; color: #7d5fcf; border: 1.5px dashed #b9a6ea; border-radius: 6px; padding: 3px 7px; }
+  .sp-grid { display: grid; grid-template-columns: minmax(0, 1fr) 320px; gap: 28px; align-items: start; }
+  .sp-main h1 { font-size: 26px; line-height: 1.15; margin: 0 0 4px; letter-spacing: -.01em; }
+  .sp-main .sp-sub { color: var(--muted); font-size: 13.5px; margin: 0 0 14px; line-height: 1.45; }
+  .sp-main .trend { max-width: none; }
+  .sp-legend { display: flex; flex-wrap: wrap; gap: 4px 14px; font-size: 11.5px; color: var(--muted); margin: 8px 0 0; }
+  .sp-legend i { display: inline-block; width: 9px; height: 9px; border-radius: 50%; margin-right: 5px; vertical-align: -1px; background: var(--c); }
+  .sp-legend i.ring { background: transparent; border: 2.5px solid var(--ink); width: 6px; height: 6px; }
+  .sp-h2 { font-size: 12px; text-transform: uppercase; letter-spacing: .06em; font-weight: 800; color: var(--muted); margin: 26px 0 8px; }
+  .sp-ev { display: grid; grid-template-columns: 30px 1fr auto; gap: 2px 10px; align-items: start; padding: 10px 0; border-top: 1px solid var(--rule); font-size: 13px; line-height: 1.4; }
+  .sp-ev.own { background: color-mix(in srgb, #7d5fcf 8%, transparent); border-radius: 8px; padding: 10px 8px; border-top-color: transparent; }
+  .sp-ev .when { font-size: 11.5px; color: var(--muted); font-weight: 700; }
+  .sp-ev .what b { font-weight: 800; }
+  .sp-ev .why { color: var(--muted); font-size: 12.5px; }
+  .sp-ev .imp { text-align: right; font-size: 12px; font-weight: 800; white-space: nowrap; font-variant-numeric: tabular-nums; }
+  .sp-ev .imp.s { color: var(--sS); } .sp-ev .imp.v { color: var(--sV); } .sp-ev .imp.z { color: var(--muted); font-weight: 600; }
+  .sp-ev .imp small { display: block; font-weight: 600; color: var(--muted); font-size: 10.5px; }
+  .sp-side { border: 1.5px solid var(--rule); border-radius: 14px; padding: 18px; position: sticky; top: 14px; }
+  .sp-side .sp-photo { display: flex; justify-content: center; margin-bottom: 12px; }
+  .sp-side h2 { font-size: 20px; margin: 0; text-align: center; }
+  .sp-side .sp-st { text-align: center; color: var(--muted); font-size: 13px; margin: 3px 0 10px; }
+  .sp-side .sp-badges { display: flex; flex-wrap: wrap; justify-content: center; gap: 6px; margin-bottom: 14px; }
+  .sp-side .sp-badges span { font-size: 11px; font-weight: 800; padding: 3px 8px; border-radius: 999px; background: color-mix(in srgb, var(--c) 16%, transparent); color: var(--ink); }
+  .sp-side .sp-stats { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 14px; }
+  .sp-side .sp-stats div { border: 1px solid var(--rule); border-radius: 10px; padding: 8px; text-align: center; }
+  .sp-side .sp-stats b { display: block; font-size: 22px; letter-spacing: -.01em; }
+  .sp-side .sp-stats span { font-size: 11px; color: var(--muted); }
+  .sp-side .sp-bio { font-size: 13px; line-height: 1.55; }
+  .sp-side .sp-bio p { margin: 0 0 8px; }
+  .sp-side .sp-note { font-size: 12.5px; color: var(--muted); border-top: 1px solid var(--rule); padding-top: 10px; margin-top: 6px; line-height: 1.5; }
+  .sp-ownmark { fill: none; stroke: var(--ink); stroke-width: 2.5; }
+  @media (max-width: 860px) {
+    .sp-grid { grid-template-columns: 1fr; }
+    .sp-side { position: static; }
+    .sp-main h1 { font-size: 22px; }
+  }
   @media (max-width: 700px) {
     .sim-head { gap: 6px; }
     .sim-card { padding: 10px 4px 9px; }
@@ -623,6 +670,7 @@
     .srow .sbar { grid-column: 1 / 4; margin-top: 6px; }
     .scount { grid-column: 1 / 4; }
     .swhy { grid-column: 1 / 4; }
+    .sfoot { grid-column: 1 / 4; }
   }
   /* ---------- News tab ---------- */
   .tab-news { --tc: #FFC8DD; background: #FFC8DD; border-color: #f4a6c4; color: #3a1424; }
@@ -3367,6 +3415,7 @@ function simDrawTrend(id, pts, t0, tEnd, o) {
   const last = pts[pts.length - 1];
   o.lines.forEach(l => { const x = X(last.t), y = Y(l.v(last.p));
     s += `<circle class="sim-pulse" cx="${x}" cy="${y}" r="6" fill="${l.c}"/><circle cx="${x}" cy="${y}" r="5" fill="${l.c}" stroke="var(--bgx,#fff)" stroke-width="1.5"/>`; });
+  if (o.marks) s += o.marks(X, Y, H - B);
   s += `<line class="tr-cur" x1="0" x2="0" y1="${T}" y2="${H - B}" stroke="var(--ink)" opacity="0"/>` + o.lines.map((l, i) => `<circle class="tr-dot" data-i="${i}" r="5" fill="${l.c}" stroke="var(--bgx,#fff)" stroke-width="2" opacity="0"/>`).join("");
   s += `<rect class="tr-hit" x="${L - 10}" y="0" width="${W - L - R + 20}" height="${H}" fill="transparent"/></svg>`;
   // photos riding at the end of each line
@@ -3379,13 +3428,13 @@ function simDrawTrend(id, pts, t0, tEnd, o) {
     const q = pts[i], x = X(q.t);
     cur.setAttribute("x1", x); cur.setAttribute("x2", x); cur.setAttribute("opacity", ".35");
     dots.forEach((d, k) => { d.setAttribute("cx", x); d.setAttribute("cy", Y(o.lines[k].v(q.p))); d.setAttribute("opacity", "1"); });
-    if (narrow()) { read.innerHTML = simTip(q.p); read.classList.add("show"); tipE.classList.remove("show"); return; }
-    tipE.innerHTML = simTip(q.p);
+    if (narrow()) { read.innerHTML = (o.tip || simTip)(q.p); read.classList.add("show"); tipE.classList.remove("show"); return; }
+    tipE.innerHTML = (o.tip || simTip)(q.p);
     const bw = plot.clientWidth, px = x * bw / W, tw = tipE.offsetWidth || 260;
     tipE.style.left = (px + 16 + tw > bw ? Math.max(0, px - 16 - tw) : px + 16) + "px"; tipE.style.top = "4px"; tipE.classList.add("show");
   };
   const hide = () => { cur.setAttribute("opacity", "0"); dots.forEach(d => d.setAttribute("opacity", "0")); tipE.classList.remove("show"); if (narrow()) showLatest(); else read.classList.remove("show"); };
-  const showLatest = () => { read.innerHTML = `<div class="tt-latest">Latest check</div>` + simTip(last.p); read.classList.add("show"); };
+  const showLatest = () => { read.innerHTML = `<div class="tt-latest">Latest check</div>` + (o.tip || simTip)(last.p); read.classList.add("show"); };
   const near = e => { const b = svg.getBoundingClientRect();
     if (e.pointerType === "touch" && pts.length > 1) { const f = ((e.clientX - b.left) * W / b.width - L) / (W - L - R); return Math.max(0, Math.min(pts.length - 1, Math.round(f * (pts.length - 1)))); }
     const t = t0 + ((e.clientX - b.left) * W / b.width - L) * (tEnd - t0) / (W - L - R);
@@ -3418,7 +3467,7 @@ function simList() {
       <div class="slock">${p.fixed != null ? `<button type="button" class="s" disabled title="Candidates always vote for themselves">S</button><button type="button" class="v" disabled>VH</button>` :
         `<button type="button" class="s" data-lock="1" aria-pressed="${lk === 1}" title="Lock to Schumer">S</button><button type="button" class="v" data-lock="0" aria-pressed="${lk === 0}" title="Lock to Van Hollen">VH</button>`}</div>
       <div class="scount">Schumer in ${simFmt(cnt)} of ${simFmt(st.kept)} runs${sh}</div>
-      <details class="swhy"><summary>Why</summary>${why}</details></div>`;
+      <div class="sfoot"><details class="swhy"><summary>Why</summary>${why}</details><button type="button" class="strend" data-trend="${p.name}">View trend over time</button></div></div>`;
   };
   simStand(rows);
   const keep = simFilterGroups();
@@ -3476,6 +3525,144 @@ function simStand(rows) {
     ${pick ? `<p class="st-pick">Showing only ${simFilter === "S" ? "senators on Schumer's side" : simFilter === "V" ? "senators on Van Hollen's side" : simFilter} below. <button type="button" data-sfilter="*">Show everyone</button></p>` :
       `<p class="st-pick">Tap a color to see who's in it.</p>`}`;
 }
+/* ---------- Senator trend page (mockup) ---------- */
+// One senator's chance of voting Schumer at every hourly check, rebuilt the same way the trend charts were:
+// rewind their tracker group with HISTORY, swap only their public-stance line, keep their other factors.
+const SP_BIO = {
+  "Mazie Hirono": ["Hawaii's junior senator since 2013 and the first Asian American woman elected to the Senate. Born in Japan, she immigrated to Hawaii as a child.",
+    "Before the Senate she served in the Hawaii House, as lieutenant governor (1994–2002) and in the U.S. House (2007–2013). She sits on the Judiciary Committee."],
+};
+function spMarginal(score, prog, est) {
+  // Chance of a Schumer vote after the shared swings, averaged over the swing (same math as the runs, without the noise)
+  const S = SIM_SETTINGS, w = S.swing, sd = Math.sqrt(w.caucus ** 2 + (prog ? w.progressive ** 2 : 0) + (est ? w.establishment ** 2 : 0) + w.state ** 2);
+  const clamp = x => Math.min(S.ceiling, Math.max(S.floor, x)), sig = x => 1 / (1 + Math.exp(-x));
+  const lp = Math.log(clamp(sig(S.k * score)) / (1 - clamp(sig(S.k * score))));
+  let a = 0, wt = 0;
+  for (let i = -400; i <= 400; i++) { const z = i / 100, d = Math.exp(-z * z / 2); a += d * clamp(sig(lp + z * sd)); wt += d; }
+  return a / wt;
+}
+function spSeries(name) {
+  const S = SIM_SETTINGS, norm = c => c === "Opposing Schumer" ? "Will not support" : c;
+  const idx = SIM.roster.findIndex(x => x.name === name), p = SIM.roster[idx], nowCat = p.cat;
+  const hist = HISTORY.map(e => ({ e, t: simStamp(e[0]) })).filter(h => h.t != null).sort((a, b) => a.t - b.t);
+  let cat = nowCat;
+  for (let i = hist.length - 1; i >= 0; i--) for (let j = hist[i].e[2].length - 1; j >= 0; j--) { const m = hist[i].e[2][j]; if (m[0] === name) cat = norm(m[2]); }
+  const STANCE = { "Support": [1, 1], "Support Van Hollen": [-1, 1], "Will not support": [-1, .75] };
+  const base = SIM_FACTORS.filter(f => f[0] === name), cache = {};
+  const share = c => {
+    if (p.fixed != null) return p.fixed;
+    if (c === nowCat) return simBase.per[idx] / simBase.kept;
+    if (cache[c] != null) return cache[c];
+    let f = base.filter(x => x[2] !== "S");
+    if (STANCE[c]) f = f.concat([[name, STANCE[c][0], "S", STANCE[c][1]]]);
+    const sc = S.baseline + (LEADER_VOTE.movedUp ? S.movedUpBoost : 0) + f.reduce((a, x) => a + x[1] * SIM_WEIGHTS[x[2]][1] * x[3], 0);
+    return cache[c] = spMarginal(sc, p.prog, p.est);
+  };
+  const rows = SIM_HISTORY.filter(r => simStamp(r[0]) != null);
+  let hi = 0;
+  const pts = rows.map(r => {
+    const t = simStamp(r[0]);
+    while (hi < hist.length && hist[hi].t <= t) { hist[hi].e[2].forEach(m => { if (m[0] === name) cat = norm(m[3]); }); hi++; }
+    const q = r.slice(); q.s = share(cat); q.cat = cat; q.who = name;
+    return { p: q, t };
+  });
+  // events: every move on the tracker, with what it did to the race and to this senator
+  const byLabel = {}; rows.forEach((r, i) => byLabel[r[0]] = i);
+  const events = hist.map(({ e, t }) => {
+    const i = byLabel[e[0]], prev = i > 0 ? rows[i - 1] : null, cur = i != null ? rows[i] : null;
+    const dRace = cur && prev ? simWin(cur) - simWin(prev) : null;
+    const own = e[2].find(m => m[0] === name);
+    const k = pts.findIndex(q => q.t >= t);
+    return { e, t, own, dRace, before: own && k > 0 ? pts[k - 1].p.s : null, after: own && k >= 0 ? pts[k].p.s : null };
+  });
+  return { p, pts, events };
+}
+function spTip(q) {
+  const w = simWin(q), note = q[7] || "", sh = Math.round(1000 * q.s) / 10, first = q.who.split(" ").slice(-1)[0];
+  return `<b>${q[0]}</b>
+    <div class="tt-sub" style="margin:4px 0 2px">${first}'s vote · ${L(q.cat)}</div>
+    <div class="tt-row"><i style="background:#2F6FD0"></i>Schumer<span>${sh.toFixed(1)}%</span><span></span></div>
+    <div class="tt-row"><i style="background:#12A6CC"></i>Van Hollen<span>${(100 - sh).toFixed(1)}%</span><span></span></div>
+    <div class="tt-sub" style="margin:6px 0 2px">The race at this check</div>
+    <div class="tt-row"><i style="background:#2F6FD0"></i>Schumer<span>${w.toFixed(1)}%</span><span>${q[1].toFixed(1)} votes</span></div>
+    <div class="tt-row"><i style="background:#12A6CC"></i>Van Hollen<span>${(100 - w).toFixed(1)}%</span><span>${(56 - q[1]).toFixed(1)} votes</span></div>
+    <div class="tt-sub">Middle 80% of runs: Schumer ${q[2]}–${q[3]} votes</div>
+    ${note ? `<div class="tt-note">${note.length > 280 ? note.slice(0, 277).replace(/\s+\S*$/, "") + "…" : note}</div>` : ""}`;
+}
+const SP_TO_C = { "Support": "#2F6FD0", "Support Van Hollen": "#12A6CC", "Will not support": "#9ADBEA", "Unclear": "#8E5BC8", "No public position": "#B8BDC4" };
+let spOpenName = null;
+function spOpen(name) {
+  if (!SIM) SIM = simBuild();
+  if (!simBase) simBase = SIM.stats({});
+  spOpenName = name;
+  const { p, pts, events } = spSeries(name);
+  let wrap = document.getElementById("simPerson");
+  if (!wrap) { wrap = document.createElement("div"); wrap.id = "simPerson"; wrap.className = "sp-wrap"; wrap.setAttribute("role", "dialog"); wrap.setAttribute("aria-modal", "true"); document.body.appendChild(wrap); }
+  const last = pts[pts.length - 1].p, firstP = pts[0].p, first = name.split(" ").slice(-1)[0];
+  const rec = Object.values(SENATORS).flat().find(r => r[0] === name) || NO_POSITION.find(r => r[0] === name) || [];
+  const elect = p.cat !== "No public position" && rec[3] === true;
+  const note = p.cat === "No public position" ? (rec[3] || NO_POSITION_DEFAULT) : rec[2] || "";
+  const lab = p.fixed != null ? (p.fixed ? "Safe Schumer" : "Safe Van Hollen") : simLabel(last.s);
+  const color = p.fixed === 1 ? "#03045E" : p.fixed === 0 ? "#06566B" : COLORS[p.cat] || "#B8BDC4";
+  const ownEv = events.filter(v => v.own), moves = events.filter(v => v.e[2].length);
+  const bio = SP_BIO[name] ? SP_BIO[name].map(x => `<p>${x}</p>`).join("") :
+    `<p>${elect ? "Senator-elect" : "U.S. senator"} from ${STATE_NAMES[p.st] || p.st}.</p><p style="color:var(--muted)">[Mockup: a short biography goes here.]</p>`;
+  const pct = x => Math.round(100 * x) + "%";
+  const evRow = v => {
+    const m = v.own || v.e[2][0], many = v.e[2].length > 1 && !v.own;
+    const imp = v.dRace == null ? `<div class="imp z">—</div>` : Math.abs(v.dRace) < .05 ? `<div class="imp z">No change<small>to the race</small></div>` :
+      `<div class="imp ${v.dRace > 0 ? "s" : "v"}">${v.dRace > 0 ? "+" : "−"}${Math.abs(v.dRace).toFixed(1)} pts<small>${v.dRace > 0 ? "toward Schumer" : "toward Van Hollen"}</small></div>`;
+    const ms = v.own ? [v.own] : v.e[2];
+    return `<div class="sp-ev${v.own ? " own" : ""}">${avatar(m[0], m[1], SP_TO_C[m[3] === "Opposing Schumer" ? "Will not support" : m[3]] || "#B8BDC4", 28)}
+      <div><div class="when">${v.e[0]}${many ? ` · ${v.e[2].length} senators moved` : ""}</div>
+      ${ms.map(x => `<div class="what"><b>${x[0]}</b> → ${L(x[3] === "Opposing Schumer" ? "Will not support" : x[3])}</div><div class="why">${x[4]}</div>`).join("")}
+      ${v.own ? `<div class="why" style="color:var(--ink);font-weight:700;margin-top:3px">${first}'s chance of voting Schumer: ${pct(v.before)} → ${pct(v.after)}</div>` : ""}</div>
+      ${imp}</div>`;
+  };
+  wrap.innerHTML = `<div class="sp-in">
+    <div class="sp-top"><button type="button" class="sp-back" data-spclose>← Back to simulations</button><span class="sp-mock">Mockup</span></div>
+    <div class="sp-grid">
+      <div class="sp-main">
+        <h1>${name}'s trend over time</h1>
+        <p class="sp-sub">How often ${name} voted for Schumer in the 11,111 runs at each hourly check since Nov. 11. ${p.fixed != null ? `As a candidate, ${first} always votes for ${p.fixed ? "himself" : "himself"}.` : `Only ${first}'s own statements move this line. When other senators move, they show up as dots along the bottom, and what that did to the race is in the tooltip and the list below.`}</p>
+        <div class="trend" id="spTrend"></div>
+        <div class="sp-legend"><span><i style="--c:#2F6FD0"></i>Votes Schumer</span><span><i style="--c:#12A6CC"></i>Votes Van Hollen</span><span><i class="ring"></i>${first} moved on the tracker</span><span><i style="--c:#8a8f96"></i>Another senator moved (colored by where they went)</span></div>
+        <h2 class="sp-h2">What moved ${ownEv.length ? `${first} and ` : ""}the race</h2>
+        ${moves.slice().reverse().map(evRow).join("")}
+      </div>
+      <aside class="sp-side">
+        <div class="sp-photo">${avatar(name, p.st, color, 132)}</div>
+        <h2>${name}</h2>
+        <div class="sp-st">${elect ? "Senator-elect, " : ""}${STATE_NAMES[p.st] || p.st}</div>
+        <div class="sp-badges"><span style="--c:${COLORS[p.cat] || "#B8BDC4"}">${L(p.cat)}</span><span style="--c:${SIM_GC[lab]}">${lab}</span></div>
+        <div class="sp-stats">
+          <div><b style="color:var(--sS)">${pct(last.s)}</b><span>Schumer now</span></div>
+          <div><b style="color:var(--muted)">${pct(firstP.s)}</b><span>On ${firstP[0].split(",")[0]}</span></div>
+        </div>
+        <div class="sp-bio">${bio}</div>
+        ${note ? `<div class="sp-note"><b style="color:var(--ink)">On the record:</b> ${note}</div>` : ""}
+      </aside>
+    </div></div>`;
+  wrap.hidden = false; document.documentElement.style.overflow = "hidden"; wrap.scrollTop = 0;
+  const t0 = pts[0].t, tEnd = simStamp(LEADER_VOTE.date) ?? simStamp("Dec. 1");
+  simDrawTrend("spTrend", pts, t0, tEnd, {
+    yMin: 0, yMax: 100, step: 25, fmt: v => v + "%", ref: 50, refLabel: "50%", tip: spTip,
+    lines: [{ v: q => Math.round(1000 * q.s) / 10, c: "#2F6FD0", who: ["Chuck Schumer", "NY", "#03045E"], tag: q => Math.round(100 * q.s) + "%" },
+            { v: q => Math.round(1000 * (1 - q.s)) / 10, c: "#12A6CC", who: ["Chris Van Hollen", "MD", "#06566B"], tag: q => Math.round(100 * (1 - q.s)) + "%" }],
+    marks: (X, Y, base) => events.filter(v => v.e[2].length).map(v => {
+      if (v.own) { const k = pts.findIndex(q => q.t >= v.t); if (k < 0) return ""; const q = pts[k];
+        return `<circle class="sp-ownmark" cx="${X(q.t)}" cy="${Y(100 * q.p.s)}" r="9"/><circle class="sp-ownmark" cx="${X(q.t)}" cy="${Y(100 - 100 * q.p.s)}" r="9" opacity=".5"/>`; }
+      const to = v.e[2][0][3] === "Opposing Schumer" ? "Will not support" : v.e[2][0][3];
+      return `<circle cx="${X(v.t)}" cy="${base - 5}" r="4" fill="${SP_TO_C[to] || "#8a8f96"}" stroke="var(--bgx,#fff)" stroke-width="1.2"/>`;
+    }).join("") });
+}
+function spClose() { const w = document.getElementById("simPerson"); if (w) w.hidden = true; document.documentElement.style.overflow = ""; spOpenName = null; }
+document.addEventListener("click", e => {
+  const t = e.target.closest("[data-trend],[data-spclose]"); if (!t) return;
+  if (t.dataset.trend) spOpen(t.dataset.trend); else spClose();
+});
+document.addEventListener("keydown", e => { if (e.key === "Escape" && spOpenName) spClose(); });
+window.addEventListener("resize", () => { if (spOpenName) { clearTimeout(spOpen._r); spOpen._r = setTimeout(() => { const y = document.getElementById("simPerson").scrollTop; spOpen(spOpenName); document.getElementById("simPerson").scrollTop = y; }, 150); } });
 function simMethod() {
   const S = SIM_SETTINGS;
   simEl("simMethod").innerHTML = `<h2 class="sim-h2" style="color:var(--ink)">How this works</h2>
