@@ -604,7 +604,7 @@
   .sim-method b { color: var(--ink); }
   .sim-method table { border-collapse: collapse; margin: 8px 0; font-size: 12.5px; }
   .sim-method td { padding: 3px 12px 3px 0; }
-  /* ---------- Senator trend page (mockup) ---------- */
+  /* ---------- Senator trend page ---------- */
   .sfoot { grid-column: 3 / 5; display: flex; align-items: flex-start; justify-content: space-between; gap: 10px; flex-wrap: wrap; }
   .sfoot .swhy { flex: 1 1 auto; min-width: 0; }
   .strend { border: 1.5px solid var(--rule); background: transparent; color: var(--ink); border-radius: 999px; padding: 4px 10px; cursor: pointer;
@@ -3529,7 +3529,7 @@ function simStand(rows) {
     ${pick ? `<p class="st-pick">Showing only ${simFilter === "S" ? "senators on Schumer's side" : simFilter === "V" ? "senators on Van Hollen's side" : simFilter} below. <button type="button" data-sfilter="*">Show everyone</button></p>` :
       `<p class="st-pick">Tap a color to see who's in it.</p>`}`;
 }
-/* ---------- Senator trend page (mockup) ---------- */
+/* ---------- Senator trend page ---------- */
 // One senator's chance of voting Schumer at every hourly check, rebuilt the same way the trend charts were:
 // rewind their tracker group with HISTORY, swap only their public-stance line, keep their other factors.
 const SP_BIO = {
@@ -3678,7 +3678,7 @@ function spOpen(name) {
       ${imp}</div>`;
   };
   wrap.innerHTML = `<div class="sp-in">
-    <div class="sp-top"><button type="button" class="sp-back" data-spclose>← Back to simulations</button><span class="sp-mock">Mockup</span></div>
+    <div class="sp-top"><button type="button" class="sp-back" data-spclose>← Back to simulations</button></div>
     <div class="sp-grid">
       <div class="sp-main">
         <h1>${name}'s trend over time</h1>
