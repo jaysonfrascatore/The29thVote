@@ -1493,7 +1493,8 @@ seats.sort((a, b) => (b.theta - a.theta) || (a.r - b.r));
 // Seat order: Support | gray | Unclear (centered on 29th line) | gray | Will not support
 function layoutFor(cn) {
   const uncStart = Math.floor((TOTAL - cn["Unclear"]) / 2);
-  const gl = uncStart - cn["Support"];
+  // Keep both gray gaps between 0 and the number of gray seats, so the blocks always add up to TOTAL
+  const gl = Math.max(0, Math.min(cn["No public position"], uncStart - cn["Support"]));
   const gr = cn["No public position"] - gl;
   const out = [];
   [["Support", cn["Support"]], ["No public position", gl], ["Unclear", cn["Unclear"]],
