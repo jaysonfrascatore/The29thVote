@@ -978,7 +978,7 @@
     </a>
     </div>
     <p class="note">Senate Democrats elect their leader by secret ballot, expected in December. Senators with no public position are not committed either way. <span style="white-space:nowrap">* Senator-elect</span></p>
-    <p class="src">Sources: CBS News, CBC, Boston Globe, Roll Call, CNN, The Hill, PolitiFact, Washington Times, Washington Examiner, Epoch Times, Punchbowl News, New Republic, NBC News, Spokesman-Review, NBC5 (WPTZ), States Newsroom, Politico, VoteHub, X &nbsp;·&nbsp; <span style="white-space:nowrap">Created by Jayson Frascatore</span></p>
+    <p class="src">Sources: CBS News, CBC, Boston Globe, Roll Call, CNN, The Hill, PolitiFact, Washington Times, Washington Examiner, Epoch Times, Punchbowl News, New Republic, NBC News, Spokesman-Review, NBC5 (WPTZ), States Newsroom, Politico, VoteHub, The Washington Sun, X &nbsp;·&nbsp; <span style="white-space:nowrap">Created by Jayson Frascatore</span></p>
   </footer>
 </div>
 
@@ -1008,7 +1008,7 @@ const TOTAL = 56;
 const NEEDED = 29;
 const SUBTITLE = "Public positions of the 56-member Senate Democratic caucus";
 const KOFI_URL = "https://ko-fi.com/jaysonfras";
-const LAST_UPDATED = "Last updated on November 16th, 2026 at 7:00pm";
+const LAST_UPDATED = "Last updated on November 16th, 2026 at 7:15pm";
 
 const SENATORS = {
   "Support": [
@@ -1026,6 +1026,7 @@ const SENATORS = {
     ["Catherine Cortez Masto", "NV", "Posted on Nov. 12 that Schumer was \"instrumental\" in winning the majority: \"I will be supporting him as our Democratic leader\" (CBC)."],
     ["Jacky Rosen", "NV", "Endorsed Schumer on Nov. 12, saying he has \"the experience and the fight to continue leading our diverse caucus\" (CBS News)."],
     ["Angela Alsobrooks", "MD", "Told Politico on Nov. 2 that she's supporting Schumer, and Politico again listed her among his public backers on Nov. 15."],
+    ["Mazie Hirono", "HI", "Told The Washington Sun she has \"a long history with Chuck\" and that he's helped her on \"some pretty important necessary things.\""],
     ["Sherrod Brown", "OH", "Senator-elect recruited by Schumer. Publicly supports him.", true],
   ],
   "Unclear": [
@@ -1039,7 +1040,6 @@ const SENATORS = {
     ["Mark Warner", "VA", "Won't commit, though he praised Schumer's fundraising."],
     ["Martin Heinrich", "NM", "Won't publicly commit to backing Schumer yet."],
     ["Ed Markey", "MA", "Asked after his reelection whether he'd back Schumer, he sidestepped it and said Schumer had called to congratulate him (Boston Globe, Nov. 5)."],
-    ["Mazie Hirono", "HI", "Asked whether she'd back Schumer, she told The Epoch Times: \"Stay tuned.\""],
     ["Tammy Duckworth", "IL", "Told The Epoch Times Schumer is \"the only one who's declared\" so far, and that she'll \"consider all options\" if someone else gets in."],
     ["Chris Coons", "DE", "Posted on Nov. 13 that the caucus needs \"a leadership team that shows we hear them,\" calling it a vigorous debate over experience and vision, without backing either candidate (<a href='https://x.com/ChrisCoons/status/2121280335321399705' target='_blank' rel='noopener' onclick='event.stopPropagation()'>X</a>)."],
     ["Maria Cantwell", "WA", "Told the Spokesman-Review on Nov. 4 she'll \"listen to the debate\" but that Schumer deserves \"points for this big victory,\" without saying she'd vote for him."],
@@ -1084,16 +1084,16 @@ const NO_POSITION_DEFAULT = "Hasn't said publicly whether they'll back Schumer f
 const NO_POSITION_NOTE = "\u2020 Elected Minnesota governor. Her seat will go to an appointee.";
 
 /* Previous snapshot for the "On the Record" box, plus who moved since then */
-const PREV = { "Support": 14, "Unclear": 25, "No public position": 7, "Will not support": 5, "Support Van Hollen": 5 };
-const PREV_LABEL = "Change since Nov. 14, 1 AM";
+const PREV = { "Support": 15, "Unclear": 25, "No public position": 6, "Will not support": 5, "Support Van Hollen": 5 };
+const PREV_LABEL = "Change since Nov. 16, 1:45 PM";
 // When the senators in MOVERS moved (short form, e.g. "Nov. 12, 9 AM"). LAST_UPDATED at the top is the time of the
 // latest check, even when that check found no change; if the two differ, the page says there was no change.
-const LAST_MOVE = "Nov. 16, 1:45 PM";
+const LAST_MOVE = "Nov. 16, 7:15 PM";
 // Date of the closed-door leader vote. Set movedUp to true only if reputable outlets report the vote was moved earlier (and update date).
 const LEADER_VOTE = { date: "Dec. 1", movedUp: false };
 // Each move: [name, moved FROM, moved TO]. Listed in the order they happened; the page animates them one at a time.
 const MOVERS = [
-  ["Angela Alsobrooks (MD)", "No public position", "Support"],
+  ["Mazie Hirono (HI)", "Unclear", "Support"],
 ];
 
 // Previous Updates timeline. One entry per update that moved anyone, oldest first; add new entries at the END.
@@ -1151,6 +1151,9 @@ const HISTORY = [
   ["Nov. 16, 1:45 PM", "", [
     ["Angela Alsobrooks", "MD", "No public position", "Support", "Told Politico she's supporting Schumer, and Politico again listed her among his public backers on Nov. 15."],
   ]],
+  ["Nov. 16, 7:15 PM", "", [
+    ["Mazie Hirono", "HI", "Unclear", "Support", "Told The Washington Sun she has \"a long history with Chuck\" and that he's helped her on \"some pretty important necessary things.\""],
+  ]],
 ];
 
 // Senators running for leader. Their own marble gets a green dotted ring, its own color and a label.
@@ -1170,7 +1173,7 @@ const CANDIDATES = [
 // a race called, someone announcing, a wave of support, big reported support or rumors, someone reaching 29, a vote date change)
 // NEWS_UPDATED = the check (short form, like LAST_MOVE) that last added a NEWS entry. When it matches the latest check
 // (LAST_UPDATED), the News light at the top of the page is green; otherwise it's orange.
-const NEWS_UPDATED = "Nov. 16, 2 PM";
+const NEWS_UPDATED = "Nov. 16, 7:15 PM";
 const NEWS = [
   ["Nov. 3", "", "significant", "Democrats win back the Senate majority",
     "Democrats flip enough seats on election night to take control of the Senate. Schumer calls it a \"generational remake\" of the chamber, and the question of whether he stays on as leader takes off right away.",
@@ -1273,6 +1276,10 @@ const NEWS = [
     "It's confirmed that Sen. Angela Alsobrooks will be supporting Schumer. She told Politico she's backing him, and Politico listed her again on Nov. 15 among his public supporters.",
     "Moved from No public position to Support Schumer, bringing him to 15 of 29.",
     [["Politico (Nov. 2)", "https://www.politico.com/news/2026/11/02/chuck-schumer-democratic-leader-midterms-01144492"], ["Politico (Nov. 15)", "https://www.politico.com/news/2026/11/15/van-hollen-schumer-senate-leadership-democrats-01166741"]]],
+  ["Nov. 16", "7:15 PM", "movement", "Hirono counted as a Schumer vote",
+    "Sen. Mazie Hirono told The Washington Sun she has \"a long history with Chuck\" and that he's helped her on \"some pretty important necessary things.\" She had earlier told The Epoch Times only to \"stay tuned.\"",
+    "Moved from Unclear to Support Schumer, bringing him to 16 of 29.",
+    [["The Washington Sun", "https://www.washingtonsun.com/"]]],
 ];
 /* ======================================================================== */
 
@@ -3020,6 +3027,7 @@ const SIM_FACTORS = [
   ["Ed Markey", -1, "P", .5, M4A_TXT, "M4A"],
   ["Ed Markey", -1, "P", .5, "Took part in \"Fight Club\" actions (NYT report)", "FC2"],
   ["Ed Markey", 1, "R", .5, "Top Democrat on Small Business (in line to chair it)", "RANK"],
+  ["Mazie Hirono", 1, "S", 1, "Tracker: Support Schumer. Told The Washington Sun she has a long history with him and he's helped her on important things", ["The Washington Sun", ""]],
   ["Mazie Hirono", -1, "P", .5, M4A_TXT, "M4A"],
   ["Chris Coons", -1, "P", .25, "Wants \"a leadership team that shows we hear them\"", ["Coons on X, Nov. 13", "https://x.com/ChrisCoons/status/2121280335321399705"]],
   ["Chris Coons", 1, "R", .5, "Top Democrat on Ethics (in line to chair it)", "RANK"],
@@ -3162,6 +3170,7 @@ const SIM_HISTORY = [
   ["Nov. 16, 5 PM", 30.56, 25, 36, 69, 22.9, 8.1, "No change in public positions."],
   ["Nov. 16, 6 PM", 30.56, 25, 36, 69, 22.9, 8.1, "No change in public positions."],
   ["Nov. 16, 7 PM", 30.56, 25, 36, 69, 22.9, 8.1, "No change in public positions."],
+  ["Nov. 16, 7:15 PM", 31.11, 26, 36, 74.1, 18.8, 7.1, "Mazie Hirono → Support Schumer: Told The Washington Sun she has \"a long history with Chuck\" and that he's helped her on \"some pretty important necessary things.\""],
 ];
 
 /* ---------- Simulations tab ---------- */
