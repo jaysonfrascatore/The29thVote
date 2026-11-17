@@ -3396,7 +3396,11 @@ function simDrawTrend(id, pts, t0, tEnd, o) {
   const el = simEl(id), narrowW = el.clientWidth > 0 && el.clientWidth < 560;
   const W = Math.max(300, Math.round(el.clientWidth) || 760), H = narrowW ? 230 : 270, L = narrowW ? 34 : 40, R = narrowW ? 62 : 70, T = 14, B = 30;
   const X = t => L + (t - t0) * (W - L - R) / Math.max(1, tEnd - t0), Y = v => T + (o.yMax - v) * (H - T - B) / (o.yMax - o.yMin);
+  const lc = (l, v) => l.split ? (v >= l.split[0] ? l.split[1] : l.split[2]) : l.c, gid = "g" + id;
   let s = `<svg viewBox="0 0 ${W} ${H}" role="img">`;
+  o.lines.forEach((l, i) => { if (l.split) { const f = Math.max(0, Math.min(1, (Y(l.split[0]) - T) / (H - B - T)));
+    s += `<defs><linearGradient id="${gid}${i}" gradientUnits="userSpaceOnUse" x1="0" y1="${T}" x2="0" y2="${H - B}"><stop offset="${f}" stop-color="${l.split[1]}"/><stop offset="${f}" stop-color="${l.split[2]}"/></linearGradient></defs>`; } });
+  if (o.bands) s += o.bands(X, Y, L, W - R);
   for (let v = o.yMin; v <= o.yMax; v += o.step) s += `<line x1="${L}" x2="${W - R}" y1="${Y(v)}" y2="${Y(v)}" stroke="var(--rule)"/><text x="${L - 7}" y="${Y(v) + 4}" text-anchor="end">${o.fmt(v)}</text>`;
   // day ticks
   const every = narrowW ? 7 : 3;
@@ -3411,23 +3415,23 @@ function simDrawTrend(id, pts, t0, tEnd, o) {
   o.lines.forEach(l => {
     if (l.lo && pts.length > 1) s += `<path d="${pts.map((q, i) => (i ? "L" : "M") + X(q.t).toFixed(1) + " " + Y(l.hi(q.p)).toFixed(1)).join("")}${pts.slice().reverse().map(q => "L" + X(q.t).toFixed(1) + " " + Y(l.lo(q.p)).toFixed(1)).join("")}Z" fill="${l.c}" opacity=".12"/>`;
   });
-  o.lines.forEach(l => { s += `<path d="${pts.map((q, i) => (i ? "L" : "M") + X(q.t).toFixed(1) + " " + Y(l.v(q.p)).toFixed(1)).join("")}" fill="none" stroke="${l.c}" stroke-width="2.6" stroke-linejoin="round" stroke-linecap="round"/>`; });
+  o.lines.forEach((l, li) => { s += `<path d="${pts.map((q, i) => (i ? "L" : "M") + X(q.t).toFixed(1) + " " + Y(l.v(q.p)).toFixed(1)).join("")}" fill="none" stroke="${l.split ? `url(#${gid}${li})` : l.c}" stroke-width="2.6" stroke-linejoin="round" stroke-linecap="round"/>`; });
   const last = pts[pts.length - 1];
   o.lines.forEach(l => { const x = X(last.t), y = Y(l.v(last.p));
-    s += `<circle class="sim-pulse" cx="${x}" cy="${y}" r="6" fill="${l.c}"/><circle cx="${x}" cy="${y}" r="5" fill="${l.c}" stroke="var(--bgx,#fff)" stroke-width="1.5"/>`; });
+    s += `<circle class="sim-pulse" cx="${x}" cy="${y}" r="6" fill="${lc(l, l.v(last.p))}"/><circle cx="${x}" cy="${y}" r="5" fill="${lc(l, l.v(last.p))}" stroke="var(--bgx,#fff)" stroke-width="1.5"/>`; });
   if (o.marks) s += o.marks(X, Y, H - B);
   s += `<line class="tr-cur" x1="0" x2="0" y1="${T}" y2="${H - B}" stroke="var(--ink)" opacity="0"/>` + o.lines.map((l, i) => `<circle class="tr-dot" data-i="${i}" r="5" fill="${l.c}" stroke="var(--bgx,#fff)" stroke-width="2" opacity="0"/>`).join("");
   s += `<rect class="tr-hit" x="${L - 10}" y="0" width="${W - L - R + 20}" height="${H}" fill="transparent"/></svg>`;
   // photos riding at the end of each line
   let pics = o.lines.map(l => { const x = X(last.t), y = Y(l.v(last.p));
-    return `<div class="tr-pic" style="left:${100 * x / W}%;top:${100 * y / H}%">${avatar(l.who[0], l.who[1], l.who[2], narrowW ? 26 : 30)}<b class="tr-val" style="color:${l.c}">${l.tag(last.p)}</b></div>`; }).join("");
+    return `<div class="tr-pic" style="left:${100 * x / W}%;top:${100 * y / H}%">${avatar(l.who[0], l.who[1], l.who[2], narrowW ? 26 : 30)}<b class="tr-val" style="color:${lc(l, l.v(last.p))}">${l.tag(last.p)}</b></div>`; }).join("");
   el.innerHTML = `<div class="tr-plot">${s}${pics}<div class="trend-tip"></div></div><div class="tr-read"></div>`;
   const svg = el.querySelector("svg"), plot = el.querySelector(".tr-plot"), tipE = plot.querySelector(".trend-tip"), read = el.querySelector(".tr-read"), cur = svg.querySelector(".tr-cur"), dots = [...svg.querySelectorAll(".tr-dot")];
   const narrow = () => el.clientWidth < 560;
   const show = i => {
     const q = pts[i], x = X(q.t);
     cur.setAttribute("x1", x); cur.setAttribute("x2", x); cur.setAttribute("opacity", ".35");
-    dots.forEach((d, k) => { d.setAttribute("cx", x); d.setAttribute("cy", Y(o.lines[k].v(q.p))); d.setAttribute("opacity", "1"); });
+    dots.forEach((d, k) => { const v = o.lines[k].v(q.p); d.setAttribute("cx", x); d.setAttribute("cy", Y(v)); d.setAttribute("fill", lc(o.lines[k], v)); d.setAttribute("opacity", "1"); });
     if (narrow()) { read.innerHTML = (o.tip || simTip)(q.p); read.classList.add("show"); tipE.classList.remove("show"); return; }
     tipE.innerHTML = (o.tip || simTip)(q.p);
     const bw = plot.clientWidth, px = x * bw / W, tw = tipE.offsetWidth || 260;
@@ -3624,9 +3628,9 @@ function spOpen(name) {
     <div class="sp-grid">
       <div class="sp-main">
         <h1>${name}'s trend over time</h1>
-        <p class="sp-sub">How often ${name} voted for Schumer in the 11,111 runs at each hourly check since Nov. 11. ${p.fixed != null ? `As a candidate, ${first} always votes for ${p.fixed ? "himself" : "himself"}.` : `Only ${first}'s own statements move this line. When other senators move, they show up as dots along the bottom, and what that did to the race is in the tooltip and the list below.`}</p>
+        <p class="sp-sub">${name}'s chance of voting Schumer or Van Hollen in the 11,111 runs at each hourly check since Nov. 11. The line is blue while it's above the tie line and turns teal when it crosses below. ${p.fixed != null ? `As a candidate, ${first} always votes for ${p.fixed ? "himself" : "himself"}.` : `Only ${first}'s own statements move this line. When other senators move, they show up as dots along the bottom, and what that did to the race is in the tooltip and the list below.`}</p>
         <div class="trend" id="spTrend"></div>
-        <div class="sp-legend"><span><i style="--c:#2F6FD0"></i>Votes Schumer</span><span><i style="--c:#12A6CC"></i>Votes Van Hollen</span><span><i class="ring"></i>${first} moved on the tracker</span><span><i style="--c:#8a8f96"></i>Another senator moved (colored by where they went)</span></div>
+        <div class="sp-legend"><span><i style="--c:#2F6FD0"></i>Above the tie: leans Schumer</span><span><i style="--c:#12A6CC"></i>Below the tie: leans Van Hollen</span><span><i class="ring"></i>${first} moved on the tracker</span><span><i style="--c:#8a8f96"></i>Another senator moved (colored by where they went)</span></div>
         <h2 class="sp-h2">What moved ${ownEv.length ? `${first} and ` : ""}the race</h2>
         ${moves.slice().reverse().map(evRow).join("")}
       </div>
@@ -3646,12 +3650,16 @@ function spOpen(name) {
   wrap.hidden = false; document.documentElement.style.overflow = "hidden"; wrap.scrollTop = 0;
   const t0 = pts[0].t, tEnd = simStamp(LEADER_VOTE.date) ?? simStamp("Dec. 1");
   simDrawTrend("spTrend", pts, t0, tEnd, {
-    yMin: 0, yMax: 100, step: 25, fmt: v => v + "%", ref: 50, refLabel: "50%", tip: spTip,
-    lines: [{ v: q => Math.round(1000 * q.s) / 10, c: "#2F6FD0", who: ["Chuck Schumer", "NY", "#03045E"], tag: q => Math.round(100 * q.s) + "%" },
-            { v: q => Math.round(1000 * (1 - q.s)) / 10, c: "#12A6CC", who: ["Chris Van Hollen", "MD", "#06566B"], tag: q => Math.round(100 * (1 - q.s)) + "%" }],
+    yMin: 0, yMax: 100, step: 25, fmt: v => (v === 50 ? 50 : v > 50 ? v : 100 - v) + "%", ref: 50, refLabel: "Tie", tip: spTip,
+    bands: (X, Y, x1, x2) => `<rect x="${x1}" y="${Y(100)}" width="${x2 - x1}" height="${Y(50) - Y(100)}" fill="#2F6FD0" opacity=".06"/>` +
+      `<rect x="${x1}" y="${Y(50)}" width="${x2 - x1}" height="${Y(0) - Y(50)}" fill="#12A6CC" opacity=".06"/>` +
+      `<text x="${x1 + 8}" y="${Y(100) + 15}" style="fill:#2F6FD0;font-weight:800">↑ Schumer</text>` +
+      `<text x="${x1 + 8}" y="${Y(0) - 18}" style="fill:#0e8cab;font-weight:800">↓ Van Hollen</text>`,
+    lines: [{ v: q => Math.round(1000 * q.s) / 10, split: [50, "#2F6FD0", "#12A6CC"], c: "#2F6FD0", who: [name, p.st, color],
+              tag: q => q.s >= .5 ? `${Math.round(100 * q.s)}% Schumer` : `${Math.round(100 * (1 - q.s))}% Van Hollen` }],
     marks: (X, Y, base) => events.filter(v => v.e[2].length).map(v => {
       if (v.own) { const k = pts.findIndex(q => q.t >= v.t); if (k < 0) return ""; const q = pts[k];
-        return `<circle class="sp-ownmark" cx="${X(q.t)}" cy="${Y(100 * q.p.s)}" r="9"/><circle class="sp-ownmark" cx="${X(q.t)}" cy="${Y(100 - 100 * q.p.s)}" r="9" opacity=".5"/>`; }
+        return `<circle class="sp-ownmark" cx="${X(q.t)}" cy="${Y(100 * q.p.s)}" r="9"/>`; }
       const to = v.e[2][0][3] === "Opposing Schumer" ? "Will not support" : v.e[2][0][3];
       return `<circle cx="${X(v.t)}" cy="${base - 5}" r="4" fill="${SP_TO_C[to] || "#8a8f96"}" stroke="var(--bgx,#fff)" stroke-width="1.2"/>`;
     }).join("") });
