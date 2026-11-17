@@ -92,7 +92,7 @@
   html.dark .news-up { background: #1b1f24; }
   html.dark .news-up:hover { background: #23282e; }
   .shot-btn[disabled] { opacity: .6; cursor: progress; }
-  .modal { position: fixed; inset: 0; z-index: 20; background: rgba(16,24,40,.55); display: none;
+  .modal { position: fixed; inset: 0; z-index: 70; background: rgba(16,24,40,.55); display: none;
     align-items: center; justify-content: center; padding: 20px; }
   .modal.open { display: flex; }
   .modal-card { background: #fff; border-radius: 14px; max-width: 760px; width: 100%; max-height: 92vh;
@@ -610,6 +610,36 @@
   .strend { border: 1.5px solid var(--rule); background: transparent; color: var(--ink); border-radius: 999px; padding: 4px 10px; cursor: pointer;
     font: 700 11.5px/1.2 "Inter", system-ui, sans-serif; white-space: nowrap; }
   .strend:hover { border-color: #7d5fcf; background: #efe8fb; color: #2f2150; }
+  /* Small screenshot buttons (Simulations tab and senator pages) */
+  .mini-shot { display: inline-flex; align-items: center; gap: 6px; vertical-align: middle; margin-left: 8px; position: relative; top: -2px;
+    font: 600 12px/1 "Inter", system-ui, sans-serif; letter-spacing: 0; color: var(--ink); background: transparent;
+    border: 1.5px solid var(--rule); border-radius: 999px; padding: 6px 10px; cursor: pointer; }
+  .mini-shot:hover { background: #f6f7f9; }
+  .mini-shot[disabled] { opacity: .6; cursor: progress; }
+  html.dark .mini-shot:hover { background: #23282e; }
+  .sp-shot { margin-left: 0; top: 0; padding: 7px 12px; font-size: 13px; }
+  /* Group screenshot: picking senators */
+  #simList.g-pick .srow { cursor: pointer; border-radius: 10px; transition: background .12s; }
+  #simList.g-pick .srow:hover { background: rgba(46,158,91,.06); }
+  #simList.g-pick .slock, #simList.g-pick .sfoot { opacity: .35; pointer-events: none; }
+  #simList .srow.g-on { background: rgba(46,158,91,.1); }
+  #simList .srow.g-on > .avatar { box-shadow: inset 0 0 0 2px var(--av), 0 0 0 3px var(--bgx, #fff), 0 0 0 6px #2e9e5b; }
+  .group-bar { position: fixed; left: 0; right: 0; bottom: 0; z-index: 30; padding: 10px 16px calc(10px + env(safe-area-inset-bottom));
+    background: #fff; border-top: 2px solid #2e9e5b; box-shadow: 0 -8px 24px rgba(0,0,0,.08); }
+  html.dark .group-bar { background: #1b1f24; }
+  .group-bar[hidden] { display: none; }
+  .group-bar .g-in { max-width: 1020px; margin: 0 auto; display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+  .group-bar .g-left { display: flex; flex-direction: column; gap: 2px; font-size: 13px; min-width: 150px; }
+  .group-bar .g-left b { font-size: 14px; color: #1f7a45; }
+  html.dark .group-bar .g-left b { color: #5fd08d; }
+  .group-bar .g-count { color: var(--muted); }
+  .group-bar .g-title { flex: 1 1 260px; min-width: 0; font: 500 16px/1.2 "Inter", system-ui, sans-serif; color: var(--ink); background: transparent;
+    border: 1.5px solid var(--rule); border-radius: 8px; padding: 9px 10px; }
+  .group-bar .g-btns { display: flex; gap: 8px; margin-left: auto; }
+  .group-bar button { font: 700 13px/1 "Inter", system-ui, sans-serif; border-radius: 8px; padding: 10px 14px; cursor: pointer; display: inline-flex; align-items: center; gap: 7px; }
+  .group-bar .g-cancel { background: transparent; color: var(--ink); border: 1.5px solid var(--rule); }
+  .group-bar .g-go { background: #2e9e5b; color: #fff; border: 1.5px solid #2e9e5b; }
+  .group-bar .g-go[disabled] { opacity: .45; cursor: default; }
   .sp-wrap { position: fixed; inset: 0; z-index: 60; overflow-y: auto; background: #fff; -webkit-overflow-scrolling: touch; }
   html.dark .sp-wrap { background: #111418; }
   .sp-in { max-width: 1120px; margin: 0 auto; padding: 18px 20px 48px; }
@@ -959,7 +989,7 @@
     </section>
     <hr>
     <section>
-      <h2 class="sim-h2">Chance of winning since Nov. 11</h2>
+      <h2 class="sim-h2">Chance of winning since Nov. 11 <button type="button" class="mini-shot" id="winShot" title="Screenshot this chart"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg><span class="lbl">Screenshot</span></button></h2>
       <p class="sim-sub">How often each candidate won the runs at each check. A 28–28 tie would go to another ballot, so it counts as half a win for each. Hover, or tap and drag, to see what changed at each point.</p>
       <div class="trend" id="simTrendWin"></div>
     </section>
@@ -972,7 +1002,7 @@
     </section>
     <hr>
     <section>
-      <h2 class="sim-h2">Every senator</h2>
+      <h2 class="sim-h2">Every senator <button type="button" class="mini-shot" id="groupShot" title="Pick senators for a stacked screenshot"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg><span class="lbl">Group screenshot</span></button></h2>
       <p class="sim-sub">How often each senator voted for each candidate across the runs. Open "Why" for the factors and sources behind it, and use S or VH to lock someone to a side.</p>
       <div class="sim-tools" id="simTools">
         <button type="button" data-sort="lean" aria-pressed="true">By lean</button>
@@ -2629,6 +2659,8 @@ function pickShot(t) {
 document.querySelectorAll(".shot-opt").forEach(b => b.addEventListener("click", e => { e.stopPropagation(); pickShot(b.dataset.theme); }));
 shotBtn.addEventListener("click", async e => {
   e.stopPropagation();
+  if (view === "history") { if (HISTORY.length) shotShow(shotHistoryDraw(), "latest-update", shotBtn); return; }
+  if (view === "sims") { if (SIM && simCur) shotShow(shotSimsDraw(), "simulations", shotBtn); return; }
   pinned = null; hideTip();
   document.querySelectorAll(".seat.active, li.active").forEach(el => el.classList.remove("active"));
   chamber.classList.remove("dim");
@@ -2655,6 +2687,515 @@ shotBtn.addEventListener("click", async e => {
 document.getElementById("shotClose").addEventListener("click", e => { e.stopPropagation(); modal.classList.remove("open"); });
 modal.addEventListener("click", e => { if (e.target === modal) modal.classList.remove("open"); e.stopPropagation(); });
 document.addEventListener("keydown", e => { if (e.key === "Escape") modal.classList.remove("open"); });
+
+/* ---------- More screenshots: Previous Updates, Simulations, one senator's trend, a group of senators ---------- */
+// Drawn on a canvas from the data, like the tracker image, so they look the same on every device. Light and dark.
+const SHOT_F = "Inter, system-ui, -apple-system, Segoe UI, sans-serif";
+const SHOT_W = 1200;
+const shotTheme = dark => dark
+  ? { BG: "#111418", INK: "#e8eaed", MUTED: "#a6adb6", FAINT: "#7d858f", RULE: "#2c3238", SOFT: "#1b1f24", LINK: "#7fb0ff", dark }
+  : { BG: "#ffffff", INK: "#16191d", MUTED: "#5b636d", FAINT: "#8c949e", RULE: "#e3e6ea", SOFT: "#f6f7f9", LINK: "#2F6FD0", dark };
+const shotImgs2 = {};
+const shotImg = src => shotImgs2[src] || (shotImgs2[src] = new Promise(res => { const im = new Image(); im.onload = () => res(im); im.onerror = () => res(null); im.src = src; }));
+// Mix a color with the background (for pill and card tints)
+function shotTint(hex, a, bg) {
+  const p = h => [1, 3, 5].map(i => parseInt(h.slice(i, i + 2), 16)), c = p(hex), b = p(bg);
+  return "#" + c.map((v, i) => Math.round(b[i] + (v - b[i]) * a).toString(16).padStart(2, "0")).join("");
+}
+// A pen: canvas plus drawing helpers. measure = true draws nothing visible and is only used to find the height.
+function shotPen(H, dark, measure) {
+  const W = SHOT_W, S = measure ? 1 : 2, T = shotTheme(dark);
+  const cv = document.createElement("canvas");
+  cv.width = measure ? 1 : W * S; cv.height = measure ? 1 : Math.ceil(H * S);
+  const g = cv.getContext("2d");
+  g.scale(S, S); g.textBaseline = "alphabetic";
+  if (!measure) { g.fillStyle = T.BG; g.fillRect(0, 0, W, H); }
+  const font = (w, px) => { g.font = `${w} ${px}px ${SHOT_F}`; };
+  const P = { cv, g, W, H, T, PAD: 64, font, measure };
+  P.width = (s, w = 400, px = 14) => { font(w, px); return g.measureText(s).width; };
+  P.text = (s, x, y, { w = 400, px = 14, color = T.INK, align = "left", maxW, spacing } = {}) => {
+    font(w, px);
+    if (maxW) { let q = px; while (q > 8 && g.measureText(s).width > maxW) { q -= 0.5; font(w, q); } }
+    const ls = "letterSpacing" in g;
+    if (spacing && ls) g.letterSpacing = spacing + "px";
+    g.fillStyle = color; g.textAlign = align; g.fillText(s, x, y);
+    if (spacing && ls) g.letterSpacing = "0px";
+  };
+  // Rich text: runs of [text, weight, color], wrapped to maxW. Returns the y after the last line.
+  P.rich = (runs, x, y, maxW, { px = 16, lh = px * 1.45, align = "left" } = {}) => {
+    const words = [];
+    runs.forEach(([s, w = 400, c = T.INK]) => String(s).split(/(\s+)/).forEach(t => { if (t) words.push([t, w, c]); }));
+    const lines = []; let line = [], lw = 0;
+    words.forEach(wd => {
+      const ww = P.width(wd[0], wd[1], px);
+      if (/^\s+$/.test(wd[0])) { if (line.length) { line.push(wd); lw += ww; } return; }
+      if (lw + ww > maxW && line.length) { while (line.length && /^\s+$/.test(line[line.length - 1][0])) { lw -= P.width(line.pop()[0], 400, px); } lines.push([line, lw]); line = []; lw = 0; }
+      line.push(wd); lw += ww;
+    });
+    if (line.length) lines.push([line, lw]);
+    lines.forEach(([ln, w2], i) => {
+      let xx = align === "center" ? x - w2 / 2 : x;
+      ln.forEach(([t, w, c]) => { P.text(t, xx, y + i * lh, { w, px, color: c }); xx += P.width(t, w, px); });
+    });
+    return y + Math.max(1, lines.length) * lh;
+  };
+  P.para = (s, x, y, maxW, o = {}) => P.rich([[s, o.w || 400, o.color || T.INK]], x, y, maxW, o);
+  P.rule = (y, x0 = P.PAD, x1 = W - P.PAD) => { g.fillStyle = T.RULE; g.fillRect(x0, y, x1 - x0, 1.5); };
+  P.rr = (x, y, w, h, r, fill, stroke, lw = 1.5) => {
+    g.beginPath(); if (g.roundRect) g.roundRect(x, y, w, h, r); else g.rect(x, y, w, h);
+    if (fill) { g.fillStyle = fill; g.fill(); }
+    if (stroke) { g.strokeStyle = stroke; g.lineWidth = lw; g.stroke(); }
+  };
+  P.dot = (x, y, r, fill, stroke, lw = 1.5) => {
+    g.beginPath(); g.arc(x, y, r, 0, Math.PI * 2);
+    if (fill) { g.fillStyle = fill; g.fill(); }
+    if (stroke) { g.strokeStyle = stroke; g.lineWidth = lw; g.stroke(); }
+  };
+  P.dash = (x1, y1, x2, y2, color, lw = 1.5, d = [5, 4], alpha = 1) => {
+    g.save(); g.globalAlpha = alpha; g.strokeStyle = color; g.lineWidth = lw; g.setLineDash(d);
+    g.beginPath(); g.moveTo(x1, y1); g.lineTo(x2, y2); g.stroke(); g.restore();
+  };
+  // A senator's photo in a circle with a colored ring (initials if there's no photo)
+  P.face = async (name, st, color, cx, cy, r, ring = Math.max(2, r * 0.07)) => {
+    const im = measure ? null : await shotImg(encodeURI(photoFile(name, st)));
+    if (measure) return;
+    g.save(); g.beginPath(); g.arc(cx, cy, r, 0, Math.PI * 2); g.closePath();
+    g.fillStyle = shotTint(color, .22, T.BG); g.fill(); g.clip();
+    if (im) {
+      const sc = Math.max(2 * r / im.naturalWidth, 2 * r / im.naturalHeight), dw = im.naturalWidth * sc, dh = im.naturalHeight * sc;
+      g.drawImage(im, cx - dw / 2, cy - r - (dh - 2 * r) * 0.12, dw, dh);
+    } else {
+      const ini = name.split(" ").filter(w => /^[A-Z]/.test(w)).map(w => w[0]).filter((_, i, a) => i === 0 || i === a.length - 1).join("");
+      P.text(ini, cx, cy + r * 0.36, { w: 700, px: r * 0.95, color, align: "center" });
+    }
+    g.restore();
+    P.dot(cx, cy, r - ring / 2, null, color, ring);
+  };
+  P.pill = (s, x, y, color, { px = 13, align = "left" } = {}) => {
+    const w = P.width(s, 800, px) + 16, h = px + 10, x0 = align === "center" ? x - w / 2 : x;
+    P.rr(x0, y, w, h, 6, shotTint(color, T.dark ? .3 : .18, T.BG));
+    P.text(s, x0 + 8, y + h / 2 + px * .36, { w: 800, px, color: T.INK });
+    return w;
+  };
+  return P;
+}
+// Header used by every card: site name, title, subtitle. Returns the y below it.
+function shotHeader(P, { kicker, title, sub }) {
+  const { W, T } = P;
+  let y = 58;
+  if (kicker) { kicker(P, y); y += 40; }
+  else { P.text("THE 29TH VOTE", W / 2, y, { w: 700, px: 14, color: T.MUTED, align: "center", spacing: 2.4 }); y += 46; }
+  P.text(title, W / 2, y, { w: 800, px: 40, align: "center", maxW: W - 2 * P.PAD });
+  y += 14;
+  if (sub) y = P.rich(Array.isArray(sub) ? sub : [[sub, 400, T.MUTED]], W / 2, y + 22, W - 2 * P.PAD - 80, { px: 18, lh: 26, align: "center" }) - 8;
+  return y + 22;
+}
+// Footer: an optional note, then the site name, address and byline
+function shotFooter(P, y, note) {
+  const { W, T } = P;
+  P.rule(y); y += 30;
+  if (note) { y = P.para(note, W / 2, y, W - 2 * P.PAD, { px: 14, lh: 20, color: T.MUTED, align: "center" }) + 6; }
+  const brand = [["The 29th Vote", 800, T.INK], ["  ·  ", 400, T.FAINT], ["jaysonfrascatore.github.io/The29thVote", 600, T.LINK],
+    ["  ·  ", 400, T.FAINT], ["Created by Jayson Frascatore", 700, T.INK]];
+  const bw = brand.map(([t, w]) => P.width(t, w, 17));
+  let bx = (W - bw.reduce((a, b) => a + b, 0)) / 2;
+  brand.forEach(([t, w, c], i) => { P.text(t, bx, y + 4, { w, px: 17, color: c }); bx += bw[i]; });
+  return y + 34;
+}
+// Draw a card twice: once to measure the height, once for real. Returns a PNG blob.
+async function shotCard(draw, dark) {
+  if (document.fonts && document.fonts.load) {
+    try { await Promise.all(["400", "600", "700", "800"].map(w => document.fonts.load(`${w} 20px Inter`))); } catch (e) {}
+  }
+  const H = await draw(shotPen(10, dark, true));
+  const P = shotPen(H, dark, false);
+  await draw(P);
+  return new Promise(r => P.cv.toBlob(r, "image/png"));
+}
+// "As of" stamp from the latest check
+const shotAsOf = () => `As of ${CHECKED}`;
+
+/* --- Charts on canvas (same math as the page's SVG charts) --- */
+// pts: [{ p, t }], o: { yMin, yMax, step, fmt, ref, refLabel, lines:[{ v, lo, hi, c, split, who, tag }], bands, marks }
+async function shotTrendChart(P, x, y, w, h, pts, t0, tEnd, o) {
+  const { g, T } = P, L = 54, R = 150, Tp = 16, B = 34;
+  const X = t => x + L + (t - t0) * (w - L - R) / Math.max(1, tEnd - t0), Y = v => y + Tp + (o.yMax - v) * (h - Tp - B) / (o.yMax - o.yMin);
+  const x1 = x + L, x2 = x + w - R, yb = y + h - B;
+  const lc = (l, v) => l.split ? (v >= l.split[0] ? l.split[1] : l.split[2]) : l.c;
+  if (o.bands) o.bands(X, Y, x1, x2);
+  for (let v = o.yMin; v <= o.yMax; v += o.step) {
+    g.fillStyle = T.RULE; g.fillRect(x1, Y(v), x2 - x1, 1);
+    P.text(String(o.fmt(v)), x1 - 9, Y(v) + 5, { px: 14, color: T.MUTED, align: "right" });
+  }
+  for (let d = Math.floor(t0 / 24) * 24; d <= tEnd; d += 24) {
+    const day = new Date(d * 3600000), dd = day.getUTCDate(), dec = day.getUTCMonth() === 11, xd = Math.max(x1, X(d));
+    g.fillStyle = T.FAINT; g.fillRect(xd, yb, 1, 5);
+    if (dec ? dd === 1 : ((dd - 11) % 3 === 0 && 30 - dd >= 2))
+      P.text((dec ? "Dec. " : "Nov. ") + dd, xd, yb + 24, { w: 600, px: 14, color: T.MUTED, align: xd <= x1 ? "left" : "center" });
+  }
+  P.dash(X(tEnd), y + Tp, X(tEnd), yb, T.INK, 1.5, [3, 4], .55);
+  P.text("Vote", X(tEnd) + 6, y + Tp + 10, { w: 700, px: 13 });
+  P.dash(x1, Y(o.ref), x2, Y(o.ref), T.INK, 1.5, [6, 5], .55);
+  P.text(o.refLabel, X(tEnd) - 8, Y(o.ref) - 8, { w: 700, px: 13, align: "right" });
+  o.lines.forEach(l => {
+    if (!l.lo || pts.length < 2) return;
+    g.save(); g.globalAlpha = .13; g.fillStyle = l.c; g.beginPath();
+    pts.forEach((q, i) => (i ? g.lineTo : g.moveTo).call(g, X(q.t), Y(l.hi(q.p))));
+    pts.slice().reverse().forEach(q => g.lineTo(X(q.t), Y(l.lo(q.p))));
+    g.closePath(); g.fill(); g.restore();
+  });
+  o.lines.forEach(l => {
+    g.save(); g.lineWidth = 3.4; g.lineJoin = "round"; g.lineCap = "round";
+    if (l.split) { const f = Math.max(0, Math.min(1, (Y(l.split[0]) - (y + Tp)) / (yb - (y + Tp))));
+      const gr = g.createLinearGradient(0, y + Tp, 0, yb); gr.addColorStop(0, l.split[1]); gr.addColorStop(f, l.split[1]); gr.addColorStop(f, l.split[2]); gr.addColorStop(1, l.split[2]); g.strokeStyle = gr; }
+    else g.strokeStyle = l.c;
+    g.beginPath(); pts.forEach((q, i) => (i ? g.lineTo : g.moveTo).call(g, X(q.t), Y(l.v(q.p)))); g.stroke(); g.restore();
+  });
+  if (o.marks) o.marks(X, Y, yb);
+  const last = pts[pts.length - 1];
+  // end dots, then each candidate's face with the latest value; nudge them apart if they'd overlap
+  const ends = o.lines.map(l => ({ l, x: X(last.t), y: Y(l.v(last.p)), c: lc(l, l.v(last.p)) }));
+  ends.forEach(e => P.dot(e.x, e.y, 6, e.c, T.BG, 2));
+  const fy = ends.map(e => e.y);
+  if (fy.length === 2 && Math.abs(fy[0] - fy[1]) < 40) { const m = (fy[0] + fy[1]) / 2, s = fy[0] <= fy[1] ? -1 : 1; fy[0] = m + s * 20; fy[1] = m - s * 20; }
+  for (let i = 0; i < ends.length; i++) {
+    const e = ends[i], l = e.l;
+    if (l.who) await P.face(l.who[0], l.who[1], l.who[2], e.x + 30, fy[i], 19);
+    const tg = l.tag(last.p), tx = e.x + (l.who ? 56 : 14);
+    P.rr(tx - 4, fy[i] - 12, P.width(tg, 800, 17) + 8, 24, 4, T.BG);
+    P.text(tg, tx, fy[i] + 6, { w: 800, px: 17, color: e.c });
+  }
+  return y + h;
+}
+function shotTrendPts() {
+  const pts = SIM_HISTORY.filter(p => simStamp(p[0]) != null);
+  const t0 = simStamp(pts[0][0]), tEnd = simStamp(LEADER_VOTE.date) ?? simStamp("Dec. 1");
+  return { pts: pts.map(p => ({ p, t: simStamp(p[0]) })), t0, tEnd };
+}
+const SHOT_SEATS_O = {
+  yMin: 16, yMax: 40, step: 4, fmt: v => v, ref: 28.5, refLabel: "29 to win",
+  lines: [{ v: p => p[1], lo: p => p[2], hi: p => p[3], c: "#2F6FD0", who: ["Chuck Schumer", "NY", "#03045E"], tag: p => p[1].toFixed(1) },
+          { v: p => 56 - p[1], lo: p => 56 - p[3], hi: p => 56 - p[2], c: "#12A6CC", who: ["Chris Van Hollen", "MD", "#06566B"], tag: p => (56 - p[1]).toFixed(1) }] };
+const SHOT_WIN_O = {
+  yMin: 0, yMax: 100, step: 25, fmt: v => v + "%", ref: 50, refLabel: "50%",
+  lines: [{ v: p => simWin(p), c: "#2F6FD0", who: ["Chuck Schumer", "NY", "#03045E"], tag: p => simWin(p).toFixed(1) + "%" },
+          { v: p => Math.round(10 * (100 - simWin(p))) / 10, c: "#12A6CC", who: ["Chris Van Hollen", "MD", "#06566B"], tag: p => (100 - simWin(p)).toFixed(1) + "%" }] };
+function shotHistogram(P, x, y, w, h) {
+  const { T } = P, st = simCur, hst = st.hist; let lo = 56, hi = 0;
+  for (let k = 0; k <= 56; k++) if (hst[k]) { lo = Math.min(lo, k); hi = Math.max(hi, k); }
+  lo = Math.min(lo, 27); hi = Math.max(hi, 30);
+  const n = hi - lo + 1, bw = w / n, top = y + 26, base = y + h - 30, max = Math.max(...hst.slice(lo, hi + 1), 1);
+  const x29 = x + (29 - lo) * bw;
+  P.g.save(); P.g.globalAlpha = .5; P.g.fillStyle = T.INK; P.g.fillRect(x29 - 2, y + 6, 2, base - y - 6); P.g.restore();
+  P.text("29 to win", x29 + 5, y + 18, { w: 700, px: 13 });
+  for (let k = lo; k <= hi; k++) {
+    const c = hst[k], bh = c ? Math.max(2, (base - top) * c / max) : 0, bx = x + (k - lo) * bw;
+    const col = k >= 29 ? "#2F6FD0" : k <= 27 ? "#12A6CC" : "#8a6fd1";
+    if (bh) P.rr(bx + 2, base - bh, bw - 4, bh, 3, col);
+    if (c) P.text(c > 999 ? (c / 1000).toFixed(1) + "k" : String(c), bx + bw / 2, base - bh - 6, { w: 600, px: bw < 26 ? 11 : 12.5, color: T.MUTED, align: "center" });
+    P.text(String(k), bx + bw / 2, base + 21, { w: 600, px: 13, color: T.MUTED, align: "center" });
+  }
+  return y + h;
+}
+function shotLegend(P, y, items) {
+  const { W, T } = P, px = 14, gap = 26;
+  const ws = items.map(([s]) => 14 + 8 + P.width(s, 400, px)), tot = ws.reduce((a, b) => a + b, 0) + gap * (items.length - 1);
+  let x = (W - tot) / 2;
+  items.forEach(([s, c, round], i) => { if (round) P.dot(x + 6, y - 5, 6, c); else P.rr(x, y - 11, 12, 12, 3, c); P.text(s, x + 21, y, { px, color: T.MUTED }); x += ws[i] + gap; });
+  return y + 12;
+}
+
+/* --- 1. Previous Updates: the latest entry --- */
+function shotHistoryDraw() {
+  const HK = k => k === "Opposing Schumer" ? "Will not support" : k;
+  const e = HISTORY[HISTORY.length - 1];
+  const [when, , moves, note, nst] = e;
+  return async P => {
+    const { W, T, PAD } = P;
+    let y = shotHeader(P, {
+      title: `${when} update`,
+      sub: moves.length ? `${moves.length === 1 ? "One senator" : (["", "", "Two", "Three", "Four", "Five", "Six", "Seven", "Eight", "Nine"][moves.length] || moves.length) + " senators"} moved on The 29th Vote, the tracker of who backs Chuck Schumer or Chris Van Hollen for Senate majority leader.` : "A change to the caucus roster.",
+    });
+    P.rule(y); y += 38;
+    if (!moves.length) {
+      y = P.rich([[nst ? `${STATE_NAMES[nst] || nst}: ` : "", 800], [note || "", 400]], PAD, y + 6, W - 2 * PAD, { px: 20, lh: 30 }) + 10;
+    }
+    for (const [nm, st, from, to, why] of moves) {
+      const tc = HK(to), fc = HK(from);
+      await P.face(nm, st, COLORS[tc] || "#B8BDC4", PAD + 40, y + 34, 40, 4);
+      const tx = PAD + 104, tw = W - PAD - tx;
+      P.text(nm, tx, y + 20, { w: 800, px: 26 });
+      P.text(`· ${STATE_NAMES[st] || st}`, tx + P.width(nm, 800, 26) + 10, y + 20, { px: 22, color: T.MUTED });
+      const fl = from === "Opposing Schumer" ? from : L(fc), tl = L(tc);
+      const fcol = TEXT_COLORS[fc] || T.MUTED, tcol = TEXT_COLORS[tc] || T.INK;
+      P.dot(tx + 7, y + 47, 7, COLORS[fc] || "#B8BDC4");
+      P.text(fl, tx + 21, y + 53, { w: 700, px: 18, color: fcol });
+      let ax = tx + 21 + P.width(fl, 700, 18) + 12;
+      P.text("→", ax, y + 53, { w: 700, px: 18, color: T.MUTED }); ax += P.width("→", 700, 18) + 12;
+      P.dot(ax + 7, y + 47, 7, COLORS[tc] || "#B8BDC4");
+      P.text(tl, ax + 21, y + 53, { w: 800, px: 18, color: tcol });
+      y = P.para(why, tx, y + 86, tw, { px: 18, lh: 27 });
+      y += 26;
+    }
+    // where things stand after it, as a bar like the tracker's
+    const segs = CATS.map(c => [c, counts[c]]).filter(([, n]) => n > 0);
+    P.rule(y - 6); y += 34;
+    P.rich([["After this update: ", 400, T.MUTED], [`${counts["Support"]} of ${NEEDED}`, 800, T.INK], [" for Schumer", 400, T.MUTED]], W / 2, y, W - 2 * PAD, { px: 18, align: "center" });
+    y += 22;
+    const BX = PAD, BW = W - 2 * PAD, BH = 48; let bx = BX;
+    segs.forEach(([c, n], i) => {
+      const w = BW * n / TOTAL, ww = w - (i === segs.length - 1 ? 0 : 3);
+      P.g.fillStyle = COLORS[c]; P.g.fillRect(bx, y, ww, BH);
+      const txt = c === "No public position" ? "#16191d" : c === "Will not support" ? "#0b4655" : "#fff";
+      if (ww > 22) P.text(String(n), bx + ww / 2, y + 31, { w: 800, px: 20, color: txt, align: "center" });
+      bx += w;
+    });
+    const MX = BX + BW * (NEEDED - 0.5) / TOTAL;
+    P.dash(MX, y - 8, MX, y + BH + 8, T.INK, 2.4, [6, 4]);
+    y += BH + 34;
+    y = shotLegend(P, y, CATS.map(c => [`${L(c)} ${counts[c]}`, COLORS[c]])) + 22;
+    return shotFooter(P, y + 4, `Senate Democrats elect their leader by secret ballot on ${LEADER_VOTE.date}. ${shotAsOf()}.`);
+  };
+}
+
+/* --- 2. Simulations: the top of the tab (odds, projected votes, how many votes Schumer got) --- */
+function shotSimsDraw() {
+  const st = simCur, R = SIM.N_RUNS, locked = Object.keys(simLocks).length > 0;
+  const { pts, t0, tEnd } = shotTrendPts();
+  return async P => {
+    const { W, T, PAD } = P;
+    let y = shotHeader(P, { title: "11,111 simulations of the leader vote",
+      sub: `Each run plays out the secret ballot once: every senator votes Schumer or Van Hollen based on what they've said and done. ${shotAsOf()}.` });
+    P.rule(y); y += 32;
+    // three cards
+    const cw = 330, gap = 24, cx0 = (W - 3 * cw - 2 * gap) / 2, ch = 196;
+    const lead = st.sWin >= st.vWin ? 0 : 2;
+    const cards = [["Chuck Schumer", "NY", "#03045E", "#2F6FD0", st.sWin, "Schumer reaches 29"], [null, null, "#8a6fd1", "#8a6fd1", st.tie, "28–28 tie"], ["Chris Van Hollen", "MD", "#06566B", "#12A6CC", st.vWin, "Van Hollen reaches 29"]];
+    for (let i = 0; i < 3; i++) {
+      const [nm, s2, ring, col, n, lbl] = cards[i], x = cx0 + i * (cw + gap), mid = x + cw / 2;
+      P.rr(x, y, cw, ch, 14, i === lead ? shotTint(col, .07, T.BG) : T.BG, i === lead ? col : T.RULE, i === lead ? 2 : 1.5);
+      if (nm) await P.face(nm, s2, ring, mid, y + 44, 28, 3);
+      else { P.dot(mid, y + 44, 27, shotTint(ring, .22, T.BG), ring, 3); P.text("28", mid, y + 51, { w: 800, px: 19, color: T.dark ? "#cdbff2" : "#4b3a85", align: "center" }); }
+      P.text(simPct(n, st.kept) + "%", mid, y + 128, { w: 800, px: 50, color: col, align: "center" });
+      P.text(lbl, mid, y + 158, { w: 700, px: 17, align: "center" });
+      P.text(`${simFmt(n)} of ${simFmt(st.kept)} runs`, mid, y + 180, { px: 14.5, color: T.MUTED, align: "center" });
+    }
+    y += ch + 40;
+    const sw = (100 * (st.sWin + st.tie / 2) / st.kept).toFixed(1), vw = (100 * (st.vWin + st.tie / 2) / st.kept).toFixed(1);
+    y = P.rich([["In the middle run, Schumer gets "], [`${st.med} votes`, 800], [" to Van Hollen's "], [`${56 - st.med}`, 800], [". Most runs (the middle 80%) land between "], [`${st.lo} and ${st.hi}`, 800],
+      [" for Schumer. Counting a tie as a coin flip, that's a "], [`${sw}%`, 800, "#2F6FD0"], [" chance for Schumer and "], [`${vw}%`, 800, T.dark ? "#3cc3e2" : "#0e8cab"], [" for Van Hollen."]],
+      W / 2, y, 900, { px: 18, lh: 27, align: "center" });
+    if (locked) {
+      const ls = Object.entries(simLocks).map(([n, v]) => `${n.split(" ").slice(-1)[0]} → ${v ? "Schumer" : "Van Hollen"}`).join(", ");
+      y = P.para(`Counting only the ${simFmt(st.kept)} of ${simFmt(R)} runs where ${ls}.`, W / 2, y + 4, 900, { px: 15, lh: 22, color: T.MUTED, align: "center" });
+    }
+    y += 14; P.rule(y); y += 52;
+    P.text("Projected votes since Nov. 11", W / 2, y, { w: 800, px: 24, align: "center" }); y += 28;
+    y = P.para("The average number of votes each candidate got across all 11,111 runs at each hourly check. Shaded bands cover the middle 80% of runs.", W / 2, y, 860, { px: 15.5, lh: 22, color: T.MUTED, align: "center" }) + 6;
+    y = await shotTrendChart(P, PAD - 10, y, W - 2 * PAD + 20, 360, pts, t0, tEnd, SHOT_SEATS_O) + 20;
+    P.rule(y); y += 52;
+    P.text("How many votes Schumer got", W / 2, y, { w: 800, px: 24, align: "center" }); y += 28;
+    y = P.para(`Each bar is how many of the ${simFmt(st.kept)} runs ended with that many votes for Schumer.`, W / 2, y, 860, { px: 15.5, lh: 22, color: T.MUTED, align: "center" }) + 6;
+    y = shotHistogram(P, PAD + 10, y, W - 2 * PAD - 20, 300) + 8;
+    y = shotLegend(P, y + 26, [["Schumer reaches 29", "#2F6FD0"], ["28–28 tie", "#8a6fd1"], ["Van Hollen reaches 29", "#12A6CC"]]) + 24;
+    return shotFooter(P, y, "These are simulations, not predictions. The odds come from sourced factors and the weights listed on the Simulations tab.");
+  };
+}
+
+/* --- 3. Chance of winning chart on its own --- */
+function shotWinDraw() {
+  const { pts, t0, tEnd } = shotTrendPts();
+  const last = pts[pts.length - 1].p;
+  return async P => {
+    const { W, T, PAD } = P;
+    let y = shotHeader(P, { title: "Chance of winning since Nov. 11",
+      sub: [["How often each candidate won the 11,111 simulated runs at each hourly check. A 28–28 tie counts as half a win for each. ", 400, T.MUTED], [shotAsOf() + ".", 400, T.MUTED]] });
+    P.rule(y); y += 30;
+    y = await shotTrendChart(P, PAD - 10, y, W - 2 * PAD + 20, 420, pts, t0, tEnd, SHOT_WIN_O) + 18;
+    const n = last[7] && !/^No change/.test(last[7]) ? last[7] : "";
+    y = shotLegend(P, y, [["Schumer", "#2F6FD0", true], ["Van Hollen", "#12A6CC", true]]) + 18;
+    if (n) { y = P.rich([[`What changed at ${last[0]}: `, 800], [n.length > 300 ? n.slice(0, 297).replace(/\s+\S*$/, "") + "…" : n, 400, T.MUTED]], PAD, y + 8, W - 2 * PAD, { px: 15, lh: 22 }) + 8; }
+    return shotFooter(P, y + 8, "These are simulations, not predictions.");
+  };
+}
+
+/* --- 4. One senator's trend: profile and chart --- */
+function shotPersonDraw(name) {
+  const { p, pts, events, color } = spState && spState.name === name ? spState : (() => { const s = spSeries(name); return { ...s, color: COLORS[s.p.cat] || "#B8BDC4" }; })();
+  const last = pts[pts.length - 1].p, firstP = pts[0].p, first = name.split(" ").slice(-1)[0];
+  const t0 = pts[0].t, tEnd = simStamp(LEADER_VOTE.date) ?? simStamp("Dec. 1");
+  const rec = Object.values(SENATORS).flat().find(r => r[0] === name) || NO_POSITION.find(r => r[0] === name) || [];
+  const elect = p.cat !== "No public position" && rec[3] === true;
+  const note = p.cat === "No public position" ? (rec[3] || NO_POSITION_DEFAULT) : (rec[2] || "");
+  const noteTxt = String(note).replace(/<a\b[^>]*>(.*?)<\/a>/g, "$1").replace(/<[^>]+>/g, "");
+  const lab = p.fixed != null ? (p.fixed ? "Safe Schumer" : "Safe Van Hollen") : simLabel(last.s);
+  const pct = x => Math.round(100 * x) + "%";
+  const lean = s => Math.round(100 * s) === 50 ? ["50%", "Each side", "#8a6fd1"] : s >= .5 ? [`${pct(s)}`, "Schumer", "#2F6FD0"] : [`${pct(1 - s)}`, "Van Hollen", "#12A6CC"];
+  return async P => {
+    const { W, T, PAD, g } = P;
+    let y = 40;
+    P.text("THE 29TH VOTE", PAD, y + 18, { w: 700, px: 14, color: T.MUTED, spacing: 2.4 });
+    P.text(`${shotAsOf()}`, W - PAD, y + 18, { w: 600, px: 14, color: T.MUTED, align: "right" });
+    y += 44;
+    // profile row
+    await P.face(name, p.st, color, PAD + 66, y + 66, 66, 5);
+    const tx = PAD + 160;
+    P.text(name, tx, y + 44, { w: 800, px: 38, maxW: 520 });
+    P.text(`${elect ? "Senator-elect, " : ""}${STATE_NAMES[p.st] || p.st}`, tx, y + 76, { px: 19, color: T.MUTED });
+    let bx = tx; bx += P.pill(L(p.cat), bx, y + 92, COLORS[p.cat] || "#B8BDC4", { px: 14 }) + 8; P.pill(lab, bx, y + 92, SIM_GC[lab] || "#a58ae0", { px: 14 });
+    // stat boxes
+    const bw2 = 170, bh2 = 100, sx = W - PAD - 2 * bw2 - 14;
+    [[last.s, "now"], [firstP.s, `on ${firstP[0].split(",")[0]}`]].forEach(([s, when], i) => {
+      const x = sx + i * (bw2 + 14), [v, who, c] = lean(s);
+      P.rr(x, y + 16, bw2, bh2, 12, T.BG, T.RULE, 1.5);
+      P.text(v, x + bw2 / 2, y + 66, { w: 800, px: 36, color: i ? T.MUTED : c, align: "center" });
+      P.text(`${who} ${when}`, x + bw2 / 2, y + 94, { w: 600, px: 14.5, color: T.MUTED, align: "center", maxW: bw2 - 12 });
+    });
+    y += 150;
+    P.rule(y); y += 46;
+    P.text(`${name}'s trend over time`, PAD, y, { w: 800, px: 24 }); y += 10;
+    y = P.para(`Chance of voting Schumer or Van Hollen in the 11,111 runs at each hourly check since Nov. 11. ${p.fixed != null ? `As a candidate, ${first} always votes for himself.` : `Only ${first}'s own statements move this line. Dots along the bottom are other senators moving.`}`, PAD, y + 22, W - 2 * PAD, { px: 15.5, lh: 22, color: T.MUTED }) + 4;
+    const o = {
+      yMin: 0, yMax: 100, step: 25, fmt: v => (v === 50 ? 50 : v > 50 ? v : 100 - v) + "%", ref: 50, refLabel: "Tie",
+      bands: (X, Y, x1, x2) => {
+        g.save(); g.globalAlpha = .07; g.fillStyle = "#2F6FD0"; g.fillRect(x1, Y(100), x2 - x1, Y(50) - Y(100)); g.fillStyle = "#12A6CC"; g.fillRect(x1, Y(50), x2 - x1, Y(0) - Y(50)); g.restore();
+        P.text("↑ Schumer", x1 + 10, Y(100) + 20, { w: 800, px: 14, color: "#2F6FD0" });
+        P.text("↓ Van Hollen", x1 + 10, Y(0) - 22, { w: 800, px: 14, color: T.dark ? "#3cc3e2" : "#0e8cab" });
+      },
+      lines: [{ v: q => Math.round(1000 * q.s) / 10, split: [50, "#2F6FD0", "#12A6CC"], c: "#2F6FD0", who: [name, p.st, color],
+                tag: q => Math.round(100 * q.s) === 50 ? "50% each side" : q.s >= .5 ? `${pct(q.s)} Schumer` : `${pct(1 - q.s)} Van Hollen` }],
+      marks: (X, Y, base) => events.filter(v => v.e[2].length && !v.own).forEach(v => {
+        const to = v.e[2][0][3] === "Opposing Schumer" ? "Will not support" : v.e[2][0][3];
+        P.dot(X(v.t), base - 7, 5, SP_TO_C[to] || "#8a8f96", T.BG, 1.5);
+      }),
+    };
+    y = await shotTrendChart(P, PAD - 10, y, W - 2 * PAD + 20, 380, pts, t0, tEnd, o) + 18;
+    y = shotLegend(P, y, [["Above the tie: leans Schumer", "#2F6FD0", true], ["Below the tie: leans Van Hollen", "#12A6CC", true], ["Another senator moved (colored by where they went)", "#8a8f96", true]]) + 22;
+    if (noteTxt) { P.rule(y); y = P.rich([["On the record: ", 800], [noteTxt, 400, T.MUTED]], PAD, y + 36, W - 2 * PAD, { px: 17, lh: 25 }) + 6; }
+    return shotFooter(P, y + 10, "These are simulations, not predictions.");
+  };
+}
+
+/* --- 5. A group of senators, stacked --- */
+function shotGroupDraw(names, title) {
+  const st = simCur, N = SIM.N_RUNS, locked = Object.keys(simLocks).length > 0;
+  const HK = k => k === "Opposing Schumer" ? "Will not support" : k;
+  const rows = names.map(n => { const i = SIM.roster.findIndex(r => r.name === n), p = SIM.roster[i];
+    const share = st.kept ? st.per[i] / st.kept : p.p, cnt = st.kept ? st.per[i] : 0;
+    return { p, share, cnt, lab: p.fixed != null ? (p.fixed ? "Safe Schumer" : "Safe Van Hollen") : simLabel(share) }; });
+  // If everyone picked moved together in their latest update, show that move at the top
+  const lastMove = n => { for (let i = HISTORY.length - 1; i >= 0; i--) { const m = HISTORY[i][2].find(x => x[0] === n); if (m) return [HISTORY[i][0], HK(m[2]), HK(m[3])]; } return null; };
+  const lm = names.map(lastMove), same = lm.every(m => m && lm[0] && m.join("|") === lm[0].join("|")) ? lm[0] : null;
+  return async P => {
+    const { W, T, PAD } = P;
+    const kicker = same ? (P2, y) => {
+      const [when, from, to] = same, px = 16, parts = [[L(from), from], ["→"], [L(to), to], [`· ${when}`]];
+      const ws = parts.map(([s, c]) => (c ? 24 : 0) + P2.width(s.toUpperCase(), 800, px)), tot = ws.reduce((a, b) => a + b, 0) + 12 * (parts.length - 1);
+      let x = (W - tot) / 2;
+      parts.forEach(([s, c], i) => { if (c) { P2.dot(x + 8, y - 6, 8, COLORS[c] || "#B8BDC4"); x += 24; }
+        P2.text(s.toUpperCase(), x, y, { w: 800, px, color: c ? (TEXT_COLORS[c] || T.MUTED) : T.MUTED }); x += ws[i] - (c ? 24 : 0) + 12; });
+    } : null;
+    let y = shotHeader(P, { kicker, title,
+      sub: `How often each one votes for Schumer or Van Hollen across ${simFmt(st.kept)} simulated leader votes${locked ? ", counting only runs that match your locks" : ""}. ${shotAsOf()}.` });
+    for (const r of rows) {
+      P.rule(y);
+      const c = r.p.fixed === 1 ? "#03045E" : r.p.fixed === 0 ? "#06566B" : COLORS[r.p.cat] || "#B8BDC4", cy = y + 64;
+      await P.face(r.p.name, r.p.st, c, PAD + 48, cy, 48, 4);
+      const tx = PAD + 120;
+      P.text(r.p.name, tx, cy - 14, { w: 800, px: 26, maxW: 300 });
+      P.text(`${STATE_NAMES[r.p.st] || r.p.st} · ${L(r.p.cat)}`, tx, cy + 12, { px: 16, color: T.MUTED, maxW: 300 });
+      P.pill(r.lab, tx, cy + 22, SIM_GC[r.lab] || "#a58ae0", { px: 13 });
+      const bx = PAD + 450, bw = W - PAD - bx, bh = 48, by = cy - 34, pS = Math.round(100 * r.share);
+      P.g.save(); P.rr(bx, by, bw, bh, 10); P.g.clip();
+      P.g.fillStyle = "#12A6CC"; P.g.fillRect(bx, by, bw, bh); P.g.fillStyle = "#2F6FD0"; P.g.fillRect(bx, by, bw * r.share, bh);
+      P.g.globalAlpha = .9; P.g.fillStyle = "#fff"; P.g.fillRect(bx + bw / 2 - 1.5, by, 3, bh); P.g.restore();
+      if (pS >= 12) P.text(`${pS}%${pS >= 25 ? " Schumer" : ""}`, bx + 16, by + 31, { w: 800, px: 19, color: "#fff" });
+      if (pS <= 88) P.text(`${100 - pS}%${pS <= 75 ? " Van Hollen" : ""}`, bx + bw - 16, by + 31, { w: 800, px: 19, color: "#fff", align: "right" });
+      P.text(`Schumer in ${simFmt(r.cnt)} runs`, bx, by + bh + 25, { px: 15, color: T.MUTED });
+      P.text(`Van Hollen in ${simFmt(st.kept - r.cnt)} runs`, bx + bw, by + bh + 25, { px: 15, color: T.MUTED, align: "right" });
+      y += 128;
+    }
+    return shotFooter(P, y, `Schumer needs ${NEEDED} of ${TOTAL}. These are simulations, not predictions.`);
+  };
+}
+
+/* --- Showing a result in the screenshot window (light and dark) --- */
+async function shotShow(draw, base, btn) {
+  const lbl = btn && (btn.querySelector(".lbl") || btn.lastChild);
+  const old = lbl ? lbl.textContent : null;
+  if (btn) { btn.disabled = true; if (lbl) lbl.textContent = lbl.nodeType === 3 ? " Working…" : "Working…"; }
+  try {
+    const [lb, db] = await Promise.all([shotCard(draw, false), shotCard(draw, true)]);
+    Object.values(shotUrls).forEach(u => URL.revokeObjectURL(u));
+    shotUrls = { light: URL.createObjectURL(lb), dark: URL.createObjectURL(db) };
+    shotImgs.light.src = shotUrls.light; shotImgs.dark.src = shotUrls.dark;
+    const d = new Date();
+    shotBase = `the29thvote-${base}-${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+    pickShot(document.documentElement.classList.contains("dark") ? "dark" : "light");
+    modal.classList.add("open");
+  } catch (err) { console.error(err); }
+  finally { if (btn) { btn.disabled = false; if (lbl) lbl.textContent = old; } }
+}
+const SHOT_ICON = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>`;
+const slug = s => s.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
+
+// Chance of winning: its own button beside the heading
+document.getElementById("winShot").addEventListener("click", e => { e.stopPropagation(); if (!SIM) return; shotShow(shotWinDraw(), "chance-of-winning", e.currentTarget); });
+// Senator trend page: button next to "Back to simulations"
+document.addEventListener("click", e => {
+  const b = e.target.closest("[data-spshot]"); if (!b || !spOpenName) return;
+  e.stopPropagation(); shotShow(shotPersonDraw(spOpenName), slug(spOpenName) + "-trend", b);
+});
+
+// Group screenshot: pick senators in the Every senator list, then confirm
+const GROUP_MAX = 8;
+var groupSel = null;   // array of names while picking, otherwise null
+const groupBar = document.createElement("div");
+groupBar.className = "group-bar"; groupBar.hidden = true; groupBar.setAttribute("role", "region"); groupBar.setAttribute("aria-label", "Group screenshot");
+document.body.appendChild(groupBar);
+function groupAutoTitle() {
+  const n = groupSel.length;
+  if (n === 1) return `How ${groupSel[0]} votes in 11,111 simulations`;
+  const words = ["", "", "Two", "Three", "Four", "Five", "Six", "Seven", "Eight"];
+  return `How ${(words[n] || n).toString().toLowerCase()} senators vote in 11,111 simulations`;
+}
+let groupTitleEdited = false;
+function groupPaint() {
+  document.querySelectorAll("#simList .srow").forEach(r => r.classList.toggle("g-on", !!groupSel && groupSel.includes(r.dataset.name)));
+  document.getElementById("simList").classList.toggle("g-pick", !!groupSel);
+  groupBar.hidden = !groupSel;
+  if (!groupSel) return;
+  const n = groupSel.length, ti = groupBar.querySelector("input");
+  groupBar.querySelector(".g-count").textContent = n ? `${n} selected${n >= GROUP_MAX ? ` (max ${GROUP_MAX})` : ""}` : "Tap senators below to pick them";
+  groupBar.querySelector(".g-go").disabled = !n;
+  if (ti && !groupTitleEdited) ti.value = n ? groupAutoTitle() : "";
+}
+function groupStart() {
+  groupSel = []; groupTitleEdited = false;
+  groupBar.innerHTML = `<div class="g-in">
+      <div class="g-left"><b>Group screenshot</b><span class="g-count"></span></div>
+      <input class="g-title" type="text" maxlength="80" placeholder="Title for the image" aria-label="Title for the image">
+      <div class="g-btns"><button type="button" class="g-cancel">Cancel</button><button type="button" class="g-go">${SHOT_ICON}<span class="lbl">Confirm group screenshot</span></button></div>
+    </div>`;
+  groupBar.querySelector("input").addEventListener("input", () => { groupTitleEdited = true; });
+  groupBar.querySelector(".g-cancel").addEventListener("click", e => { e.stopPropagation(); groupSel = null; groupPaint(); });
+  groupBar.querySelector(".g-go").addEventListener("click", e => {
+    e.stopPropagation(); if (!groupSel || !groupSel.length) return;
+    const t = groupBar.querySelector("input").value.trim() || groupAutoTitle();
+    shotShow(shotGroupDraw(groupSel.slice(), t), "group", e.currentTarget);
+  });
+  groupPaint();
+}
+document.getElementById("groupShot").addEventListener("click", e => { e.stopPropagation(); if (groupSel) { groupSel = null; groupPaint(); } else groupStart(); });
+// While picking, a tap anywhere on a senator's row selects or unselects them (and does nothing else)
+document.getElementById("simList").addEventListener("click", e => {
+  if (!groupSel) return;
+  const row = e.target.closest(".srow"); if (!row) return;
+  e.preventDefault(); e.stopPropagation();
+  const n = row.dataset.name, i = groupSel.indexOf(n);
+  if (i >= 0) groupSel.splice(i, 1); else if (groupSel.length < GROUP_MAX) groupSel.push(n);
+  groupPaint();
+}, true);
 
 /* ====================== Create Predictions tab ====================== */
 // Two-way race: Schumer (fills from the left) vs. Van Hollen (fills from the right), toss-ups in the middle
@@ -3520,6 +4061,7 @@ function simList() {
   const open = new Set([...document.querySelectorAll("#simList details[open]")].map(d => d.closest(".srow").dataset.name));
   simEl("simList").innerHTML = html;
   open.forEach(n => { const d = document.querySelector(`#simList .srow[data-name="${CSS.escape(n)}"] details`); if (d) d.open = true; });
+  if (groupSel) groupPaint();
 }
 // Standings bar: how many senators sit in each Safe / Likely / Lean / Toss-up group right now (follows any locks).
 // Click a piece (or a side's name) to show just those senators in the list below.
@@ -3708,7 +4250,7 @@ function spOpen(name) {
       ${imp}</div>`;
   };
   wrap.innerHTML = `<div class="sp-in">
-    <div class="sp-top"><button type="button" class="sp-back" data-spclose>← Back to simulations</button></div>
+    <div class="sp-top"><button type="button" class="sp-back" data-spclose>← Back to simulations</button><button type="button" class="mini-shot sp-shot" data-spshot title="Screenshot this senator's profile and trend">${SHOT_ICON}<span class="lbl">Screenshot</span></button></div>
     <div class="sp-grid">
       <div class="sp-main">
         <h1>${name}'s trend over time</h1>
@@ -3819,7 +4361,7 @@ function setView(v) {
   document.getElementById("viewHistory").hidden = v !== "history";
   document.getElementById("viewNews").hidden = v !== "news";
   document.getElementById("viewSims").hidden = v !== "sims";
-  shotBtn.hidden = v === "history" || v === "news" || v === "sims";
+  shotBtn.hidden = v === "news";
   document.querySelectorAll(".tab").forEach(t => t.setAttribute("aria-selected", String(t.dataset.view === v)));
   pinned = null; hideTip();
   try { history.replaceState(null, "", v === "predict" ? "#predict" : v === "history" ? "#history" : v === "news" ? "#news" : v === "sims" ? "#sims" : location.pathname + location.search); } catch (e) {}
