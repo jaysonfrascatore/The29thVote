@@ -604,6 +604,53 @@
   .sim-method b { color: var(--ink); }
   .sim-method table { border-collapse: collapse; margin: 8px 0; font-size: 12.5px; }
   .sim-method td { padding: 3px 12px 3px 0; }
+  /* ---------- Senator trend page ---------- */
+  .sfoot { grid-column: 3 / 5; display: flex; align-items: flex-start; justify-content: space-between; gap: 10px; flex-wrap: wrap; }
+  .sfoot .swhy { flex: 1 1 auto; min-width: 0; }
+  .strend { border: 1.5px solid var(--rule); background: transparent; color: var(--ink); border-radius: 999px; padding: 4px 10px; cursor: pointer;
+    font: 700 11.5px/1.2 "Inter", system-ui, sans-serif; white-space: nowrap; }
+  .strend:hover { border-color: #7d5fcf; background: #efe8fb; color: #2f2150; }
+  .sp-wrap { position: fixed; inset: 0; z-index: 60; overflow-y: auto; background: #fff; -webkit-overflow-scrolling: touch; }
+  html.dark .sp-wrap { background: #111418; }
+  .sp-in { max-width: 1120px; margin: 0 auto; padding: 18px 20px 48px; }
+  .sp-top { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 14px; }
+  .sp-back { border: 1.5px solid var(--rule); background: transparent; color: var(--ink); border-radius: 999px; padding: 7px 14px; cursor: pointer; font: 700 13px/1 "Inter", system-ui, sans-serif; }
+  .sp-mock { font-size: 11px; font-weight: 800; letter-spacing: .06em; text-transform: uppercase; color: #7d5fcf; border: 1.5px dashed #b9a6ea; border-radius: 6px; padding: 3px 7px; }
+  .sp-grid { display: grid; grid-template-columns: minmax(0, 1fr) 320px; gap: 28px; align-items: start; }
+  .sp-main h1 { font-size: 26px; line-height: 1.15; margin: 0 0 4px; letter-spacing: -.01em; }
+  .sp-main .sp-sub { color: var(--muted); font-size: 13.5px; margin: 0 0 14px; line-height: 1.45; }
+  .sp-main .trend { max-width: none; }
+  .sp-legend { display: flex; flex-wrap: wrap; gap: 4px 14px; font-size: 11.5px; color: var(--muted); margin: 8px 0 0; }
+  .sp-legend i { display: inline-block; width: 9px; height: 9px; border-radius: 50%; margin-right: 5px; vertical-align: -1px; background: var(--c); }
+  .sp-legend i.ring { background: transparent; border: 2.5px solid var(--ink); width: 6px; height: 6px; }
+  .sp-h2 { font-size: 12px; text-transform: uppercase; letter-spacing: .06em; font-weight: 800; color: var(--muted); margin: 26px 0 8px; }
+  .sp-ev { display: grid; grid-template-columns: 30px 1fr auto; gap: 2px 10px; align-items: start; padding: 10px 0; border-top: 1px solid var(--rule); font-size: 13px; line-height: 1.4; }
+  .sp-ev.own { background: color-mix(in srgb, #7d5fcf 8%, transparent); border-radius: 8px; padding: 10px 8px; border-top-color: transparent; }
+  .sp-ev .when { font-size: 11.5px; color: var(--muted); font-weight: 700; }
+  .sp-ev .what b { font-weight: 800; }
+  .sp-ev .why { color: var(--muted); font-size: 12.5px; }
+  .sp-ev .imp { text-align: right; font-size: 12px; font-weight: 800; white-space: nowrap; font-variant-numeric: tabular-nums; }
+  .sp-ev .imp.s { color: var(--sS); } .sp-ev .imp.v { color: var(--sV); } .sp-ev .imp.z { color: var(--muted); font-weight: 600; }
+  .sp-ev .imp small { display: block; font-weight: 600; color: var(--muted); font-size: 10.5px; }
+  .sp-side { border: 1.5px solid var(--rule); border-radius: 14px; padding: 18px; position: sticky; top: 14px; }
+  .sp-side .sp-photo { display: flex; justify-content: center; margin-bottom: 12px; }
+  .sp-side h2 { font-size: 20px; margin: 0; text-align: center; }
+  .sp-side .sp-st { text-align: center; color: var(--muted); font-size: 13px; margin: 3px 0 10px; }
+  .sp-side .sp-badges { display: flex; flex-wrap: wrap; justify-content: center; gap: 6px; margin-bottom: 14px; }
+  .sp-side .sp-badges span { font-size: 11px; font-weight: 800; padding: 3px 8px; border-radius: 999px; background: color-mix(in srgb, var(--c) 16%, transparent); color: var(--ink); }
+  .sp-side .sp-stats { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 14px; }
+  .sp-side .sp-stats div { border: 1px solid var(--rule); border-radius: 10px; padding: 8px; text-align: center; }
+  .sp-side .sp-stats b { display: block; font-size: 22px; letter-spacing: -.01em; }
+  .sp-side .sp-stats span { font-size: 11px; color: var(--muted); }
+  .sp-side .sp-bio { font-size: 13px; line-height: 1.55; }
+  .sp-side .sp-bio p { margin: 0 0 8px; }
+  .sp-side .sp-note { font-size: 12.5px; color: var(--muted); border-top: 1px solid var(--rule); padding-top: 10px; margin-top: 6px; line-height: 1.5; }
+  .sp-ownmark { fill: none; stroke: var(--ink); stroke-width: 2.5; }
+  @media (max-width: 860px) {
+    .sp-grid { grid-template-columns: 1fr; }
+    .sp-side { position: static; }
+    .sp-main h1 { font-size: 22px; }
+  }
   @media (max-width: 700px) {
     .sim-head { gap: 6px; }
     .sim-card { padding: 10px 4px 9px; }
@@ -623,6 +670,7 @@
     .srow .sbar { grid-column: 1 / 4; margin-top: 6px; }
     .scount { grid-column: 1 / 4; }
     .swhy { grid-column: 1 / 4; }
+    .sfoot { grid-column: 1 / 4; }
   }
   /* ---------- News tab ---------- */
   .tab-news { --tc: #FFC8DD; background: #FFC8DD; border-color: #f4a6c4; color: #3a1424; }
@@ -3349,7 +3397,11 @@ function simDrawTrend(id, pts, t0, tEnd, o) {
   const el = simEl(id), narrowW = el.clientWidth > 0 && el.clientWidth < 560;
   const W = Math.max(300, Math.round(el.clientWidth) || 760), H = narrowW ? 230 : 270, L = narrowW ? 34 : 40, R = narrowW ? 62 : 70, T = 14, B = 30;
   const X = t => L + (t - t0) * (W - L - R) / Math.max(1, tEnd - t0), Y = v => T + (o.yMax - v) * (H - T - B) / (o.yMax - o.yMin);
+  const lc = (l, v) => l.split ? (v >= l.split[0] ? l.split[1] : l.split[2]) : l.c, gid = "g" + id;
   let s = `<svg viewBox="0 0 ${W} ${H}" role="img">`;
+  o.lines.forEach((l, i) => { if (l.split) { const f = Math.max(0, Math.min(1, (Y(l.split[0]) - T) / (H - B - T)));
+    s += `<defs><linearGradient id="${gid}${i}" gradientUnits="userSpaceOnUse" x1="0" y1="${T}" x2="0" y2="${H - B}"><stop offset="${f}" stop-color="${l.split[1]}"/><stop offset="${f}" stop-color="${l.split[2]}"/></linearGradient></defs>`; } });
+  if (o.bands) s += o.bands(X, Y, L, W - R);
   for (let v = o.yMin; v <= o.yMax; v += o.step) s += `<line x1="${L}" x2="${W - R}" y1="${Y(v)}" y2="${Y(v)}" stroke="var(--rule)"/><text x="${L - 7}" y="${Y(v) + 4}" text-anchor="end">${o.fmt(v)}</text>`;
   // day ticks
   const every = narrowW ? 7 : 3;
@@ -3364,29 +3416,30 @@ function simDrawTrend(id, pts, t0, tEnd, o) {
   o.lines.forEach(l => {
     if (l.lo && pts.length > 1) s += `<path d="${pts.map((q, i) => (i ? "L" : "M") + X(q.t).toFixed(1) + " " + Y(l.hi(q.p)).toFixed(1)).join("")}${pts.slice().reverse().map(q => "L" + X(q.t).toFixed(1) + " " + Y(l.lo(q.p)).toFixed(1)).join("")}Z" fill="${l.c}" opacity=".12"/>`;
   });
-  o.lines.forEach(l => { s += `<path d="${pts.map((q, i) => (i ? "L" : "M") + X(q.t).toFixed(1) + " " + Y(l.v(q.p)).toFixed(1)).join("")}" fill="none" stroke="${l.c}" stroke-width="2.6" stroke-linejoin="round" stroke-linecap="round"/>`; });
+  o.lines.forEach((l, li) => { s += `<path d="${pts.map((q, i) => (i ? "L" : "M") + X(q.t).toFixed(1) + " " + Y(l.v(q.p)).toFixed(1)).join("")}" fill="none" stroke="${l.split ? `url(#${gid}${li})` : l.c}" stroke-width="2.6" stroke-linejoin="round" stroke-linecap="round"/>`; });
   const last = pts[pts.length - 1];
   o.lines.forEach(l => { const x = X(last.t), y = Y(l.v(last.p));
-    s += `<circle class="sim-pulse" cx="${x}" cy="${y}" r="6" fill="${l.c}"/><circle cx="${x}" cy="${y}" r="5" fill="${l.c}" stroke="var(--bgx,#fff)" stroke-width="1.5"/>`; });
+    s += `<circle class="sim-pulse" cx="${x}" cy="${y}" r="6" fill="${lc(l, l.v(last.p))}"/><circle cx="${x}" cy="${y}" r="5" fill="${lc(l, l.v(last.p))}" stroke="var(--bgx,#fff)" stroke-width="1.5"/>`; });
+  if (o.marks) s += o.marks(X, Y, H - B);
   s += `<line class="tr-cur" x1="0" x2="0" y1="${T}" y2="${H - B}" stroke="var(--ink)" opacity="0"/>` + o.lines.map((l, i) => `<circle class="tr-dot" data-i="${i}" r="5" fill="${l.c}" stroke="var(--bgx,#fff)" stroke-width="2" opacity="0"/>`).join("");
   s += `<rect class="tr-hit" x="${L - 10}" y="0" width="${W - L - R + 20}" height="${H}" fill="transparent"/></svg>`;
   // photos riding at the end of each line
   let pics = o.lines.map(l => { const x = X(last.t), y = Y(l.v(last.p));
-    return `<div class="tr-pic" style="left:${100 * x / W}%;top:${100 * y / H}%">${avatar(l.who[0], l.who[1], l.who[2], narrowW ? 26 : 30)}<b class="tr-val" style="color:${l.c}">${l.tag(last.p)}</b></div>`; }).join("");
+    return `<div class="tr-pic" style="left:${100 * x / W}%;top:${100 * y / H}%">${avatar(l.who[0], l.who[1], l.who[2], narrowW ? 26 : 30)}<b class="tr-val" style="color:${lc(l, l.v(last.p))}">${l.tag(last.p)}</b></div>`; }).join("");
   el.innerHTML = `<div class="tr-plot">${s}${pics}<div class="trend-tip"></div></div><div class="tr-read"></div>`;
   const svg = el.querySelector("svg"), plot = el.querySelector(".tr-plot"), tipE = plot.querySelector(".trend-tip"), read = el.querySelector(".tr-read"), cur = svg.querySelector(".tr-cur"), dots = [...svg.querySelectorAll(".tr-dot")];
   const narrow = () => el.clientWidth < 560;
   const show = i => {
     const q = pts[i], x = X(q.t);
     cur.setAttribute("x1", x); cur.setAttribute("x2", x); cur.setAttribute("opacity", ".35");
-    dots.forEach((d, k) => { d.setAttribute("cx", x); d.setAttribute("cy", Y(o.lines[k].v(q.p))); d.setAttribute("opacity", "1"); });
-    if (narrow()) { read.innerHTML = simTip(q.p); read.classList.add("show"); tipE.classList.remove("show"); return; }
-    tipE.innerHTML = simTip(q.p);
+    dots.forEach((d, k) => { const v = o.lines[k].v(q.p); d.setAttribute("cx", x); d.setAttribute("cy", Y(v)); d.setAttribute("fill", lc(o.lines[k], v)); d.setAttribute("opacity", "1"); });
+    if (narrow()) { read.innerHTML = (o.tip || simTip)(q.p); read.classList.add("show"); tipE.classList.remove("show"); return; }
+    tipE.innerHTML = (o.tip || simTip)(q.p);
     const bw = plot.clientWidth, px = x * bw / W, tw = tipE.offsetWidth || 260;
     tipE.style.left = (px + 16 + tw > bw ? Math.max(0, px - 16 - tw) : px + 16) + "px"; tipE.style.top = "4px"; tipE.classList.add("show");
   };
   const hide = () => { cur.setAttribute("opacity", "0"); dots.forEach(d => d.setAttribute("opacity", "0")); tipE.classList.remove("show"); if (narrow()) showLatest(); else read.classList.remove("show"); };
-  const showLatest = () => { read.innerHTML = `<div class="tt-latest">Latest check</div>` + simTip(last.p); read.classList.add("show"); };
+  const showLatest = () => { read.innerHTML = `<div class="tt-latest">Latest check</div>` + (o.tip || simTip)(last.p); read.classList.add("show"); };
   const near = e => { const b = svg.getBoundingClientRect();
     if (e.pointerType === "touch" && pts.length > 1) { const f = ((e.clientX - b.left) * W / b.width - L) / (W - L - R); return Math.max(0, Math.min(pts.length - 1, Math.round(f * (pts.length - 1)))); }
     const t = t0 + ((e.clientX - b.left) * W / b.width - L) * (tEnd - t0) / (W - L - R);
@@ -3419,7 +3472,7 @@ function simList() {
       <div class="slock">${p.fixed != null ? `<button type="button" class="s" disabled title="Candidates always vote for themselves">S</button><button type="button" class="v" disabled>VH</button>` :
         `<button type="button" class="s" data-lock="1" aria-pressed="${lk === 1}" title="Lock to Schumer">S</button><button type="button" class="v" data-lock="0" aria-pressed="${lk === 0}" title="Lock to Van Hollen">VH</button>`}</div>
       <div class="scount">Schumer in ${simFmt(cnt)} of ${simFmt(st.kept)} runs${sh}</div>
-      <details class="swhy"><summary>Why</summary>${why}</details></div>`;
+      <div class="sfoot"><details class="swhy"><summary>Why</summary>${why}</details><button type="button" class="strend" data-trend="${p.name}">View trend over time</button></div></div>`;
   };
   simStand(rows);
   const keep = simFilterGroups();
@@ -3477,6 +3530,202 @@ function simStand(rows) {
     ${pick ? `<p class="st-pick">Showing only ${simFilter === "S" ? "senators on Schumer's side" : simFilter === "V" ? "senators on Van Hollen's side" : simFilter} below. <button type="button" data-sfilter="*">Show everyone</button></p>` :
       `<p class="st-pick">Tap a color to see who's in it.</p>`}`;
 }
+/* ---------- Senator trend page ---------- */
+// One senator's chance of voting Schumer at every hourly check, rebuilt the same way the trend charts were:
+// rewind their tracker group with HISTORY, swap only their public-stance line, keep their other factors.
+const SP_BIO = {
+  "Chuck Schumer": ["New York's senior senator, in office since 1999. He has led Senate Democrats since 2017, as minority leader (2017–2021 and since 2025) and as majority leader (2021–2025), the first New Yorker to hold that post.", "A Harvard Law School graduate, he entered the New York State Assembly in 1975 and served in the U.S. House from 1981 to 1999. He chaired the Democratic Senatorial Campaign Committee for two cycles in the 2000s."],
+  "Kirsten Gillibrand": ["New York's junior senator since 2009. She chaired the Democratic Senatorial Campaign Committee, the party's Senate campaign arm, for the 2026 elections and is the ranking member of the Special Committee on Aging.", "A lawyer, she worked at Davis Polk & Wardwell and Boies, Schiller & Flexner and was special counsel to HUD Secretary Andrew Cuomo. She represented New York's 20th District in the U.S. House (2007–2009) and sits on the Armed Services and Intelligence committees."],
+  "Ruben Gallego": ["Arizona's junior senator since 2025 and the first Latino to represent the state in the Senate. He and Ohio Republican Bernie Moreno are the first Colombian American senators.", "A Marine Corps reservist, he deployed to Iraq in 2005 with Lima Company, 3rd Battalion, 25th Marines. He served in the Arizona House (2011–2014) and the U.S. House (2015–2025), and sits on the Veterans' Affairs and Banking committees."],
+  "Sheldon Whitehouse": ["Rhode Island's junior senator since 2007; he won a fourth term in 2024. He is the ranking member of the Environment and Public Works Committee and chaired the Budget Committee from 2023 to 2025.", "A lawyer, he served as U.S. attorney for Rhode Island in the 1990s and as the state's attorney general (1999–2003). He also sits on the Finance and Judiciary committees."],
+  "Mark Kelly": ["Arizona's senior senator, in office since December 2020 after winning a special election; he was reelected in 2022. He and his twin brother, Scott, are the only siblings who have both traveled to orbit.", "A Navy pilot, he flew 39 combat missions in the Gulf War, then flew four space shuttle missions (2001–2011) as a NASA astronaut, commanding Endeavour's final flight. He retired as a Navy captain in 2011 and sits on the Armed Services and Intelligence committees."],
+  "Richard Blumenthal": ["Connecticut's senior senator, in office since 2011 and reelected in 2016 and 2022. He is the ranking member of the Veterans' Affairs Committee.", "A lawyer and Marine Corps Reserve veteran, he was U.S. attorney for Connecticut (1977–1981) and served in both chambers of the state legislature. He was Connecticut's attorney general for 20 years, from 1991 until he joined the Senate, and sits on the Judiciary Committee."],
+  "John Fetterman": ["Pennsylvania's senior senator, in office since 2023. He became the senior senator in 2025, when Bob Casey left office.", "He was mayor of Braddock (2006–2019) and lieutenant governor of Pennsylvania (2019–2023). Earlier he worked as an insurance underwriter and in AmeriCorps, and he sits on the Agriculture and Banking committees."],
+  "Tammy Baldwin": ["Wisconsin's junior senator since 2013 and the first openly gay person elected to the Senate. She has been secretary of the Senate Democratic caucus since 2017 and won a third term in 2024.", "A lawyer, she served on the Dane County Board, in the Wisconsin Assembly (1993–1999) and in the U.S. House (1999–2013). She sits on the Appropriations, Commerce and Health, Education, Labor and Pensions committees."],
+  "Brian Schatz": ["Hawaii's senior senator, appointed in December 2012 to fill Daniel Inouye's seat. He is the Democrats' chief deputy whip and is running to succeed Dick Durbin as whip in the next Congress.", "Before the Senate he led the nonprofit Helping Hands Hawaii, served in the Hawaii House (1998–2006), chaired the state Democratic Party and was lieutenant governor (2010–2012). He is vice chair of the Indian Affairs Committee."],
+  "Jack Reed": ["Rhode Island's senior senator, in office since 1997; he won a sixth term on Nov. 3, 2026. He is the ranking member of the Armed Services Committee, which he chaired from 2021 to 2025.", "A West Point graduate, he served as an Army officer in the 82nd Airborne Division (1971–1979) and later earned a Harvard law degree. He served in the Rhode Island Senate (1985–1991) and the U.S. House (1991–1997)."],
+  "Angus King": ["Maine's junior senator since 2013, an independent who caucuses with Democrats. He won a third term in 2024.", "He was Maine's governor (1995–2003), elected as an independent. Earlier he practiced law, hosted a public television program and started an energy business, and he sits on the Armed Services and Intelligence committees."],
+  "Catherine Cortez Masto": ["Nevada's senior senator, in office since 2017, and the first Latina elected to the Senate. She chaired the Democratic Senatorial Campaign Committee from 2019 to 2021.", "She was Nevada's attorney general (2007–2015). Earlier she was a civil attorney, a federal prosecutor in Washington, D.C., and chief of staff to Gov. Bob Miller, and she sits on the Finance Committee."],
+  "Jacky Rosen": ["Nevada's junior senator since 2019; she won a second term in 2024. She is the ranking member of the Foreign Relations subcommittee on the Near East, South Asia, Central Asia and Counterterrorism.", "A former computer programmer, she was president of a Henderson synagogue before entering politics. She represented Nevada's 3rd District in the U.S. House (2017–2019) and sits on the Armed Services and Commerce committees."],
+  "Angela Alsobrooks": ["Maryland's junior senator since 2025 and the state's first Black senator. She is the third Black woman elected to the Senate.", "A lawyer, she was an assistant state's attorney, then Prince George's County state's attorney (2011–2018) and county executive (2018–2024). She sits on the Banking, Health, Education, Labor and Pensions, and Environment and Public Works committees."],
+  "Cory Booker": ["New Jersey's senior senator, in office since 2013, and chair of the Senate Democrats' Strategic Communications Committee. He won a third full term on Nov. 3, 2026, and in 2025 gave a 25-hour floor speech that set the Senate record.", "A lawyer by training, he served on the Newark Municipal Council (1998–2002) and as mayor of Newark (2006–2013). He was the first Black senator from New Jersey."],
+  "Raphael Warnock": ["Georgia's junior senator since 2021 and the first Black senator from Georgia. He won a January 2021 runoff special election and a full six-year term in a December 2022 runoff.", "He has been senior pastor of Atlanta's Ebenezer Baptist Church, the former pulpit of Martin Luther King Jr., since 2005, after leading a Baltimore church (2001–2005). He sits on the Finance Committee."],
+  "Elizabeth Warren": ["Massachusetts' senior senator since 2013 and a vice chair of the Senate Democratic Caucus. She is the top Democrat on the Banking Committee and won a third term in 2024.", "Before the Senate she was a Harvard Law School professor, chaired the congressional panel overseeing the TARP bank bailout (2008–2010) and helped set up the Consumer Financial Protection Bureau as a special adviser (2010–2011)."],
+  "Chris Murphy": ["Connecticut's junior senator since 2013, serving alongside Richard Blumenthal. Since 2025 he has been one of two deputy conference secretaries on the Senate Democratic leadership team.", "He earned a law degree from the University of Connecticut and served in the Connecticut House (1999–2003), the Connecticut Senate (2003–2007) and the U.S. House (2007–2013). He sits on the Foreign Relations Committee."],
+  "Jon Ossoff": ["Georgia's senior senator since 2021 and the first Jewish senator from Georgia. He won reelection on Nov. 3, 2026, defeating Republican Rep. Mike Collins.", "He worked as a national security aide to Rep. Hank Johnson (2007–2012) and then ran an investigative documentary company (2013–2021). He lost a 2017 House special election. He sits on the Appropriations Committee."],
+  "Ben Ray Luján": ["New Mexico's junior senator since 2021. He won a second term on Nov. 3, 2026, and returned to the Senate in 2022 after recovering from a stroke.", "He served on the New Mexico Public Regulation Commission and in the U.S. House (2009–2021), where he chaired the Democratic Congressional Campaign Committee and was assistant speaker (2019–2021). He sits on the Finance and Commerce committees."],
+  "Alex Padilla": ["California's senior senator, appointed in 2021 to succeed Kamala Harris and elected to a full term in 2022. He is the first Latino senator from California and the top Democrat on the Rules Committee.", "An MIT-trained engineer, he served on the Los Angeles City Council (1999–2006), including as its president, in the California Senate (2006–2014) and as California secretary of state (2015–2021)."],
+  "Mark Warner": ["Virginia's senior senator since 2009 and a vice chair of the Senate Democratic Caucus. He won a fourth term on Nov. 3, 2026, and is the top Democrat on the Intelligence Committee, which he chaired (2021–2025).", "Before the Senate he was governor of Virginia (2002–2006). Earlier he worked in business as a venture capitalist, co-founding the firm Columbia Capital and investing early in Nextel."],
+  "Martin Heinrich": ["New Mexico's senior senator, in office since 2013. He is the top Democrat on the Energy and Natural Resources Committee and won a third term in 2024.", "Trained as a mechanical engineer, he ran a nonprofit foundation, then served on the Albuquerque City Council (2004–2008) and in the U.S. House (2009–2013). He chaired the Joint Economic Committee (2023–2025)."],
+  "Ed Markey": ["Massachusetts' junior senator since winning a 2013 special election. He won reelection on Nov. 3, 2026, after defeating Rep. Seth Moulton in the September primary, and is the top Democrat on the Small Business Committee.", "A lawyer, he served in the Massachusetts House (1973–1976) and then in the U.S. House (1976–2013)."],
+  "Tammy Duckworth": ["Illinois' junior senator since 2017. In 2018 she became the first senator to give birth while in office.", "An Army helicopter pilot, she lost both legs in 2004 when her helicopter was hit by a rocket-propelled grenade in Iraq and retired from the National Guard as a lieutenant colonel. She led the Illinois Department of Veterans' Affairs (2006–2009), was an assistant U.S. veterans affairs secretary (2009–2011) and served in the U.S. House (2013–2017)."],
+  "Chris Coons": ["Delaware's senior senator, in office since winning a 2010 special election. He won reelection on Nov. 3, 2026, and is vice chairman of the Ethics Committee, which he chaired (2021–2025).", "A lawyer, he was president of the New Castle County Council (2001–2005) and New Castle County executive (2005–2010). He also sits on the Appropriations, Foreign Relations and Judiciary committees."],
+  "Maria Cantwell": ["Washington's junior senator since 2001. She is the top Democrat on the Commerce Committee, which she chaired (2021–2025), and won a fifth term in 2024.", "She served in the Washington House (1987–1993) and the U.S. House (1993–1995). After losing her House seat in 1994, she worked as a marketing executive at the tech company RealNetworks."],
+  "Patty Murray": ["Washington's senior senator since 1993 and the first woman to serve as Senate president pro tempore (2023–2025). She is vice chair of the Appropriations Committee and was assistant Democratic leader (2017–2023).", "A former preschool teacher, she served on a local school board (1985–1989) and in the Washington State Senate (1989–1993)."],
+  "Peter Welch": ["Vermont's junior senator since 2023, serving alongside Bernie Sanders. He succeeded Patrick Leahy, who retired after more than four decades in the Senate.", "Before the Senate he served in the Vermont Senate (1981–1989 and 2001–2007), including two stints as president pro tempore, and in the U.S. House (2007–2023). A lawyer, he began his career as a public defender. He sits on the Finance and Judiciary committees."],
+  "Ron Wyden": ["Oregon's senior senator since 1996, when he won a special election to succeed Bob Packwood. He is the top Democrat on the Finance Committee, which he chaired in 2014 and from 2021 to 2025.", "Before the Senate he represented Oregon's 3rd District in the U.S. House (1981–1996). Earlier he led the Oregon Gray Panthers, directed a legal services center for the elderly and taught gerontology."],
+  "Tim Kaine": ["Virginia's junior senator since 2013, serving alongside Mark Warner. He was the Democratic vice presidential nominee in 2016 and won a third Senate term in 2024.", "Before the Senate he was a Richmond city councilman and mayor (1998–2001), Virginia's lieutenant governor (2002–2006) and governor (2006–2010), and chaired the Democratic National Committee (2009–2011). Earlier he practiced fair-housing law in Richmond for 17 years. He sits on the Armed Services and Foreign Relations committees."],
+  "Andy Kim": ["New Jersey's junior senator since December 2024, serving alongside Cory Booker. He is the first Korean American to serve in the Senate.", "Before the Senate he represented New Jersey's 3rd District in the U.S. House (2019–2024). Earlier he worked on national security at the State Department, the Pentagon and the White House, including as a civilian adviser in Afghanistan. He sits on the Banking and Commerce committees."],
+  "Chris Van Hollen": ["Maryland's senior senator, in office since 2017 and reelected in 2022. On Nov. 12, 2026, he announced he is running for Senate Democratic leader in the next Congress.", "Before the Senate he served in the Maryland House of Delegates (1991–1995), the Maryland Senate (1995–2003) and the U.S. House (2003–2017), where he chaired the Democratic Congressional Campaign Committee and was the top Democrat on the Budget Committee. Earlier he was a Senate aide and a lawyer. He sits on the Appropriations Committee."],
+  "Bernie Sanders": ["Vermont's senior senator since 2007 and an independent who caucuses with Democrats. The longest-serving independent in congressional history, he won a fourth term in 2024 and is the top Democratic-caucus member on the Health, Education, Labor and Pensions Committee.", "Before the Senate he was mayor of Burlington (1981–1989) and represented Vermont in the U.S. House (1991–2007). He sought the Democratic presidential nomination in 2016 and 2020. Earlier jobs included carpenter, filmmaker and writer."],
+  "Jeff Merkley": ["Oregon's junior senator since 2009, serving alongside Ron Wyden. He won a fourth term on Nov. 3, 2026, and is the top Democrat on the Budget Committee.", "Before the Senate he served in the Oregon House (1999–2009), including as speaker (2007–2009). Earlier he was a Congressional Budget Office analyst, led Portland Habitat for Humanity (1991–1994) and was president of the World Affairs Council of Oregon. He also sits on the Appropriations Committee."],
+  "Elissa Slotkin": ["Michigan's junior senator since 2025, serving alongside Gary Peters. She delivered the Democratic response to President Trump's 2025 address to Congress.", "Before the Senate she represented Michigan in the U.S. House (2019–2025). Earlier she was a CIA analyst who served three tours in Iraq, worked at the State and Defense departments, and was acting assistant secretary of defense for international security affairs (2015–2017). She sits on the Armed Services Committee."],
+  "Adam Schiff": ["California's junior senator since December 2024. He won the November 2024 election for the seat long held by the late Dianne Feinstein.", "Before the Senate he served in the California State Senate (1996–2000) and the U.S. House (2001–2024), where he chaired the Intelligence Committee (2019–2023). Earlier he was an assistant U.S. attorney (1987–1993). He sits on the Judiciary Committee."],
+  "Michael Bennet": ["Colorado's senior senator, appointed in January 2009 and elected to full terms in 2010, 2016 and 2022. He ran for governor in 2026 but lost the June 30 Democratic primary to Attorney General Phil Weiser, and remains in the Senate.", "Before the Senate he was superintendent of Denver Public Schools (2005–2009) and chief of staff to Denver Mayor John Hickenlooper (2003–2005). Earlier he was a lawyer, a Justice Department official and an investment company executive. He sits on the Finance and Intelligence committees."],
+  "John Hickenlooper": ["Colorado's junior senator since 2021, serving alongside Michael Bennet. He won a second term on Nov. 3, 2026, defeating Republican state Sen. Mark Baisley.", "Before the Senate he was mayor of Denver (2003–2011) and governor of Colorado (2011–2019), and briefly sought the 2020 Democratic presidential nomination. Earlier he was a petroleum geologist and in 1988 co-founded the Wynkoop Brewing Company brewpub."],
+  "Lisa Blunt Rochester": ["Delaware's junior senator since 2025, serving alongside Chris Coons. She is the first woman and first African American to represent Delaware in both chambers of Congress.", "Before the Senate she represented Delaware in the U.S. House (2017–2025). Earlier she was Delaware's deputy secretary of health and social services, secretary of labor and state personnel director, and led the Metropolitan Wilmington Urban League. She sits on the Commerce and HELP committees."],
+  "Amy Klobuchar": ["Minnesota's senior senator, in office since 2007, and the No. 3 Senate Democrat as chair of the Steering and Policy Committee. Elected Minnesota governor on Nov. 3, 2026, she will leave the Senate, and an appointee will hold her seat until a special election.", "The first woman elected to the Senate from Minnesota, she was previously Hennepin County attorney (1999–2007) and a corporate lawyer. She sought the 2020 Democratic presidential nomination and chaired the Senate Rules Committee (2021–2025)."],
+  "Maggie Hassan": ["New Hampshire's junior senator since 2017, serving alongside Jeanne Shaheen. She won a second term in 2022 and is the top Democrat on the Joint Economic Committee.", "Before the Senate she was governor of New Hampshire (2013–2017) and served in the state Senate, where she was majority leader (2008–2010). Earlier she was a lawyer, including as associate general counsel at Brigham and Women's Hospital. She sits on the Finance Committee."],
+  "Mazie Hirono": ["Hawaii's junior senator since 2013, serving alongside Brian Schatz, and the first Asian American woman elected to the Senate. Born in Japan, she immigrated to Hawaii as a child and won a third term in 2024.", "Before the Senate she served in the Hawaii House (1981–1994), as lieutenant governor (1994–2002) and in the U.S. House (2007–2013). A lawyer, she sits on the Judiciary Committee."],
+  "Sherrod Brown": ["Senator-elect from Ohio, he defeated appointed Republican Sen. Jon Husted in a 2026 special election. He returns to the Senate two years after losing his seat and will serve the final two years of the term JD Vance won in 2022.", "He served in the Ohio House, as Ohio secretary of state (1983–1991), in the U.S. House (1993–2007) and in the U.S. Senate (2007–2025). He lost his 2024 reelection bid to Bernie Moreno."],
+  "James Talarico": ["Senator-elect from Texas, he defeated Republican Ken Paxton for the seat held by John Cornyn, whom Paxton beat in the primary runoff. His win ended three decades of Republican control of every Texas statewide office.", "He has served in the Texas House since 2018, when he flipped a Republican-held district. He previously taught sixth-grade English at a San Antonio middle school and studied at Austin Presbyterian Theological Seminary."],
+  "Chris Pappas": ["Senator-elect from New Hampshire, he defeated Republican John E. Sununu for the open seat of retiring Sen. Jeanne Shaheen. He will be the first openly gay man to serve in the Senate.", "He served in the New Hampshire House (2002–2006), as Hillsborough County treasurer (2007–2011), on the state Executive Council (2013–2019) and in the U.S. House since 2019. He grew up working in his family's Manchester restaurant."],
+  "Josh Turek": ["Senator-elect from Iowa, he defeated Republican Rep. Ashley Hinson for the seat of retiring Sen. Joni Ernst. He is the first Democrat Iowa voters have elected to the Senate since 2008.", "He has served in the Iowa House since 2023. Before politics he played wheelchair basketball, winning Paralympic gold medals with the U.S. team in 2016 and 2020 and playing professionally in Europe."],
+  "Roy Cooper": ["Senator-elect from North Carolina, he defeated Republican Michael Whatley for the open seat of retiring Sen. Thom Tillis. He is the first Democrat elected to the Senate from North Carolina since 2008.", "He served in the North Carolina House (1987–1991) and state Senate (1991–2001), where he was majority leader, then as attorney general (2001–2017) and governor (2017–2025). He earlier practiced law at his family's firm in Nashville, N.C."],
+  "Scott Colom": ["Senator-elect from Mississippi, he defeated Republican Sen. Cindy Hyde-Smith in a race the AP called on Nov. 11. He will be the state's first Black U.S. senator since Reconstruction.", "A lawyer, he has been district attorney for Mississippi's 16th Judicial District since 2016 and earlier served as a Lowndes County justice court judge and Columbus city prosecutor. President Biden nominated him to a federal judgeship in 2022, but Hyde-Smith blocked the nomination."],
+  "Mary Peltola": ["Senator-elect from Alaska after VoteHub called her race against Republican Sen. Dan Sullivan on Nov. 14; official ranked-choice results are due Nov. 18. A Yup'ik from the Yukon–Kuskokwim Delta, she would be the first Alaska Native to serve in the Senate.", "She served in the Alaska House (1999–2009) and in the U.S. House (2022–2025), where she was the first Alaska Native member of Congress. She also served on the Bethel City Council and led the Kuskokwim River Inter-Tribal Fish Commission."],
+  "Abdul El-Sayed": ["Senator-elect from Michigan, he defeated Republican former Rep. Mike Rogers for the seat of retiring Sen. Gary Peters. He will be the first Muslim American to serve in the Senate.", "An epidemiologist with a medical degree and a former Rhodes Scholar, he led the Detroit Health Department (2015–2017) and Wayne County's health and human services department (2023–2025). He ran for governor in 2018, losing the Democratic primary to Gretchen Whitmer."],
+  "Peggy Flanagan": ["Senator-elect from Minnesota, she defeated Republican Michele Tafoya for the seat of retiring Sen. Tina Smith. A citizen of the White Earth Nation, she is the first Native American woman elected to the Senate.", "She has been lieutenant governor since 2019 and earlier served in the Minnesota House (2015–2019) and on the Minneapolis school board. She previously led Children's Defense Fund-Minnesota."],
+  "Troy Jackson": ["Senator-elect from Maine, he defeated five-term Republican Sen. Susan Collins. A fifth-generation logger from Aroostook County, he went to work as a lumberjack at 19.", "He served in the Maine House (2002–2008) and the Maine Senate (2008–2014 and 2016–2024), including as majority leader (2013–2014) and Senate president (2018–2024). He became the Democratic Senate nominee at a July 2026 party convention."],
+  "Juliana Stratton": ["Senator-elect from Illinois, she defeated Republican Don Tracy for the seat of retiring Sen. Dick Durbin. She will be the second Black woman to represent Illinois in the Senate, after Carol Moseley Braun.", "She has been lieutenant governor since 2019, the first Black woman in that office, after serving in the Illinois House (2017–2019). A lawyer, she earlier worked as an administrative law judge and led the Cook County Justice Advisory Council (2011–2014)."],
+  "Adam Hamilton": ["Senator-elect from Kansas, he defeated Republican Sen. Roger Marshall. He is the first Democrat to win a Senate race in Kansas since 1932.", "He has not held elected office before. A United Methodist pastor, he founded the Church of the Resurrection in Leawood in 1990 and has written more than 30 books. In 2016 President Obama named him to a White House faith advisory council."],
+  "Annie Andrews": ["Senator-elect from South Carolina, she defeated appointed Republican Sen. Darline Graham, who took the seat after her brother, Sen. Lindsey Graham, died in July 2026. She is the first woman elected to the Senate from South Carolina and the first Democrat to win a Senate race there since 1998.", "A pediatrician, she worked at MUSC Children's Hospital in Charleston until 2023. She was the Democratic nominee for the state's 1st Congressional District in 2022, losing to Nancy Mace."],
+};
+function spMarginal(score, prog, est) {
+  // Chance of a Schumer vote after the shared swings, averaged over the swing (same math as the runs, without the noise)
+  const S = SIM_SETTINGS, w = S.swing, sd = Math.sqrt(w.caucus ** 2 + (prog ? w.progressive ** 2 : 0) + (est ? w.establishment ** 2 : 0) + w.state ** 2);
+  const clamp = x => Math.min(S.ceiling, Math.max(S.floor, x)), sig = x => 1 / (1 + Math.exp(-x));
+  const lp = Math.log(clamp(sig(S.k * score)) / (1 - clamp(sig(S.k * score))));
+  let a = 0, wt = 0;
+  for (let i = -400; i <= 400; i++) { const z = i / 100, d = Math.exp(-z * z / 2); a += d * clamp(sig(lp + z * sd)); wt += d; }
+  return a / wt;
+}
+function spSeries(name) {
+  const S = SIM_SETTINGS, norm = c => c === "Opposing Schumer" ? "Will not support" : c;
+  const idx = SIM.roster.findIndex(x => x.name === name), p = SIM.roster[idx], nowCat = p.cat;
+  const hist = HISTORY.map(e => ({ e, t: simStamp(e[0]) })).filter(h => h.t != null).sort((a, b) => a.t - b.t);
+  let cat = nowCat;
+  for (let i = hist.length - 1; i >= 0; i--) for (let j = hist[i].e[2].length - 1; j >= 0; j--) { const m = hist[i].e[2][j]; if (m[0] === name) cat = norm(m[2]); }
+  const STANCE = { "Support": [1, 1], "Support Van Hollen": [-1, 1], "Will not support": [-1, .75] };
+  const base = SIM_FACTORS.filter(f => f[0] === name), cache = {};
+  const share = c => {
+    if (p.fixed != null) return p.fixed;
+    if (c === nowCat) return simBase.per[idx] / simBase.kept;
+    if (cache[c] != null) return cache[c];
+    let f = base.filter(x => x[2] !== "S");
+    if (STANCE[c]) f = f.concat([[name, STANCE[c][0], "S", STANCE[c][1]]]);
+    const sc = S.baseline + (LEADER_VOTE.movedUp ? S.movedUpBoost : 0) + f.reduce((a, x) => a + x[1] * SIM_WEIGHTS[x[2]][1] * x[3], 0);
+    return cache[c] = spMarginal(sc, p.prog, p.est);
+  };
+  const rows = SIM_HISTORY.filter(r => simStamp(r[0]) != null);
+  let hi = 0;
+  const pts = rows.map(r => {
+    const t = simStamp(r[0]);
+    while (hi < hist.length && hist[hi].t <= t) { hist[hi].e[2].forEach(m => { if (m[0] === name) cat = norm(m[3]); }); hi++; }
+    const q = r.slice(); q.s = share(cat); q.cat = cat; q.who = name;
+    return { p: q, t };
+  });
+  // events: every move on the tracker, with what it did to the race and to this senator
+  const byLabel = {}; rows.forEach((r, i) => byLabel[r[0]] = i);
+  const events = hist.map(({ e, t }) => {
+    const i = byLabel[e[0]], prev = i > 0 ? rows[i - 1] : null, cur = i != null ? rows[i] : null;
+    const dRace = cur && prev ? simWin(cur) - simWin(prev) : null;
+    const own = e[2].find(m => m[0] === name);
+    const k = pts.findIndex(q => q.t >= t);
+    return { e, t, own, dRace, before: own && k > 0 ? pts[k - 1].p.s : null, after: own && k >= 0 ? pts[k].p.s : null };
+  });
+  return { p, pts, events };
+}
+function spTip(q) {
+  const w = simWin(q), note = q[7] || "", sh = Math.round(1000 * q.s) / 10, first = q.who.split(" ").slice(-1)[0];
+  return `<b>${q[0]}</b>
+    <div class="tt-sub" style="margin:4px 0 2px">${first}'s vote · ${L(q.cat)}</div>
+    <div class="tt-row"><i style="background:#2F6FD0"></i>Schumer<span>${sh.toFixed(1)}%</span><span></span></div>
+    <div class="tt-row"><i style="background:#12A6CC"></i>Van Hollen<span>${(100 - sh).toFixed(1)}%</span><span></span></div>
+    <div class="tt-sub" style="margin:6px 0 2px">The race at this check</div>
+    <div class="tt-row"><i style="background:#2F6FD0"></i>Schumer<span>${w.toFixed(1)}%</span><span>${q[1].toFixed(1)} votes</span></div>
+    <div class="tt-row"><i style="background:#12A6CC"></i>Van Hollen<span>${(100 - w).toFixed(1)}%</span><span>${(56 - q[1]).toFixed(1)} votes</span></div>
+    <div class="tt-sub">Middle 80% of runs: Schumer ${q[2]}–${q[3]} votes</div>
+    ${note ? `<div class="tt-note">${note.length > 280 ? note.slice(0, 277).replace(/\s+\S*$/, "") + "…" : note}</div>` : ""}`;
+}
+const SP_TO_C = { "Support": "#2F6FD0", "Support Van Hollen": "#12A6CC", "Will not support": "#9ADBEA", "Unclear": "#8E5BC8", "No public position": "#B8BDC4" };
+let spOpenName = null;
+function spOpen(name) {
+  if (!SIM) SIM = simBuild();
+  if (!simBase) simBase = SIM.stats({});
+  spOpenName = name;
+  const { p, pts, events } = spSeries(name);
+  let wrap = document.getElementById("simPerson");
+  if (!wrap) { wrap = document.createElement("div"); wrap.id = "simPerson"; wrap.className = "sp-wrap"; wrap.setAttribute("role", "dialog"); wrap.setAttribute("aria-modal", "true"); document.body.appendChild(wrap); }
+  const last = pts[pts.length - 1].p, firstP = pts[0].p, first = name.split(" ").slice(-1)[0];
+  const rec = Object.values(SENATORS).flat().find(r => r[0] === name) || NO_POSITION.find(r => r[0] === name) || [];
+  const elect = p.cat !== "No public position" && rec[3] === true;
+  const note = p.cat === "No public position" ? (rec[3] || NO_POSITION_DEFAULT) : rec[2] || "";
+  const lab = p.fixed != null ? (p.fixed ? "Safe Schumer" : "Safe Van Hollen") : simLabel(last.s);
+  const color = p.fixed === 1 ? "#03045E" : p.fixed === 0 ? "#06566B" : COLORS[p.cat] || "#B8BDC4";
+  const ownEv = events.filter(v => v.own), moves = events.filter(v => v.e[2].length);
+  const bio = SP_BIO[name] ? SP_BIO[name].map(x => `<p>${x}</p>`).join("") :
+    `<p>${elect ? "Senator-elect" : "U.S. senator"} from ${STATE_NAMES[p.st] || p.st}.</p>`;
+  const pct = x => Math.round(100 * x) + "%";
+  const evRow = v => {
+    const m = v.own || v.e[2][0], many = v.e[2].length > 1 && !v.own;
+    const imp = v.dRace == null ? `<div class="imp z">—</div>` : Math.abs(v.dRace) < .05 ? `<div class="imp z">No change<small>to the race</small></div>` :
+      `<div class="imp ${v.dRace > 0 ? "s" : "v"}">${v.dRace > 0 ? "+" : "−"}${Math.abs(v.dRace).toFixed(1)} pts<small>${v.dRace > 0 ? "toward Schumer" : "toward Van Hollen"}</small></div>`;
+    const ms = v.own ? [v.own] : v.e[2];
+    return `<div class="sp-ev${v.own ? " own" : ""}">${avatar(m[0], m[1], SP_TO_C[m[3] === "Opposing Schumer" ? "Will not support" : m[3]] || "#B8BDC4", 28)}
+      <div><div class="when">${v.e[0]}${many ? ` · ${v.e[2].length} senators moved` : ""}</div>
+      ${ms.map(x => `<div class="what"><b>${x[0]}</b> → ${L(x[3] === "Opposing Schumer" ? "Will not support" : x[3])}</div><div class="why">${x[4]}</div>`).join("")}
+      ${v.own ? `<div class="why" style="color:var(--ink);font-weight:700;margin-top:3px">${first}'s chance of voting Schumer: ${pct(v.before)} → ${pct(v.after)}</div>` : ""}</div>
+      ${imp}</div>`;
+  };
+  wrap.innerHTML = `<div class="sp-in">
+    <div class="sp-top"><button type="button" class="sp-back" data-spclose>← Back to simulations</button></div>
+    <div class="sp-grid">
+      <div class="sp-main">
+        <h1>${name}'s trend over time</h1>
+        <p class="sp-sub">${name}'s chance of voting Schumer or Van Hollen in the 11,111 runs at each hourly check since Nov. 11. The line is blue while it's above the tie line and turns teal when it crosses below. ${p.fixed != null ? `As a candidate, ${first} always votes for ${p.fixed ? "himself" : "himself"}.` : `Only ${first}'s own statements move this line. When other senators move, they show up as dots along the bottom, and what that did to the race is in the tooltip and the list below.`}</p>
+        <div class="trend" id="spTrend"></div>
+        <div class="sp-legend"><span><i style="--c:#2F6FD0"></i>Above the tie: leans Schumer</span><span><i style="--c:#12A6CC"></i>Below the tie: leans Van Hollen</span><span><i class="ring"></i>${first} moved on the tracker</span><span><i style="--c:#8a8f96"></i>Another senator moved (colored by where they went)</span></div>
+        <h2 class="sp-h2">What moved ${ownEv.length ? `${first} and ` : ""}the race</h2>
+        ${moves.slice().reverse().map(evRow).join("")}
+      </div>
+      <aside class="sp-side">
+        <div class="sp-photo">${avatar(name, p.st, color, 132)}</div>
+        <h2>${name}</h2>
+        <div class="sp-st">${elect ? "Senator-elect, " : ""}${STATE_NAMES[p.st] || p.st}</div>
+        <div class="sp-badges"><span style="--c:${COLORS[p.cat] || "#B8BDC4"}">${L(p.cat)}</span><span style="--c:${SIM_GC[lab]}">${lab}</span></div>
+        <div class="sp-stats">
+          <div><b style="color:var(--sS)">${pct(last.s)}</b><span>Schumer now</span></div>
+          <div><b style="color:var(--muted)">${pct(firstP.s)}</b><span>On ${firstP[0].split(",")[0]}</span></div>
+        </div>
+        <div class="sp-bio">${bio}</div>
+        ${note ? `<div class="sp-note"><b style="color:var(--ink)">On the record:</b> ${note}</div>` : ""}
+      </aside>
+    </div></div>`;
+  wrap.hidden = false; document.documentElement.style.overflow = "hidden"; wrap.scrollTop = 0;
+  const t0 = pts[0].t, tEnd = simStamp(LEADER_VOTE.date) ?? simStamp("Dec. 1");
+  simDrawTrend("spTrend", pts, t0, tEnd, {
+    yMin: 0, yMax: 100, step: 25, fmt: v => (v === 50 ? 50 : v > 50 ? v : 100 - v) + "%", ref: 50, refLabel: "Tie", tip: spTip,
+    bands: (X, Y, x1, x2) => `<rect x="${x1}" y="${Y(100)}" width="${x2 - x1}" height="${Y(50) - Y(100)}" fill="#2F6FD0" opacity=".06"/>` +
+      `<rect x="${x1}" y="${Y(50)}" width="${x2 - x1}" height="${Y(0) - Y(50)}" fill="#12A6CC" opacity=".06"/>` +
+      `<text x="${x1 + 8}" y="${Y(100) + 15}" style="fill:#2F6FD0;font-weight:800">↑ Schumer</text>` +
+      `<text x="${x1 + 8}" y="${Y(0) - 18}" style="fill:#0e8cab;font-weight:800">↓ Van Hollen</text>`,
+    lines: [{ v: q => Math.round(1000 * q.s) / 10, split: [50, "#2F6FD0", "#12A6CC"], c: "#2F6FD0", who: [name, p.st, color],
+              tag: q => q.s >= .5 ? `${Math.round(100 * q.s)}% Schumer` : `${Math.round(100 * (1 - q.s))}% Van Hollen` }],
+    marks: (X, Y, base) => events.filter(v => v.e[2].length).map(v => {
+      if (v.own) { const k = pts.findIndex(q => q.t >= v.t); if (k < 0) return ""; const q = pts[k];
+        return `<circle class="sp-ownmark" cx="${X(q.t)}" cy="${Y(100 * q.p.s)}" r="9"/>`; }
+      const to = v.e[2][0][3] === "Opposing Schumer" ? "Will not support" : v.e[2][0][3];
+      return `<circle cx="${X(v.t)}" cy="${base - 5}" r="4" fill="${SP_TO_C[to] || "#8a8f96"}" stroke="var(--bgx,#fff)" stroke-width="1.2"/>`;
+    }).join("") });
+}
+function spClose() { const w = document.getElementById("simPerson"); if (w) w.hidden = true; document.documentElement.style.overflow = ""; spOpenName = null; }
+document.addEventListener("click", e => {
+  const t = e.target.closest("[data-trend],[data-spclose]"); if (!t) return;
+  if (t.dataset.trend) spOpen(t.dataset.trend); else spClose();
+});
+document.addEventListener("keydown", e => { if (e.key === "Escape" && spOpenName) spClose(); });
+window.addEventListener("resize", () => { if (spOpenName) { clearTimeout(spOpen._r); spOpen._r = setTimeout(() => { const y = document.getElementById("simPerson").scrollTop; spOpen(spOpenName); document.getElementById("simPerson").scrollTop = y; }, 150); } });
 function simMethod() {
   const S = SIM_SETTINGS;
   simEl("simMethod").innerHTML = `<h2 class="sim-h2" style="color:var(--ink)">How this works</h2>
