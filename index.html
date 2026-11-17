@@ -3484,10 +3484,10 @@ function simList() {
       : `<ul><li><span class="pts">0.00</span><span>No sourced factors yet, so this senator starts at a coin flip.</span></li></ul>`;
     return `<div class="srow" data-name="${p.name}">${avatar(p.name, p.st, color, 42)}
       <div class="who"><b>${p.name}</b><span>${STATE_NAMES[p.st] || p.st} · ${L(p.cat)}</span><br><span class="lab" style="--c:${c}">${r.lab}</span></div>
-      <div class="sbar" title="${pctS}% Schumer, ${100 - pctS}% Van Hollen"><div class="sS" style="width:${100 * r.share}%"></div>${pctS >= 12 ? `<span class="pl l">${pctS}%</span>` : ""}${pctS <= 88 ? `<span class="pl r">${100 - pctS}%</span>` : ""}</div>
+      <div class="sbar" title="${pctS}% Schumer, ${100 - pctS}% Van Hollen"><div class="sS" style="width:${100 * r.share}%"></div>${r.share >= .5 ? `<span class="pl l">${pctS}% Schumer</span>` : `<span class="pl r">${100 - pctS}% Van Hollen</span>`}</div>
       <div class="slock">${p.fixed != null ? `<button type="button" class="s" disabled title="Candidates always vote for themselves">S</button><button type="button" class="v" disabled>VH</button>` :
         `<button type="button" class="s" data-lock="1" aria-pressed="${lk === 1}" title="Lock to Schumer">S</button><button type="button" class="v" data-lock="0" aria-pressed="${lk === 0}" title="Lock to Van Hollen">VH</button>`}</div>
-      <div class="scount">Schumer in ${simFmt(cnt)} of ${simFmt(st.kept)} runs${sh}</div>
+      <div class="scount">Schumer in ${simFmt(cnt)} of ${simFmt(st.kept)} runs<br>Van Hollen in ${simFmt(st.kept - cnt)} of ${simFmt(st.kept)} runs${sh}</div>
       <div class="sfoot"><details class="swhy"><summary>Why</summary>${why}</details><button type="button" class="strend" data-trend="${p.name}">View trend over time</button></div></div>`;
   };
   simStand(rows);
