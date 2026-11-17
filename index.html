@@ -3481,7 +3481,7 @@ function simList() {
     const color = p.fixed === 1 ? "#03045E" : p.fixed === 0 ? "#06566B" : COLORS[p.cat] || "#B8BDC4";
     const sh = Object.keys(simLocks).length && p.fixed == null && lk == null && Math.abs(r.shift) >= .005 ? `<span class="shift ${r.shift > 0 ? "up" : "dn"}">${r.shift > 0 ? "▲" : "▼"} ${Math.abs(Math.round(100 * r.shift))} pts ${r.shift > 0 ? "toward Schumer" : "toward Van Hollen"}</span>` : "";
     const why = p.factors.length ? `<ul>${p.factors.map(f => `<li><span class="pts ${f.pts > 0 ? "s" : "v"}">${f.pts > 0 ? "+" : "−"}${Math.abs(f.pts).toFixed(2)}</span><span>${f.what} <span class="ty">· ${f.type}${f.src[1] ? ` · <a href="${f.src[1]}" target="_blank" rel="noopener">${f.src[0]}</a>` : ""}</span></span></li>`).join("")}</ul>` +
-      `<div class="ty">Score ${p.score >= 0 ? "+" : "−"}${Math.abs(p.score).toFixed(2)} → ${p.fixed != null ? (p.fixed ? "always votes Schumer" : "always votes Van Hollen") : `${Math.round(100 * p.p)}% Schumer before shared swings`}</div>`
+      `<div class="ty">Score ${p.score >= 0 ? "+" : "−"}${Math.abs(p.score).toFixed(2)} → ${p.fixed != null ? (p.fixed ? "always votes Schumer" : "always votes Van Hollen") : `${p.p >= .5 ? Math.round(100 * p.p) + "% Schumer" : Math.round(100 * (1 - p.p)) + "% Van Hollen"} before shared swings`}</div>`
       : `<ul><li><span class="pts">0.00</span><span>No sourced factors yet, so this senator starts at a coin flip.</span></li></ul>`;
     return `<div class="srow" data-name="${p.name}">${avatar(p.name, p.st, color, 42)}
       <div class="who"><b>${p.name}</b><span>${STATE_NAMES[p.st] || p.st} · ${L(p.cat)}</span><br><span class="lab" style="--c:${c}">${r.lab}</span></div>
