@@ -3700,7 +3700,7 @@ function spOpen(name) {
         <p class="sp-sub">${name}'s chance of voting Schumer or Van Hollen in the 11,111 runs at each hourly check since Nov. 11. The line is blue while it's above the tie line and turns teal when it crosses below. ${p.fixed != null ? `As a candidate, ${first} always votes for ${p.fixed ? "himself" : "himself"}.` : `Only ${first}'s own statements move this line. When other senators move, they show up as dots along the bottom, and what that did to the race is in the tooltip and the list below.`}</p>
         <div class="sim-tools sp-modes" role="group" aria-label="Graph view"><button type="button" data-spmode="trend" aria-pressed="${spMode === "trend"}">Trend</button><button type="button" data-spmode="compare" aria-pressed="${spMode === "compare"}">Comparison</button></div>
         <div class="trend" id="spTrend"></div>
-        <div class="sp-legend" id="spLegend"><span><i style="--c:#2F6FD0"></i>Above the tie: leans Schumer</span><span><i style="--c:#12A6CC"></i>Below the tie: leans Van Hollen</span><span><i class="ring"></i>${first} moved on the tracker</span><span><i style="--c:#8a8f96"></i>Another senator moved (colored by where they went)</span></div>
+        <div class="sp-legend" id="spLegend"><span><i style="--c:#2F6FD0"></i>Above the tie: leans Schumer</span><span><i style="--c:#12A6CC"></i>Below the tie: leans Van Hollen</span><span><i style="--c:#8a8f96"></i>Another senator moved (colored by where they went)</span></div>
         <h2 class="sp-h2">What moved ${ownEv.length ? `${first} and ` : ""}the race</h2>
         ${moves.slice().reverse().map(evRow).join("")}
       </div>
@@ -3743,9 +3743,7 @@ function spDraw() {
     lines: [{ v: q => Math.round(1000 * q.s) / 10, split: [50, "#2F6FD0", "#12A6CC"], c: "#2F6FD0", who: [name, p.st, color],
               tag: q => q.s >= .5 ? `${Math.round(100 * q.s)}% Schumer` : `${Math.round(100 * (1 - q.s))}% Van Hollen` }],
     marks: (X, Y, base) => events.filter(v => v.e[2].length).map(v => {
-      if (v.own) { const k = pts.findIndex(q => q.t >= v.t); if (k < 0) return ""; const q = pts[k];
-        return `<circle class="sp-ownmark" cx="${X(q.t)}" cy="${Y(100 * q.p.s)}" r="9"/>`; }
-      if (cmp) return "";
+      if (v.own || cmp) return "";
       const to = v.e[2][0][3] === "Opposing Schumer" ? "Will not support" : v.e[2][0][3];
       return `<circle cx="${X(v.t)}" cy="${base - 5}" r="4" fill="${SP_TO_C[to] || "#8a8f96"}" stroke="var(--bgx,#fff)" stroke-width="1.2"/>`;
     }).join(""),
