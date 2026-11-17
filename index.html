@@ -647,6 +647,8 @@
   .sp-side .sp-note { font-size: 12.5px; color: var(--muted); border-top: 1px solid var(--rule); padding-top: 10px; margin-top: 6px; line-height: 1.5; }
   .sp-ownmark { fill: none; stroke: var(--ink); stroke-width: 2.5; }
   .sp-modes { justify-content: flex-start; margin: 0 0 8px; }
+  .sp-rip { font-size: 12.5px; line-height: 1.5; color: var(--muted); border: 1.5px dashed #b9a6ea; border-radius: 10px; padding: 9px 12px; margin: 10px 0 0; }
+  .sp-rip b { color: var(--ink); }
   .sp-dot { position: absolute; transform: translate(-50%, -50%); border: 0; padding: 0; margin: 0; background: none; cursor: pointer; z-index: 2; border-radius: 50%; line-height: 0; }
   .sp-dot .avatar { filter: grayscale(1); opacity: .5; transition: filter .15s, opacity .15s; }
   .sp-dot:hover, .sp-dot:focus-visible { z-index: 6; }
@@ -3430,15 +3432,15 @@ function simDrawTrend(id, pts, t0, tEnd, o) {
   o.lines.forEach(l => {
     if (l.lo && pts.length > 1) s += `<path d="${pts.map((q, i) => (i ? "L" : "M") + X(q.t).toFixed(1) + " " + Y(l.hi(q.p)).toFixed(1)).join("")}${pts.slice().reverse().map(q => "L" + X(q.t).toFixed(1) + " " + Y(l.lo(q.p)).toFixed(1)).join("")}Z" fill="${l.c}" opacity=".12"/>`;
   });
-  o.lines.forEach((l, li) => { s += `<path d="${pts.map((q, i) => (i ? "L" : "M") + X(q.t).toFixed(1) + " " + Y(l.v(q.p)).toFixed(1)).join("")}" fill="none" stroke="${l.split ? `url(#${gid}${li})` : l.c}" stroke-width="2.6" stroke-linejoin="round" stroke-linecap="round"/>`; });
+  o.lines.forEach((l, li) => { s += `<path d="${pts.map((q, i) => (i ? "L" : "M") + X(q.t).toFixed(1) + " " + Y(l.v(q.p)).toFixed(1)).join("")}" fill="none" stroke="${l.split ? `url(#${gid}${li})` : l.c}" stroke-width="${l.dash ? 2 : 2.6}"${l.dash ? ` stroke-dasharray="${l.dash}" opacity=".85"` : ""} stroke-linejoin="round" stroke-linecap="round"/>`; });
   const last = pts[pts.length - 1];
-  o.lines.forEach(l => { const x = X(last.t), y = Y(l.v(last.p));
+  o.lines.filter(l => !l.noPic).forEach(l => { const x = X(last.t), y = Y(l.v(last.p));
     s += `<circle class="sim-pulse" cx="${x}" cy="${y}" r="6" fill="${lc(l, l.v(last.p))}"/><circle cx="${x}" cy="${y}" r="5" fill="${lc(l, l.v(last.p))}" stroke="var(--bgx,#fff)" stroke-width="1.5"/>`; });
   if (o.marks) s += o.marks(X, Y, H - B);
   s += `<line class="tr-cur" x1="0" x2="0" y1="${T}" y2="${H - B}" stroke="var(--ink)" opacity="0"/>` + o.lines.map((l, i) => `<circle class="tr-dot" data-i="${i}" r="5" fill="${l.c}" stroke="var(--bgx,#fff)" stroke-width="2" opacity="0"/>`).join("");
   s += `<rect class="tr-hit" x="${L - 10}" y="0" width="${W - L - R + 20}" height="${H}" fill="transparent"/></svg>`;
   // photos riding at the end of each line
-  let pics = (o.html ? o.html(X, Y, W, H) : "") + (o.noPics ? [] : o.lines).map(l => { const x = X(last.t), y = Y(l.v(last.p));
+  let pics = (o.html ? o.html(X, Y, W, H) : "") + (o.noPics ? [] : o.lines.filter(l => !l.noPic)).map(l => { const x = X(last.t), y = Y(l.v(last.p));
     return `<div class="tr-pic" style="left:${100 * x / W}%;top:${100 * y / H}%">${avatar(l.who[0], l.who[1], l.who[2], narrowW ? 26 : 30)}<b class="tr-val" style="color:${lc(l, l.v(last.p))}">${l.tag(last.p)}</b></div>`; }).join("");
   el.innerHTML = `<div class="tr-plot">${s}${pics}<div class="trend-tip"></div></div><div class="tr-read"></div>`;
   const svg = el.querySelector("svg"), plot = el.querySelector(".tr-plot"), tipE = plot.querySelector(".trend-tip"), read = el.querySelector(".tr-read"), cur = svg.querySelector(".tr-cur"), dots = [...svg.querySelectorAll(".tr-dot")];
@@ -3650,12 +3652,68 @@ function spSeries(name) {
   });
   return { p, pts, events };
 }
+/* ---------- Mockup: endorsement ripple ----------
+   Treats each public endorsement as evidence about the shared swings (caucus mood, progressive wing, leadership wing, state).
+   A senator who endorses Schumer makes runs where the caucus leans Schumer more likely, weighted by how surprising the
+   endorsement was given their lean before they said it. Everyone else's odds are then averaged over those reweighted runs. */
+let spRipZ = null, spRipCache = {};
+function spRipSwings() {
+  if (spRipZ) return spRipZ;
+  const S = SIM_SETTINGS, R = SIM.roster; let seed = S.seed >>> 0;
+  const rnd = () => { seed |= 0; seed = seed + 0x6D2B79F5 | 0; let t = Math.imul(seed ^ seed >>> 15, 1 | seed); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; };
+  const gauss = () => { let u = 0; while (!u) u = rnd(); return Math.sqrt(-2 * Math.log(u)) * Math.cos(2 * Math.PI * rnd()); };
+  const states = [...new Set(R.map(p => p.st))], Z = [];
+  for (let r = 0; r < S.runs; r++) {   // same draws, in the same order, as the 11,111 runs
+    const zc = gauss() * S.swing.caucus, zp = gauss() * S.swing.progressive, ze = gauss() * S.swing.establishment, zs = {};
+    states.forEach(st => zs[st] = gauss() * S.swing.state); Z.push({ zc, zp, ze, zs });
+    for (let i = 0; i < R.length; i++) if (R[i].fixed == null) rnd();
+  }
+  return spRipZ = Z;
+}
+const spRipShift = (p, z) => z.zc + (p.prog ? z.zp : 0) + (p.est ? z.ze : 0) + z.zs[p.st];
+function spRipCats(t) {   // every senator's tracker group at time t
+  const norm = c => c === "Opposing Schumer" ? "Will not support" : c, cats = {};
+  SIM.roster.forEach(p => cats[p.name] = p.cat);
+  const hist = HISTORY.map(e => ({ e, t: simStamp(e[0]) })).filter(h => h.t != null).sort((a, b) => a.t - b.t);
+  for (let i = hist.length - 1; i >= 0 && hist[i].t > t; i--) for (let j = hist[i].e[2].length - 1; j >= 0; j--) cats[hist[i].e[2][j][0]] = norm(hist[i].e[2][j][2]);
+  return cats;
+}
+function spRipWeights(t) {
+  const cats = spRipCats(t), key = SIM.roster.map(p => cats[p.name]).join("|");
+  if (spRipCache[key]) return spRipCache[key];
+  const S = SIM_SETTINGS, Z = spRipSwings(), clamp = x => Math.min(S.ceiling, Math.max(S.floor, x)), sig = x => 1 / (1 + Math.exp(-x));
+  const side = { "Support": 1, "Support Van Hollen": 0, "Will not support": 0 };
+  const ends = SIM.roster.filter(p => p.fixed == null && side[cats[p.name]] != null).map(p => {
+    const pre = clamp(sig(S.k * (S.baseline + p.factors.filter(f => f.type !== "Public stance").reduce((a, f) => a + f.pts, 0))));
+    return { p, side: side[cats[p.name]], lp: Math.log(pre / (1 - pre)) };
+  });
+  const terms = Z.map(z => ends.map(e => { const q = clamp(sig(e.lp + spRipShift(e.p, z))); return Math.log(e.side ? q : 1 - q); }));
+  const lw = terms.map(a => a.reduce((x, y) => x + y, 0)), mx = Math.max(...lw);
+  return spRipCache[key] = { cats, ends, terms, lw, mx };
+}
+function spRipple(name, t) {
+  const S = SIM_SETTINGS, Z = spRipSwings(), W = spRipWeights(t), p = SIM.roster.find(x => x.name === name);
+  const clamp = x => Math.min(S.ceiling, Math.max(S.floor, x)), sig = x => 1 / (1 + Math.exp(-x));
+  const STANCE = { "Support": [1, 1], "Support Van Hollen": [-1, 1], "Will not support": [-1, .75] }, cat = W.cats[name];
+  let pp = p.p;
+  if (cat !== p.cat) { const sc = S.baseline + p.factors.filter(f => f.type !== "Public stance").reduce((a, f) => a + f.pts, 0) + (STANCE[cat] ? STANCE[cat][0] * 2 * STANCE[cat][1] : 0); pp = clamp(sig(S.k * sc)); }
+  const self = W.ends.findIndex(e => e.p === p), lp = Math.log(pp / (1 - pp));
+  let a = 0, b = 0;
+  for (let r = 0; r < Z.length; r++) { const w = Math.exp(W.lw[r] - W.mx - (self >= 0 ? W.terms[r][self] : 0)); a += w * clamp(sig(lp + spRipShift(p, Z[r]))); b += w; }
+  return a / b;
+}
+function spRippleRace() {   // the race right now, with and without the ripple, using the actual runs
+  const W = spRipWeights(Infinity); let s = 0, tie = 0, m = 0, sw = 0;
+  for (let r = 0; r < SIM.N_RUNS; r++) { const w = Math.exp(W.lw[r] - W.mx), n = SIM.sCount[r]; sw += w; m += w * n; if (n >= 29) s += w; else if (n === 28) tie += w; }
+  return { win: 100 * (s + tie / 2) / sw, mean: m / sw, base: 100 * (simBase.sWin + simBase.tie / 2) / simBase.kept, bmean: simBase.mean };
+}
 function spTip(q) {
   const w = simWin(q), note = q[7] || "", sh = Math.round(1000 * q.s) / 10, first = q.who.split(" ").slice(-1)[0];
   return `<b>${q[0]}</b>
     <div class="tt-sub" style="margin:4px 0 2px">${first}'s vote · ${L(q.cat)}</div>
     <div class="tt-row"><i style="background:#2F6FD0"></i>Schumer<span>${sh.toFixed(1)}%</span><span></span></div>
     <div class="tt-row"><i style="background:#12A6CC"></i>Van Hollen<span>${(100 - sh).toFixed(1)}%</span><span></span></div>
+    ${q.rip != null ? `<div class="tt-row"><i style="background:transparent;border:2px dashed #7d5fcf;width:6px;height:6px"></i>With ripple<span>${(100 * q.rip).toFixed(1)}%</span><span>Schumer</span></div>` : ""}
     <div class="tt-sub" style="margin:6px 0 2px">The race at this check</div>
     <div class="tt-row"><i style="background:#2F6FD0"></i>Schumer<span>${w.toFixed(1)}%</span><span>${q[1].toFixed(1)} votes</span></div>
     <div class="tt-row"><i style="background:#12A6CC"></i>Van Hollen<span>${(100 - w).toFixed(1)}%</span><span>${(56 - q[1]).toFixed(1)} votes</span></div>
@@ -3700,6 +3758,7 @@ function spOpen(name) {
         <p class="sp-sub">${name}'s chance of voting Schumer or Van Hollen in the 11,111 runs at each hourly check since Nov. 11. The line is blue while it's above the tie line and turns teal when it crosses below. ${p.fixed != null ? `As a candidate, ${first} always votes for ${p.fixed ? "himself" : "himself"}.` : `Only ${first}'s own statements move this line. When other senators move, they show up as dots along the bottom, and what that did to the race is in the tooltip and the list below.`}</p>
         <div class="sim-tools sp-modes" role="group" aria-label="Graph view"><button type="button" data-spmode="trend" aria-pressed="${spMode === "trend"}">Trend</button><button type="button" data-spmode="compare" aria-pressed="${spMode === "compare"}">Comparison</button></div>
         <div class="trend" id="spTrend"></div>
+        <p class="sp-rip" id="spRipNote"></p>
         <div class="sp-legend" id="spLegend"><span><i style="--c:#2F6FD0"></i>Above the tie: leans Schumer</span><span><i style="--c:#12A6CC"></i>Below the tie: leans Van Hollen</span><span><i style="--c:#8a8f96"></i>Another senator moved (colored by where they went)</span></div>
         <h2 class="sp-h2">What moved ${ownEv.length ? `${first} and ` : ""}the race</h2>
         ${moves.slice().reverse().map(evRow).join("")}
@@ -3718,6 +3777,9 @@ function spOpen(name) {
       </aside>
     </div></div>`;
   wrap.hidden = false; document.documentElement.style.overflow = "hidden"; wrap.scrollTop = 0;
+  if (p.fixed == null) pts.forEach(q => q.p.rip = spRipple(name, q.t));
+  const rp = document.getElementById("spRipNote");
+  if (rp) { const rr = spRippleRace(); rp.innerHTML = `<b>Mockup: endorsement ripple.</b> The dashed purple line is ${name.split(" ").slice(-1)[0]}'s chance of voting Schumer if every public endorsement also counted as a sign of where the caucus is heading. With that ripple, Schumer's chance of winning right now would be <b>${rr.win.toFixed(1)}%</b> instead of <b>${rr.base.toFixed(1)}%</b>, and his average vote count <b>${rr.mean.toFixed(1)}</b> instead of <b>${rr.bmean.toFixed(1)}</b>.`; }
   spState = { name, p, pts, events, color, legend: document.getElementById("spLegend").innerHTML };
   spDraw();
 }
@@ -3741,7 +3803,8 @@ function spDraw() {
       `<text x="${x1 + 8}" y="${Y(0) - 18}" style="fill:#0e8cab;font-weight:800">↓ Van Hollen</text>` +
       (cmp ? all.filter(a => a.r.name !== name).map(a => `<path d="${a.pts.map((q, k) => (k ? "L" : "M") + X(q.t).toFixed(1) + " " + Y(100 * q.p.s).toFixed(1)).join("")}" fill="none" stroke="var(--muted)" stroke-width="1.4" opacity=".22"/>`).join("") : ""),
     lines: [{ v: q => Math.round(1000 * q.s) / 10, split: [50, "#2F6FD0", "#12A6CC"], c: "#2F6FD0", who: [name, p.st, color],
-              tag: q => q.s >= .5 ? `${Math.round(100 * q.s)}% Schumer` : `${Math.round(100 * (1 - q.s))}% Van Hollen` }],
+              tag: q => q.s >= .5 ? `${Math.round(100 * q.s)}% Schumer` : `${Math.round(100 * (1 - q.s))}% Van Hollen` },
+            ...(cmp || p.fixed != null ? [] : [{ v: q => Math.round(1000 * q.rip) / 10, split: [50, "#7d5fcf", "#7d5fcf"], c: "#7d5fcf", dash: "5 4", noPic: true }])],
     marks: (X, Y, base) => events.filter(v => v.e[2].length).map(v => {
       if (v.own || cmp) return "";
       const to = v.e[2][0][3] === "Opposing Schumer" ? "Will not support" : v.e[2][0][3];
