@@ -4463,10 +4463,10 @@ function focusTimeline() {
 }
 window.addEventListener("scroll", () => { if ((view === "history" || view === "news") && !tlRAF) tlRAF = requestAnimationFrame(() => { tlRAF = 0; focusTimeline(); }); }, { passive: true });
 window.addEventListener("resize", () => focusTimeline());
-/* ---------- Next update countdown (checks for 9 AM to midnight Eastern; each one starts 10 minutes before its hour) ---------- */
+/* ---------- Next update countdown (checks run on the hour, 9 AM to midnight Eastern) ---------- */
 const nextUpEl = document.getElementById("nextUp");
 const CHECK_SKIP = [1, 2, 3, 4, 5, 6, 7, 8];   // Eastern hours with no check (last check is midnight, first is 9 AM)
-const CHECK_LEAD = 10;                  // the check for 9 AM starts at 8:50 AM, and so on
+const CHECK_GRACE = 15;                 // minutes after the hour that a check is still running
 const etFmt = (() => { try { return new Intl.DateTimeFormat("en-US", { timeZone: "America/New_York", hour12: false, hour: "2-digit", minute: "2-digit", second: "2-digit" }); } catch (e) { return null; } })();
 const CLOCK_SVG = `<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>`;
 const ampm = h => (h % 12 || 12) + (h < 12 ? "am" : "pm");
@@ -4474,13 +4474,13 @@ function tickNextUp() {
   if (!nextUpEl || !etFmt) return;
   const parts = {}; etFmt.formatToParts(new Date()).forEach(x => parts[x.type] = +x.value);
   const H = parts.hour % 24, M = parts.minute, S = parts.second;
-  if (!CHECK_SKIP.includes((H + 1) % 24) && M >= 60 - CHECK_LEAD) {
+  if (!CHECK_SKIP.includes(H) && M < CHECK_GRACE) {
     nextUpEl.classList.add("now");
     nextUpEl.innerHTML = `${CLOCK_SVG}<span>Checking for updates</span><span class="cd">now</span>`;
     return;
   }
   let k = 1; while (CHECK_SKIP.includes((H + k) % 24)) k++;
-  const left = k * 3600 - CHECK_LEAD * 60 - (M * 60 + S), hh = Math.floor(left / 3600), mm = Math.floor(left / 60) % 60, ss = left % 60;
+  const left = k * 3600 - (M * 60 + S), hh = Math.floor(left / 3600), mm = Math.floor(left / 60) % 60, ss = left % 60;
   const pad = n => String(n).padStart(2, "0");
   nextUpEl.classList.remove("now");
   nextUpEl.innerHTML = `${CLOCK_SVG}<span>Next Update: ${ampm((H + k) % 24)} Eastern</span><span class="cd">${hh ? hh + ":" + pad(mm) : mm}:${pad(ss)}</span>`;
