@@ -1101,7 +1101,7 @@ const TOTAL = 56;
 const NEEDED = 29;
 const SUBTITLE = "Public positions of the 56-member Senate Democratic caucus";
 const KOFI_URL = "https://ko-fi.com/jaysonfras";
-const LAST_UPDATED = "Last updated on November 18th, 2026 at 4:00pm";
+const LAST_UPDATED = "Last updated on November 18th, 2026 at 5:00pm";
 
 const SENATORS = {
   "Support": [
@@ -1144,6 +1144,7 @@ const SENATORS = {
     ["John Hickenlooper", "CO", "Made a coin-toss motion when asked who he's supporting, Politico reported Nov. 16, while telling The Hill that Schumer deserves credit for flipping nine seats."],
     ["Michael Bennet", "CO", "Dodged reporters' questions on Nov. 16 as several veteran senators declined to say how they'll vote (Politico)."],
     ["Lisa Blunt Rochester", "DE", "Said of the leadership fight, \"It's a family conversation that we're going to have amongst ourselves,\" without backing either candidate (Politico, Nov. 16)."],
+    ["Maggie Hassan", "NH", "Told NHPR on Nov. 16 the caucus is having \"a really healthy discussion\" about how it runs, without saying whether she'll back Schumer or Van Hollen."],
     ["James Talarico", "TX", "Declined to affirm support when asked.", true],
     ["Chris Pappas", "NH", "Declined to affirm support when asked.", true],
     ["Josh Turek", "IA", "Declined to affirm support when asked.", true],
@@ -1173,24 +1174,21 @@ const SENATORS = {
 const NO_POSITION = [
   ["Adam Schiff", "CA"],
   ["Amy Klobuchar", "MN", "\u2020", "Elected Minnesota governor, so her seat will go to an appointee. Hasn't said publicly where she stands on Schumer."],
-  ["Maggie Hassan", "NH"],
 ];
 const NO_POSITION_DEFAULT = "Hasn't said publicly whether they'll back Schumer for majority leader.";
 const NO_POSITION_NOTE = "\u2020 Elected Minnesota governor. Her seat will go to an appointee.";
 
 /* Previous snapshot for the "On the Record" box, plus who moved since then */
-const PREV = { "Support": 16, "Unclear": 24, "No public position": 6, "Will not support": 5, "Support Van Hollen": 5 };
-const PREV_LABEL = "Change since Nov. 16, 7:15 PM";
+const PREV = { "Support": 16, "Unclear": 27, "No public position": 3, "Will not support": 5, "Support Van Hollen": 5 };
+const PREV_LABEL = "Change since Nov. 17, 9 AM";
 // When the senators in MOVERS moved (short form, e.g. "Nov. 12, 9 AM"). LAST_UPDATED at the top is the time of the
 // latest check, even when that check found no change; if the two differ, the page says there was no change.
-const LAST_MOVE = "Nov. 17, 9 AM";
+const LAST_MOVE = "Nov. 18, 5 PM";
 // Date of the closed-door leader vote. Set movedUp to true only if reputable outlets report the vote was moved earlier (and update date).
 const LEADER_VOTE = { date: "Dec. 1", movedUp: false };
 // Each move: [name, moved FROM, moved TO]. Listed in the order they happened; the page animates them one at a time.
 const MOVERS = [
-  ["John Hickenlooper (CO)", "No public position", "Unclear"],
-  ["Michael Bennet (CO)", "No public position", "Unclear"],
-  ["Lisa Blunt Rochester (DE)", "No public position", "Unclear"],
+  ["Maggie Hassan (NH)", "No public position", "Unclear"],
 ];
 
 // Previous Updates timeline. One entry per update that moved anyone, oldest first; add new entries at the END.
@@ -1255,6 +1253,9 @@ const HISTORY = [
     ["John Hickenlooper", "CO", "No public position", "Unclear", "Made a coin-toss motion when asked who he's supporting (Politico), while telling The Hill that Schumer deserves credit for flipping nine seats."],
     ["Michael Bennet", "CO", "No public position", "Unclear", "Dodged reporters' questions as several veteran senators declined to say how they'll vote (Politico)."],
     ["Lisa Blunt Rochester", "DE", "No public position", "Unclear", "Said of the leadership fight, \"It's a family conversation that we're going to have amongst ourselves,\" without backing either candidate (Politico)."],
+  ]],
+  ["Nov. 18, 5 PM", "", [
+    ["Maggie Hassan", "NH", "No public position", "Unclear", "Told NHPR the caucus is having \"a really healthy discussion\" about how it runs, without saying whether she'll back Schumer or Van Hollen."],
   ]],
 ];
 
@@ -3814,6 +3815,7 @@ const SIM_HISTORY = [
   ["Nov. 18, 2 PM", 31.11, 26, 36, 73.9, 18.7, 7.4, "No change in public positions."],
   ["Nov. 18, 3 PM", 31.11, 26, 36, 73.9, 18.7, 7.4, "No change in public positions."],
   ["Nov. 18, 4 PM", 31.11, 26, 36, 73.9, 18.7, 7.4, "No change in public positions."],
+  ["Nov. 18, 5 PM", 31.1, 26, 36, 73.9, 18.7, 7.4, "Maggie Hassan → Unclear: Told NHPR the caucus is having \"a really healthy discussion\" about how it runs, without saying whether she'll back Schumer or Van Hollen."],
 ];
 
 /* ---------- Simulations tab ---------- */
