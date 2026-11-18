@@ -84,6 +84,7 @@
   .next-up.now .cd { color: #1a8f4c; }
   html.dark .next-up { background: #1b1f24; }
   html.dark .next-up.now .cd { color: #5fd08f; }
+  .vote-cd .cd { color: var(--ink); }
   .news-up { display: inline-flex; align-items: center; gap: 6px; font: 600 10.5px/1 "Inter", system-ui, sans-serif; color: var(--ink);
     background: #fff; border: 1.5px solid var(--rule); border-radius: 6px; padding: 5px 8px; white-space: nowrap; cursor: pointer; }
   .news-up:hover { background: #f6f7f9; }
@@ -896,7 +897,8 @@
     </nav>
     <div class="tool-right">
     <button class="news-up" id="newsUp" type="button" data-noshot hidden></button>
-    <div class="next-up" id="nextUp" title="The tracker is checked every hour from 8 AM to 3 AM Eastern"></div>
+    <div class="next-up vote-cd" id="voteCd" title="Counting down to Dec. 1 at 9 AM Eastern, the first update on the day of the leader vote"></div>
+    <div class="next-up" id="nextUp" title="The tracker is checked every hour from 9 AM to midnight Eastern"></div>
     <button class="shot-btn" id="shotBtn" type="button" data-noshot>
       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
       Screenshot
@@ -4460,10 +4462,10 @@ function focusTimeline() {
 }
 window.addEventListener("scroll", () => { if ((view === "history" || view === "news") && !tlRAF) tlRAF = requestAnimationFrame(() => { tlRAF = 0; focusTimeline(); }); }, { passive: true });
 window.addEventListener("resize", () => focusTimeline());
-/* ---------- Next update countdown (checks run on the hour, 9 AM to midnight Eastern) ---------- */
+/* ---------- Next update countdown (checks for 9 AM to midnight Eastern; each one starts 10 minutes before its hour) ---------- */
 const nextUpEl = document.getElementById("nextUp");
 const CHECK_SKIP = [1, 2, 3, 4, 5, 6, 7, 8];   // Eastern hours with no check (last check is midnight, first is 9 AM)
-const CHECK_GRACE = 15;                 // minutes after the hour that a check is still running
+const CHECK_LEAD = 10;                  // the check for 9 AM starts at 8:50 AM, and so on
 const etFmt = (() => { try { return new Intl.DateTimeFormat("en-US", { timeZone: "America/New_York", hour12: false, hour: "2-digit", minute: "2-digit", second: "2-digit" }); } catch (e) { return null; } })();
 const CLOCK_SVG = `<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>`;
 const ampm = h => (h % 12 || 12) + (h < 12 ? "am" : "pm");
@@ -4471,19 +4473,40 @@ function tickNextUp() {
   if (!nextUpEl || !etFmt) return;
   const parts = {}; etFmt.formatToParts(new Date()).forEach(x => parts[x.type] = +x.value);
   const H = parts.hour % 24, M = parts.minute, S = parts.second;
-  if (!CHECK_SKIP.includes(H) && M < CHECK_GRACE) {
+  if (!CHECK_SKIP.includes((H + 1) % 24) && M >= 60 - CHECK_LEAD) {
     nextUpEl.classList.add("now");
     nextUpEl.innerHTML = `${CLOCK_SVG}<span>Checking for updates</span><span class="cd">now</span>`;
     return;
   }
   let k = 1; while (CHECK_SKIP.includes((H + k) % 24)) k++;
-  const left = k * 3600 - (M * 60 + S), hh = Math.floor(left / 3600), mm = Math.floor(left / 60) % 60, ss = left % 60;
+  const left = k * 3600 - CHECK_LEAD * 60 - (M * 60 + S), hh = Math.floor(left / 3600), mm = Math.floor(left / 60) % 60, ss = left % 60;
   const pad = n => String(n).padStart(2, "0");
   nextUpEl.classList.remove("now");
   nextUpEl.innerHTML = `${CLOCK_SVG}<span>Next Update: ${ampm((H + k) % 24)} Eastern</span><span class="cd">${hh ? hh + ":" + pad(mm) : mm}:${pad(ss)}</span>`;
 }
 tickNextUp();
 setInterval(tickNextUp, 1000);
+
+/* ---------- Countdown to the leader vote (fixed: Dec. 1, 2026 at 9 AM Eastern, the first update that day) ---------- */
+const VOTE_AT = Date.parse("2026-12-01T09:00:00-05:00");
+const voteCdEl = document.getElementById("voteCd");
+const BALLOT_SVG = `<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 11h16v9H4z"/><path d="M8 11V4h8v7"/><path d="M10 7.5l1.5 1.5L14 6.5"/></svg>`;
+function tickVoteCd() {
+  if (!voteCdEl) return;
+  const now = Date.now(), left = Math.floor((VOTE_AT - now) / 1000);
+  if (left <= 0) {
+    if (now - VOTE_AT < 15 * 3600 * 1000) {
+      voteCdEl.classList.add("now");
+      voteCdEl.innerHTML = `${BALLOT_SVG}<span>Leader vote</span><span class="cd">today</span>`;
+    } else voteCdEl.innerHTML = "";
+    return;
+  }
+  const d = Math.floor(left / 86400), h = Math.floor(left / 3600) % 24, m = Math.floor(left / 60) % 60, sec = left % 60;
+  const pad = n => String(n).padStart(2, "0");
+  voteCdEl.innerHTML = `${BALLOT_SVG}<span>Countdown to Dec. 1 vote</span><span class="cd">${d ? d + "d " : ""}${pad(h)}:${pad(m)}:${pad(sec)}</span>`;
+}
+tickVoteCd();
+setInterval(tickVoteCd, 1000);
 
 /* ---------- News timeline ---------- */
 const newsEl = document.getElementById("newsline");
