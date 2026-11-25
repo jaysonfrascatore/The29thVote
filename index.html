@@ -4359,8 +4359,9 @@ function spTip(q) {
   const w = simWin(q), note = q[7] || "", sh = Math.round(1000 * q.s) / 10, first = q.who.split(" ").slice(-1)[0];
   return `<b>${q[0]}</b>
     <div class="tt-sub" style="margin:4px 0 2px">${first}'s vote · ${L(q.cat)}</div>
-    <div class="tt-row"><i style="background:#2F6FD0"></i>Schumer<span>${sh.toFixed(1)}%</span><span></span></div>
-    <div class="tt-row"><i style="background:#12A6CC"></i>Van Hollen<span>${(100 - sh).toFixed(1)}%</span><span></span></div>
+    ${(() => { const rs = `<div class="tt-row"><i style="background:#2F6FD0"></i>Schumer<span>${sh.toFixed(1)}%</span><span></span></div>`,
+      rv = `<div class="tt-row"><i style="background:#12A6CC"></i>Van Hollen<span>${(100 - sh).toFixed(1)}%</span><span></span></div>`;
+      return sh >= 50 ? rs + rv : rv + rs; })()}
     <div class="tt-sub" style="margin:6px 0 2px">The race at this check</div>
     <div class="tt-row"><i style="background:#2F6FD0"></i>Schumer<span>${w.toFixed(1)}%</span><span>${q[1].toFixed(1)} votes</span></div>
     <div class="tt-row"><i style="background:#12A6CC"></i>Van Hollen<span>${(100 - w).toFixed(1)}%</span><span>${(56 - q[1]).toFixed(1)} votes</span></div>
@@ -4386,6 +4387,10 @@ function spOpen(name) {
   const bio = SP_BIO[name] ? SP_BIO[name].map(x => `<p>${x}</p>`).join("") :
     `<p>${elect ? "Senator-elect" : "U.S. senator"} from ${STATE_NAMES[p.st] || p.st}.</p>`;
   const pct = x => Math.round(100 * x) + "%";
+  // Show whichever candidate the senator leans toward (95% Van Hollen, not 5% Schumer)
+  const lean = s => Math.round(100 * s) === 50 ? ["50%", "Each side", "#8a6fd1"] : s >= .5 ? [pct(s), "Schumer", "#2F6FD0"] : [pct(1 - s), "Van Hollen", "#12A6CC"];
+  const leanTxt = s => { const [v, who] = lean(s); return who === "Each side" ? "50% each side" : `${v} ${who}`; };
+  const [nowV, nowWho, nowC] = lean(last.s), [firstV, firstWho] = lean(firstP.s);
   const evRow = v => {
     const m = v.own || v.e[2][0], many = v.e[2].length > 1 && !v.own;
     const imp = v.dRace == null ? `<div class="imp z">—</div>` : Math.abs(v.dRace) < .05 ? `<div class="imp z">No change<small>to the race</small></div>` :
@@ -4394,7 +4399,7 @@ function spOpen(name) {
     return `<div class="sp-ev${v.own ? " own" : ""}">${avatar(m[0], m[1], SP_TO_C[m[3] === "Opposing Schumer" ? "Will not support" : m[3]] || "#B8BDC4", 28)}
       <div><div class="when">${v.e[0]}${many ? ` · ${v.e[2].length} senators moved` : ""}</div>
       ${ms.map(x => `<div class="what"><b>${x[0]}</b> → ${L(x[3] === "Opposing Schumer" ? "Will not support" : x[3])}</div><div class="why">${x[4]}</div>`).join("")}
-      ${v.own ? `<div class="why" style="color:var(--ink);font-weight:700;margin-top:3px">${first}'s chance of voting Schumer: ${pct(v.before)} → ${pct(v.after)}</div>` : ""}</div>
+      ${v.own ? `<div class="why" style="color:var(--ink);font-weight:700;margin-top:3px">${first}'s vote: ${leanTxt(v.before)} → ${leanTxt(v.after)}</div>` : ""}</div>
       ${imp}</div>`;
   };
   wrap.innerHTML = `<div class="sp-in">
@@ -4415,8 +4420,8 @@ function spOpen(name) {
         <div class="sp-st">${elect ? "Senator-elect, " : ""}${STATE_NAMES[p.st] || p.st}</div>
         <div class="sp-badges"><span style="--c:${COLORS[p.cat] || "#B8BDC4"}">${L(p.cat)}</span><span style="--c:${SIM_GC[lab]}">${lab}</span></div>
         <div class="sp-stats">
-          <div><b style="color:var(--sS)">${pct(last.s)}</b><span>Schumer now</span></div>
-          <div><b style="color:var(--muted)">${pct(firstP.s)}</b><span>On ${firstP[0].split(",")[0]}</span></div>
+          <div><b style="color:${nowC}">${nowV}</b><span>${nowWho} now</span></div>
+          <div><b style="color:var(--muted)">${firstV}</b><span>${firstWho} on ${firstP[0].split(",")[0]}</span></div>
         </div>
         <div class="sp-bio">${bio}</div>
         ${note ? `<div class="sp-note"><b style="color:var(--ink)">On the record:</b> ${note}</div>` : ""}
