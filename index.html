@@ -1071,7 +1071,7 @@
     </a>
     </div>
     <p class="note">Senate Democrats elect their leader by secret ballot, expected in December. Senators with no public position are not committed either way. <span style="white-space:nowrap">* Senator-elect</span></p>
-    <p class="src">Sources: CBS News, CBC, Boston Globe, Roll Call, CNN, The Hill, PolitiFact, Washington Times, Washington Examiner, Epoch Times, Punchbowl News, New Republic, NBC News, Spokesman-Review, NBC5 (WPTZ), States Newsroom, Politico, VoteHub, The Washington Sun, Post and Courier, SC Daily Gazette, X &nbsp;·&nbsp; <span style="white-space:nowrap">Created by Jayson Frascatore</span></p>
+    <p class="src">Sources: CBS News, CBC, Boston Globe, Roll Call, CNN, The Hill, PolitiFact, Washington Times, Washington Examiner, Epoch Times, Punchbowl News, New Republic, NBC News, Spokesman-Review, NBC5 (WPTZ), States Newsroom, Politico, VoteHub, The Washington Sun, Post and Courier, SC Daily Gazette, Bangor Daily News, WMTW, X &nbsp;·&nbsp; <span style="white-space:nowrap">Created by Jayson Frascatore</span></p>
   </footer>
 </div>
 
@@ -1101,7 +1101,7 @@ const TOTAL = 56;
 const NEEDED = 29;
 const SUBTITLE = "Public positions of the 56-member Senate Democratic caucus";
 const KOFI_URL = "https://ko-fi.com/jaysonfras";
-const LAST_UPDATED = "Last updated on November 25th, 2026 at 1:00pm";
+const LAST_UPDATED = "Last updated on November 25th, 2026 at 1:45pm";
 
 const SENATORS = {
   "Support": [
@@ -1161,10 +1161,10 @@ const SENATORS = {
     ["Elissa Slotkin", "MI", "Said in a video posted on Nov. 19 that she'll back Van Hollen, adding \"I don't think that Sen. Schumer is best positioned to be our next leader\" (The Washington Sun, <a href='https://x.com/SenatorSlotkin/status/2123555725339226549' target='_blank' rel='noopener' onclick='event.stopPropagation()'>X</a>)."],
     ["Abdul El-Sayed", "MI", "Reiterated his support for Van Hollen after Van Hollen announced on Nov. 12 (CNN). First backed him for leader in April.", true],
     ["Peggy Flanagan", "MN", "Announced on X on Nov. 13 that she's backing Van Hollen for leader. Had already called for new leadership.", true],
+    ["Troy Jackson", "ME", "Said in a statement on Nov. 25 that it's \"time for a change in leadership\" and \"I'll be voting for Senator Van Hollen\" (<a href='https://www.bangordailynews.com/2026/11/25/politics/washington/maine-troy-jackson-chris-van-hollen-senate-majority-leader-support/' target='_blank' rel='noopener' onclick='event.stopPropagation()'>Bangor Daily News</a>, <a href='https://www.wmtw.com/article/maine-sen-elect-troy-jackson-support-van-hollen-majority-leader/74533877' target='_blank' rel='noopener' onclick='event.stopPropagation()'>WMTW</a>). Had long said he wouldn't back Schumer.", true],
   ],
   // Against Schumer, but haven't said who they'd back instead
   "Will not support": [
-    ["Troy Jackson", "ME", "Told Schumer he'll support somebody else.", true],
     ["Juliana Stratton", "IL", "Said through a spokesperson she won't support Schumer.", true],
     ["Adam Hamilton", "KS", "Has said repeatedly he won't vote for Schumer.", true],
   ],
@@ -1179,16 +1179,16 @@ const NO_POSITION_DEFAULT = "Hasn't said publicly whether they'll back Schumer f
 const NO_POSITION_NOTE = "\u2020 Elected Minnesota governor. Her seat will go to an appointee.";
 
 /* Previous snapshot for the "On the Record" box, plus who moved since then */
-const PREV = { "Support": 16, "Unclear": 28, "No public position": 2, "Will not support": 4, "Support Van Hollen": 6 };
-const PREV_LABEL = "Change since Nov. 19, 6:45 PM";
+const PREV = { "Support": 16, "Unclear": 29, "No public position": 2, "Will not support": 3, "Support Van Hollen": 6 };
+const PREV_LABEL = "Change since Nov. 20, 10 AM";
 // When the senators in MOVERS moved (short form, e.g. "Nov. 12, 9 AM"). LAST_UPDATED at the top is the time of the
 // latest check, even when that check found no change; if the two differ, the page says there was no change.
-const LAST_MOVE = "Nov. 20, 10 AM";
+const LAST_MOVE = "Nov. 25, 1:45 PM";
 // Date of the closed-door leader vote. Set movedUp to true only if reputable outlets report the vote was moved earlier (and update date).
 const LEADER_VOTE = { date: "Dec. 1", movedUp: false };
 // Each move: [name, moved FROM, moved TO]. Listed in the order they happened; the page animates them one at a time.
 const MOVERS = [
-  ["Annie Andrews (SC)", "Will not support", "Unclear"],
+  ["Troy Jackson (ME)", "Will not support", "Support Van Hollen"],
 ];
 
 // Previous Updates timeline. One entry per update that moved anyone, oldest first; add new entries at the END.
@@ -1262,6 +1262,9 @@ const HISTORY = [
   ]],
   ["Nov. 20, 10 AM", "", [
     ["Annie Andrews", "SC", "Will not support", "Unclear", "Told reporters she hasn't decided and is meeting with Schumer and Van Hollen before choosing, though she still wants generational change (Post and Courier, SC Daily Gazette)."],
+  ]],
+  ["Nov. 25, 1:45 PM", "", [
+    ["Troy Jackson", "ME", "Will not support", "Support Van Hollen", "Said in a statement that it's \"time for a change in leadership\" and \"I'll be voting for Senator Van Hollen\" (Bangor Daily News, WMTW)."],
   ]],
 ];
 
@@ -3687,7 +3690,7 @@ const SIM_FACTORS = [
   ["Peggy Flanagan", -1, "S", 1, "Tracker: Support Van Hollen", ["Flanagan on X, Nov. 13", "https://x.com/peggyflanagan/status/2121245502545018920"]],
   ["Peggy Flanagan", -1, "G", 1, "Beat the establishment pick (Angie Craig) after campaigning against Schumer's leadership", ["Newsweek, 2026", "https://www.newsweek.com/full-list-democrats-rallying-against-chuck-schumer-senate-12315442"]],
   ["Elissa Slotkin", -1, "S", 1, "Tracker: Support Van Hollen. \"I don't think that Sen. Schumer is best positioned to be our next leader\"", ["Slotkin on X, Nov. 19", "https://x.com/SenatorSlotkin/status/2123555725339226549"]],
-  ["Troy Jackson", -1, "S", .75, "Tracker: Opposing Schumer, no pick yet. Told Schumer he'll \"support somebody else\"", "AJ"],
+  ["Troy Jackson", -1, "S", 1, "Tracker: Support Van Hollen. Said in a statement he'll be voting for Van Hollen", ["Bangor Daily News, Nov. 25", "https://www.bangordailynews.com/2026/11/25/politics/washington/maine-troy-jackson-chris-van-hollen-senate-majority-leader-support/"]],
   ["Troy Jackson", -1, "P", .5, "Ran as a Medicare for All supporter", "CD"],
   ["Juliana Stratton", -1, "S", .75, "Tracker: Opposing Schumer, no pick yet. Said through a spokesperson she won't support him", "AJ"],
   ["Juliana Stratton", -1, "G", 1, "Ran in the primary on not backing Schumer", ["Fox News, March 2026", "https://www.foxnews.com/politics/blue-state-democrat-fast-track-senate-defies-schumer"]],
@@ -3934,6 +3937,7 @@ const SIM_HISTORY = [
   ["Nov. 25, 11 AM", 31.41, 26, 37, 76.1, 17.1, 6.8, "No change in public positions."],
   ["Nov. 25, 12 PM", 31.41, 26, 37, 76.1, 17.1, 6.8, "No change in public positions."],
   ["Nov. 25, 1 PM", 31.41, 26, 37, 76.1, 17.1, 6.8, "No change in public positions."],
+  ["Nov. 25, 1:45 PM", 31.4, 26, 37, 76.2, 17, 6.7, "Troy Jackson → Support Van Hollen: Said in a statement that it's \"time for a change in leadership\" and \"I'll be voting for Senator Van Hollen\" (Bangor Daily News, WMTW)."],
 ];
 
 /* ---------- Simulations tab ---------- */
