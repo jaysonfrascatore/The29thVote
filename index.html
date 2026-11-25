@@ -1101,7 +1101,7 @@ const TOTAL = 56;
 const NEEDED = 29;
 const SUBTITLE = "Public positions of the 56-member Senate Democratic caucus";
 const KOFI_URL = "https://ko-fi.com/jaysonfras";
-const LAST_UPDATED = "Last updated on November 25th, 2026 at 3:00pm";
+const LAST_UPDATED = "Last updated on November 25th, 2026 at 3:45pm";
 
 const SENATORS = {
   "Support": [
@@ -1120,6 +1120,7 @@ const SENATORS = {
     ["Jacky Rosen", "NV", "Endorsed Schumer on Nov. 12, saying he has \"the experience and the fight to continue leading our diverse caucus\" (CBS News)."],
     ["Angela Alsobrooks", "MD", "Told Politico on Nov. 2 that she's supporting Schumer, and Politico again listed her among his public backers on Nov. 15."],
     ["Mazie Hirono", "HI", "Told The Washington Sun she has \"a long history with Chuck\" and that he's helped her on \"some pretty important necessary things.\""],
+    ["Mark Warner", "VA", "Said on Nov. 25: \"Nobody worked harder than Chuck Schumer to secure this historic majority, and he has earned my vote to serve another two years as leader\" (Punchbowl News' Andrew Desiderio on <a href='https://x.com/andrewdesiderio/status/2125682182870147224' target='_blank' rel='noopener' onclick='event.stopPropagation()'>X</a>)."],
     ["Sherrod Brown", "OH", "Senator-elect recruited by Schumer. Publicly supports him.", true],
   ],
   "Unclear": [
@@ -1130,7 +1131,6 @@ const SENATORS = {
     ["Jon Ossoff", "GA", "His campaign wouldn't say whether he'd back Schumer."],
     ["Ben Ray Luján", "NM", "Deflected when asked, pointing out no one is running against Schumer yet."],
     ["Alex Padilla", "CA", "Declined to commit without further conversation."],
-    ["Mark Warner", "VA", "Won't commit, though he praised Schumer's fundraising."],
     ["Martin Heinrich", "NM", "Won't publicly commit to backing Schumer yet."],
     ["Ed Markey", "MA", "Asked after his reelection whether he'd back Schumer, he sidestepped it and said Schumer had called to congratulate him (Boston Globe, Nov. 5)."],
     ["Tammy Duckworth", "IL", "Told The Epoch Times Schumer is \"the only one who's declared\" so far, and that she'll \"consider all options\" if someone else gets in."],
@@ -1179,16 +1179,16 @@ const NO_POSITION_DEFAULT = "Hasn't said publicly whether they'll back Schumer f
 const NO_POSITION_NOTE = "\u2020 Elected Minnesota governor. Her seat will go to an appointee.";
 
 /* Previous snapshot for the "On the Record" box, plus who moved since then */
-const PREV = { "Support": 16, "Unclear": 29, "No public position": 2, "Will not support": 3, "Support Van Hollen": 6 };
-const PREV_LABEL = "Change since Nov. 20, 10 AM";
+const PREV = { "Support": 16, "Unclear": 29, "No public position": 2, "Will not support": 2, "Support Van Hollen": 7 };
+const PREV_LABEL = "Change since Nov. 25, 1:45 PM";
 // When the senators in MOVERS moved (short form, e.g. "Nov. 12, 9 AM"). LAST_UPDATED at the top is the time of the
 // latest check, even when that check found no change; if the two differ, the page says there was no change.
-const LAST_MOVE = "Nov. 25, 1:45 PM";
+const LAST_MOVE = "Nov. 25, 3:45 PM";
 // Date of the closed-door leader vote. Set movedUp to true only if reputable outlets report the vote was moved earlier (and update date).
 const LEADER_VOTE = { date: "Dec. 1", movedUp: false };
 // Each move: [name, moved FROM, moved TO]. Listed in the order they happened; the page animates them one at a time.
 const MOVERS = [
-  ["Troy Jackson (ME)", "Will not support", "Support Van Hollen"],
+  ["Mark Warner (VA)", "Unclear", "Support"],
 ];
 
 // Previous Updates timeline. One entry per update that moved anyone, oldest first; add new entries at the END.
@@ -1265,6 +1265,9 @@ const HISTORY = [
   ]],
   ["Nov. 25, 1:45 PM", "", [
     ["Troy Jackson", "ME", "Will not support", "Support Van Hollen", "Said in a statement that it's \"time for a change in leadership\" and \"I'll be voting for Senator Van Hollen\" (Bangor Daily News, WMTW)."],
+  ]],
+  ["Nov. 25, 3:45 PM", "", [
+    ["Mark Warner", "VA", "Unclear", "Support", "Said \"nobody worked harder than Chuck Schumer to secure this historic majority, and he has earned my vote to serve another two years as leader,\" Punchbowl News' Andrew Desiderio reported on X."],
   ]],
 ];
 
@@ -3649,6 +3652,7 @@ const SIM_FACTORS = [
   ["Mark Warner", 1, "R", .5, "Vice chair of the conference", "LEAD"],
   ["Mark Warner", 1, "R", .5, "Top Democrat on Intelligence (in line to chair it)", "RANK"],
   ["Mark Warner", 1, "G", .5, "Praised Schumer's fundraising while declining to commit", "NW"],
+  ["Mark Warner", 1, "S", 1, "Tracker: Support Schumer. Said Schumer \"has earned my vote\" for another two years as leader", ["Punchbowl News (X), Nov. 25", "https://x.com/andrewdesiderio/status/2125682182870147224"]],
   ["Martin Heinrich", -1, "P", .5, M4A_TXT, "M4A"],
   ["Martin Heinrich", -1, "P", .25, "Named among \"Fight Club\" senators in one opinion piece (not in the NYT core list)", ["The Hill opinion (via AOL), Nov. 2025", "https://www.aol.com/articles/opinion-senate-dems-revolt-against-184950270.html"]],
   ["Martin Heinrich", 1, "R", .5, "Expected Energy chair in the new majority", "JB"],
@@ -3940,6 +3944,7 @@ const SIM_HISTORY = [
   ["Nov. 25, 1:45 PM", 31.4, 26, 37, 76.2, 17, 6.7, "Troy Jackson → Support Van Hollen: Said in a statement that it's \"time for a change in leadership\" and \"I'll be voting for Senator Van Hollen\" (Bangor Daily News, WMTW)."],
   ["Nov. 25, 2 PM", 31.4, 26, 37, 76.2, 17, 6.7, "No change in public positions."],
   ["Nov. 25, 3 PM", 31.4, 26, 37, 76.2, 17, 6.7, "No change in public positions."],
+  ["Nov. 25, 3:45 PM", 31.62, 26, 37, 78, 15.6, 6.5, "Mark Warner → Support Schumer: Said \"nobody worked harder than Chuck Schumer to secure this historic majority, and he has earned my vote to serve another two years as leader,\" Punchbowl News' Andrew Desiderio reported on X."],
 ];
 
 /* ---------- Simulations tab ---------- */
