@@ -1071,7 +1071,7 @@
     </a>
     </div>
     <p class="note">Senate Democrats elect their leader by secret ballot, expected in December. Senators with no public position are not committed either way. <span style="white-space:nowrap">* Senator-elect</span></p>
-    <p class="src">Sources: CBS News, CBC, Boston Globe, Roll Call, CNN, The Hill, PolitiFact, Washington Times, Washington Examiner, Epoch Times, Punchbowl News, New Republic, NBC News, Spokesman-Review, NBC5 (WPTZ), States Newsroom, Politico, VoteHub, The Washington Sun, Post and Courier, SC Daily Gazette, Bangor Daily News, WMTW, X &nbsp;·&nbsp; <span style="white-space:nowrap">Created by Jayson Frascatore</span></p>
+    <p class="src">Sources: CBS News, CBC, Boston Globe, Roll Call, CNN, The Hill, PolitiFact, Washington Times, Washington Examiner, Epoch Times, Punchbowl News, New Republic, NBC News, Spokesman-Review, NBC5 (WPTZ), States Newsroom, Politico, VoteHub, The Washington Sun, Post and Courier, SC Daily Gazette, Bangor Daily News, WMTW, The New Yorker, X &nbsp;·&nbsp; <span style="white-space:nowrap">Created by Jayson Frascatore</span></p>
   </footer>
 </div>
 
@@ -1288,7 +1288,7 @@ const CANDIDATES = [
 // a race called, someone announcing, a wave of support, big reported support or rumors, someone reaching 29, a vote date change)
 // NEWS_UPDATED = the check (short form, like LAST_MOVE) that last added a NEWS entry. When it matches the latest check
 // (LAST_UPDATED), the News light at the top of the page is green; otherwise it's orange.
-const NEWS_UPDATED = "Nov. 23, 1 PM";
+const NEWS_UPDATED = "Nov. 27, 11 AM";
 const NEWS = [
   ["Nov. 3", "", "significant", "Democrats win back the Senate majority",
     "Democrats flip enough seats on election night to take control of the Senate. Schumer calls it a \"generational remake\" of the chamber, and the question of whether he stays on as leader takes off right away.",
@@ -1399,6 +1399,10 @@ const NEWS = [
     "Senate Democrats will hold their closed-door, secret-ballot vote for leader at 9:30 AM on Tuesday, Dec. 1.",
     "No change. The date stays the same; this sets the time.",
     [["Igor Bobic (X)", "https://x.com/igorbobic/status/2124873397674897862"]]],
+  ["Nov. 27", "", "no movement", "Tina Smith: the lobbying is \"happening one on one\"",
+    "Outgoing Minnesota Sen. Tina Smith tells The New Yorker: \"There's a lot of active conversation about this, but I think it's happening one on one. It would not surprise me if you don't see very many people speaking out publicly about how they're going to vote.\"",
+    "No change. Smith is retiring and won't vote in the new caucus, and she didn't say where any of her colleagues stand.",
+    [["The New Yorker", "https://www.newyorker.com/news/the-political-scene/chris-van-hollens-unlikely-bid-for-senate-majority-leader"]]],
 ];
 /* ======================================================================== */
 
@@ -4708,8 +4712,8 @@ renderNews();
   const fresh = NEWS_UPDATED === CHECKED;
   const at = CHECKED.replace(/^.*?,\s*/, "");
   el.classList.toggle("fresh", fresh);
-  el.innerHTML = `<i class="lt" aria-hidden="true"></i><span>${fresh ? `News update at ${at}` : `No new news at ${at}`}</span>`;
-  el.title = fresh ? "The latest check added news. Open the News tab." : `No new news in the latest check. Last news update: ${NEWS_UPDATED}. Open the News tab.`;
+  el.innerHTML = `<i class="lt" aria-hidden="true"></i><span>${fresh ? `News update at ${at}` : `News last updated ${NEWS_UPDATED}`}</span>`;
+  el.title = fresh ? "The latest check added news. Open the News tab." : `No new news in the latest check. News last updated ${NEWS_UPDATED}. Open the News tab.`;
   el.hidden = false;
   el.addEventListener("click", e => { e.stopPropagation(); setView("news"); window.scrollTo({ top: 0 }); });
 })();
