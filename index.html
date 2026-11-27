@@ -977,7 +977,7 @@
       <p class="site-name">The 29th Vote</p>
       <h1>11,111 simulations of the leader vote</h1>
       <p class="subtitle">Each run plays out the secret ballot once: every senator votes Schumer or Van Hollen based on what they've said and done, with shared swings so allies tend to move together.</p>
-      <p class="sim-note"><b>These are simulations, not predictions.</b> The odds come from sourced factors and the weights listed at the bottom of this tab. Lock any senator to a side and everything recalculates from only the runs where that happened.</p>
+      <p class="sim-note"><b>These are simulations, not predictions.</b> The odds come from sourced factors and the weights listed at the bottom of this tab. Lock any senator to a side and all the runs are redone as if they had endorsed that candidate on the record.</p>
     </header>
     <hr>
     <section class="sim-head" id="simHead"></section>
@@ -1008,7 +1008,6 @@
       <p class="sim-sub">How often each senator voted for each candidate across the runs. Open "Why" for the factors and sources behind it, and use S or VH to lock someone to a side.</p>
       <div class="sim-tools" id="simTools">
         <button type="button" data-sort="lean" aria-pressed="true">By lean</button>
-        <button type="button" data-sort="shift" aria-pressed="false">Biggest shifts</button>
         <button type="button" data-sort="name" aria-pressed="false">A to Z</button>
       </div>
       <div class="sstand" id="simStand"></div>
@@ -3014,7 +3013,7 @@ function shotSimsDraw() {
       W / 2, y, 900, { px: 18, lh: 27, align: "center" });
     if (locked) {
       const ls = Object.entries(simLocks).map(([n, v]) => `${n.split(" ").slice(-1)[0]} → ${v ? "Schumer" : "Van Hollen"}`).join(", ");
-      y = P.para(`Counting only the ${simFmt(st.kept)} of ${simFmt(R)} runs where ${ls}.`, W / 2, y + 4, 900, { px: 15, lh: 22, color: T.MUTED, align: "center" });
+      y = P.para(`All ${simFmt(R)} runs redone as if ${ls} had been endorsed on the record.`, W / 2, y + 4, 900, { px: 15, lh: 22, color: T.MUTED, align: "center" });
     }
     y += 14; P.rule(y); y += 52;
     P.text("Projected votes since Nov. 11", W / 2, y, { w: 800, px: 24, align: "center" }); y += 28;
@@ -3107,7 +3106,7 @@ function shotPersonDraw(name) {
 function shotGroupDraw(names, title) {
   const st = simCur, N = SIM.N_RUNS, locked = Object.keys(simLocks).length > 0;
   const HK = k => k === "Opposing Schumer" ? "Will not support" : k;
-  const rows = names.map(n => { const i = SIM.roster.findIndex(r => r.name === n), p = SIM.roster[i];
+  const V = SIMV || SIM, rows = names.map(n => { const i = V.roster.findIndex(r => r.name === n), p = V.roster[i];
     const share = st.kept ? st.per[i] / st.kept : p.p, cnt = st.kept ? st.per[i] : 0;
     return { p, share, cnt, lab: p.fixed != null ? (p.fixed ? "Safe Schumer" : "Safe Van Hollen") : simLabel(share) }; });
   // If everyone picked moved together in their latest update, show that move at the top
@@ -3123,7 +3122,7 @@ function shotGroupDraw(names, title) {
         P2.text(s.toUpperCase(), x, y, { w: 800, px, color: c ? (TEXT_COLORS[c] || T.MUTED) : T.MUTED }); x += ws[i] - (c ? 24 : 0) + 12; });
     } : null;
     let y = shotHeader(P, { kicker, title,
-      sub: `How often each one votes for Schumer or Van Hollen across ${simFmt(st.kept)} simulated leader votes${locked ? ", counting only runs that match your locks" : ""}. ${shotAsOf()}.` });
+      sub: `How often each one votes for Schumer or Van Hollen across ${simFmt(st.kept)} simulated leader votes${locked ? ", with your locks scored as on-record endorsements" : ""}. ${shotAsOf()}.` });
     for (const r of rows) {
       P.rule(y);
       const c = r.p.fixed === 1 ? "#03045E" : r.p.fixed === 0 ? "#06566B" : COLORS[r.p.cat] || "#B8BDC4", cy = y + 64;
@@ -3991,14 +3990,20 @@ const SIM_HISTORY = [
 
 /* ---------- Simulations tab ---------- */
 let SIM = null;
-const simBuild = () => {
+// locks: { name: 1 (Schumer) | 0 (Van Hollen) }. A locked senator is scored exactly like an on-record endorser
+// (their public-stance line swapped for a full-strength one), then all runs are redone with the same seed.
+const simBuild = (locks = {}) => {
   const S = SIM_SETTINGS, N_RUNS = S.runs;
   const roster = [];
   CATS.forEach(c => { if (c === "No public position") return; (SENATORS[c] || []).forEach(r => roster.push({ name: r[0], st: r[1], cat: c })); });
   NO_POSITION.forEach(r => roster.push({ name: r[0], st: r[1], cat: "No public position" }));
   const src = k => Array.isArray(k) ? k : (SRC[k] || ["", ""]);
   roster.forEach(p => {
-    p.factors = SIM_FACTORS.filter(f => f[0] === p.name).map(f => {
+    let fs = SIM_FACTORS.filter(f => f[0] === p.name);
+    if (locks[p.name] != null) fs = fs.filter(f => f[2] !== "S").concat([[p.name, locks[p.name] ? 1 : -1, "S", 1,
+      `What-if: you locked this senator to ${locks[p.name] ? "Schumer" : "Van Hollen"}, so they're scored like an on-record endorsement`, ["Your lock", ""]]]);
+    p.locked = locks[p.name] != null;
+    p.factors = fs.map(f => {
       const [lbl, w] = SIM_WEIGHTS[f[2]];
       return { side: f[1], type: lbl, strength: f[3], what: f[4], src: src(f[5]), pts: f[1] * w * f[3] };
     });
@@ -4056,7 +4061,7 @@ const simBuild = () => {
 const simEl = id => document.getElementById(id);
 const simFmt = n => n.toLocaleString("en-US");
 const simPct = (a, b) => b ? Math.round(100 * a / b) : 0;
-let simLocks = {}, simBase = null, simCur = null, simSort = "lean", simPick = null, simFilter = null;
+let SIMV = null, simLocks = {}, simBase = null, simCur = null, simSort = "lean", simPick = null, simFilter = null;
 function simLabel(p) {
   const S = SIM_SETTINGS, m = Math.max(p, 1 - p), side = p > .5 ? "Schumer" : "Van Hollen";
   if (m >= S.safe) return "Safe " + side; if (m >= S.likely) return "Likely " + side; if (m >= S.lean) return "Lean " + side; return "Toss-up";
@@ -4066,7 +4071,8 @@ const SIM_GC = { "Safe Schumer": "#2F6FD0", "Likely Schumer": "#5d8fdc", "Lean S
 function simPaint() {
   if (!SIM) SIM = simBuild();
   if (!simBase) simBase = SIM.stats({});
-  simCur = Object.keys(simLocks).length ? SIM.stats(simLocks) : simBase;
+  SIMV = Object.keys(simLocks).length ? simBuild(simLocks) : SIM;
+  simCur = SIMV === SIM ? simBase : SIMV.stats({});
   const st = simCur, R = SIM.N_RUNS, locked = Object.keys(simLocks).length > 0;
   // Headline
   const lead = st.sWin >= st.vWin ? "s" : "v";
@@ -4077,7 +4083,7 @@ function simPaint() {
     card("v", simPct(st.vWin, st.kept) + "%", "Van Hollen reaches 29", `${simFmt(st.vWin)} of ${simFmt(st.kept)} runs`, avatar("Chris Van Hollen", "MD", "#06566B", 46)),
   ].join("") : `<p class="sim-sub" style="grid-column:1/-1">None of the ${simFmt(R)} runs match every lock you set. Remove one to see results.</p>`;
   simEl("simMedian").innerHTML = st.kept ? `In the middle run, Schumer gets <b>${st.med} votes</b> to Van Hollen's <b>${56 - st.med}</b>. Most runs (the middle 80%) land between <b>${st.lo} and ${st.hi}</b> for Schumer. Counting a tie as a coin flip, that's a <b style="color:#2F6FD0">${(100 * (st.sWin + st.tie / 2) / st.kept).toFixed(1)}%</b> chance for Schumer and <b style="color:#0e8cab">${(100 * (st.vWin + st.tie / 2) / st.kept).toFixed(1)}%</b> for Van Hollen.` +
-    (locked ? `<br><span style="color:var(--muted)">Counting only the ${simFmt(st.kept)} of ${simFmt(R)} runs that match your locks.</span>` : "") : "";
+    (locked ? `<br><span style="color:var(--muted)">All ${simFmt(R)} runs redone as if your locked senators had endorsed on the record. Everyone else keeps their own odds.</span>` : "") : "";
   // Lock chips
   const lk = simEl("simLocks"); lk.hidden = !locked;
   lk.innerHTML = Object.entries(simLocks).map(([n, v]) => { const p = SIM.roster.find(x => x.name === n);
@@ -4106,10 +4112,10 @@ function simHist() {
 }
 function simMini(r) {
   // Small half-circle: Schumer votes from the left, Van Hollen from the right
-  const N = SIM.N; const tot = [12, 13, 15, 16];
+  const V = SIMV || SIM, N = V.N; const tot = [12, 13, 15, 16];
   const pts = []; tot.forEach((cnt, ri) => { const rad = 40 + ri * 14; for (let j = 0; j < cnt; j++) { const a = Math.PI * (1 - j / (cnt - 1)); pts.push([100 + rad * Math.cos(a), 98 - rad * Math.sin(a), a]); } });
   pts.sort((a, b) => b[2] - a[2]);
-  const order = SIM.roster.map((p, i) => ({ p, i, v: SIM.votes[r * N + i] })).sort((a, b) => (b.v - a.v) || (b.p.p - a.p.p));
+  const order = V.roster.map((p, i) => ({ p, i, v: V.votes[r * N + i] })).sort((a, b) => (b.v - a.v) || (b.p.p - a.p.p));
   return `<svg viewBox="0 0 200 104">` + order.map((o, j) => { const [x, y] = pts[j];
     const surprise = (o.v && o.p.p < .5) || (!o.v && o.p.p > .5);
     return `<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="5" fill="${o.v ? "#2F6FD0" : "#12A6CC"}" ${surprise ? 'stroke="#f2b134" stroke-width="2"' : 'stroke="var(--bgx,#fff)" stroke-width="1"'}><title>${o.p.name} (${o.p.st}): ${o.v ? "Schumer" : "Van Hollen"}</title></circle>`; }).join("") + `</svg>`;
@@ -4117,12 +4123,12 @@ function simMini(r) {
 function simSamples() {
   const el = simEl("simSamples");
   if (simPick == null) { el.innerHTML = ""; return; }
-  const pool = simCur.runs.filter(r => SIM.sCount[r] === simPick);
+  const V = SIMV || SIM, pool = simCur.runs.filter(r => V.sCount[r] === simPick);
   if (!pool.length) { el.innerHTML = ""; return; }
   const pick = [0, 1, 2].map(j => pool[Math.floor((j + .5) * pool.length / 3)]).filter((r, j, a) => r != null && a.indexOf(r) === j);
   el.innerHTML = pick.map(r => {
-    const s = SIM.sCount[r], N = SIM.N;
-    const sur = SIM.roster.map((p, i) => ({ p, v: SIM.votes[r * N + i] })).filter(o => o.p.fixed == null && ((o.v && o.p.p < .5) || (!o.v && o.p.p > .5)));
+    const s = V.sCount[r], N = V.N;
+    const sur = V.roster.map((p, i) => ({ p, v: V.votes[r * N + i] })).filter(o => o.p.fixed == null && ((o.v && o.p.p < .5) || (!o.v && o.p.p > .5)));
     const surS = sur.filter(o => o.v).map(o => o.p.name.split(" ").slice(-1)[0]), surV = sur.filter(o => !o.v).map(o => o.p.name.split(" ").slice(-1)[0]);
     return `<div class="sample"><b>Run #${simFmt(r + 1)}</b><div class="res" style="color:${s >= 29 ? "#2F6FD0" : s <= 27 ? "#12A6CC" : "#8a6fd1"}">${s >= 29 ? "Schumer wins" : s <= 27 ? "Van Hollen wins" : "Tie"}, ${s}–${56 - s}</div>${simMini(r)}` +
       `<div class="sur">${surV.length ? `<b>Leaned Schumer, voted Van Hollen:</b> ${surV.join(", ")}<br>` : ""}${surS.length ? `<b>Leaned Van Hollen, voted Schumer:</b> ${surS.join(", ")}` : ""}${!sur.length ? "Everyone voted the way they lean." : ""}</div></div>`;
@@ -4223,8 +4229,8 @@ let simRsz = null, simLastW = 0;
 window.addEventListener("resize", () => { clearTimeout(simRsz); simRsz = setTimeout(() => { const w = (simEl("simTrendWin") || {}).clientWidth; if (view === "sims" && SIM && w && w !== simLastW) { simLastW = w; simTrend(); } }, 150); });
 document.addEventListener("pointerdown", e => { if (!e.target.closest(".trend")) document.querySelectorAll(".trend").forEach(t => t._hide && t._hide()); });
 function simList() {
-  const st = simCur, N = SIM.N, base = simBase;
-  const rows = SIM.roster.map((p, i) => ({ p, i, share: st.kept ? st.per[i] / st.kept : p.p, b: base.per[i] / base.kept }));
+  const st = simCur, V = SIMV || SIM, base = simBase;
+  const rows = V.roster.map((p, i) => ({ p, i, share: st.kept ? st.per[i] / st.kept : p.p, b: base.per[i] / base.kept }));
   rows.forEach(r => { r.shift = r.share - r.b; r.lab = r.p.fixed != null ? (r.p.fixed ? "Safe Schumer" : "Safe Van Hollen") : simLabel(r.share); });
   const row = r => {
     const p = r.p, lk = simLocks[p.name], pctS = Math.round(100 * r.share), cnt = st.kept ? st.per[r.i] : 0, c = SIM_GC[r.lab];
@@ -4250,10 +4256,8 @@ function simList() {
     SIM_GROUPS.forEach(g => { const rs = shown.filter(r => r.lab === g); if (rs.length) html += `<div class="sgroup"><h3 style="--c:${SIM_GC[g]}"><i></i>${g} <span>${rs.length}</span></h3>${rs.map(row).join("")}</div>`; });
   } else {
     const rows = shown;
-    if (simSort === "shift") rows.sort((a, b) => Math.abs(b.shift) - Math.abs(a.shift) || b.share - a.share);
-    else rows.sort((a, b) => a.p.name.split(" ").slice(-1)[0].localeCompare(b.p.name.split(" ").slice(-1)[0]));
+    rows.sort((a, b) => a.p.name.split(" ").slice(-1)[0].localeCompare(b.p.name.split(" ").slice(-1)[0]));
     html = `<div class="sgroup">${rows.map(row).join("")}</div>`;
-    if (simSort === "shift" && !Object.keys(simLocks).length) html = `<p class="sim-sub">Lock a senator to a side first, then this shows who moves most with them.</p>` + html;
   }
   const open = new Set([...document.querySelectorAll("#simList details[open]")].map(d => d.closest(".srow").dataset.name));
   simEl("simList").innerHTML = html;
@@ -4539,7 +4543,7 @@ function simMethod() {
     <table><tr><td><b>Type</b></td><td><b>Weight</b></td></tr>${Object.values(SIM_WEIGHTS).map(([n, w]) => `<tr><td>${n}</td><td>${w.toFixed(2)}</td></tr>`).join("")}</table>
     <p>The <b>strength</b> is how solid that one piece of evidence is, from 0.25 (one outlet's read, or an old statement) to 1 (said it themselves, holds the post, or is on the bill). A factor's points are <b>weight × strength</b>, counted as plus for Schumer and minus for Van Hollen. For example, a senator who said on the record they'll back Schumer gets 2.00 × 1 = <b>+2.00</b>. One who said they won't back Schumer but hasn't picked Van Hollen gets 2.00 × 0.75 = <b>−1.50</b>. A Medicare for All cosponsor gets 0.50 × 0.5 = <b>−0.25</b>. The points in each senator's "Why" list are already multiplied out.</p>
     <p>A senator's score is all their points added up. A score turns into odds with a logistic curve (steepness ${S.k}), capped at ${Math.round(S.ceiling * 100)}% and ${Math.round(S.floor * 100)}% because the ballot is secret. Schumer and Van Hollen always vote for themselves.</p>
-    <p>Each run also draws shared swings: one for the whole caucus, one for senators tied to the progressive wing (Medicare for All, "Fight Club"), one for senators tied to leadership (party posts, committee gavels, Schumer recruits), and one for each state's pair. That's why locking one senator moves others. The runs use a fixed seed, so everyone sees the same ${simFmt(SIM.N_RUNS)}.</p>
+    <p>Each run also draws shared swings: one for the whole caucus, one for senators tied to the progressive wing (Medicare for All, "Fight Club"), one for senators tied to leadership (party posts, committee gavels, Schumer recruits), and one for each state's pair. Locking a senator swaps their public-stance line for a full on-record endorsement (+2.00 or −2.00) and redoes every run with the same seed, so they're scored like any senator who has endorsed, still capped at ${Math.round(S.ceiling * 100)}%, and nobody else's odds change. The runs use a fixed seed, so everyone sees the same ${simFmt(SIM.N_RUNS)}.</p>
     <p>The vote is set for <b>${LEADER_VOTE.date}</b>. If it gets moved up, every senator except the two candidates gets a small nudge toward Schumer, worth about <b>1.25 votes</b> in total, since an earlier vote leaves less time for defections and reads as a show of confidence.${LEADER_VOTE.movedUp ? " <b>That nudge is on now.</b>" : ""}</p>
     <p>The two charts at the top go back to the tracker's launch on Nov. 11. Earlier points were rebuilt from each senator's tracker position at that hour, using the same factors and weights, and only at times inside the hourly check window (8 AM to 1 AM through Nov. 14, 9 AM to midnight since). A 28–28 tie counts as half a win for each candidate.</p>`;
 }
